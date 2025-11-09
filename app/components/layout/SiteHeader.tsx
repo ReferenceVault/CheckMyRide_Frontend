@@ -10,19 +10,18 @@ type NavLink = {
 
 interface SiteHeaderProps {
   navLinks: NavLink[];
-  onBookInspection: () => void;
 }
 
-export default function SiteHeader({ navLinks, onBookInspection }: SiteHeaderProps) {
+export default function SiteHeader({ navLinks }: SiteHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <nav className="sticky top-0 z-50 bg-white shadow-[0_8px_24px_-20px_rgba(15,23,42,0.35)]">
       <div className="px-4 sm:px-[8%] lg:px-[15%]">
         <div className="relative mx-auto flex max-w-7xl items-center justify-between py-4">
-          <Link href="/" className="relative flex items-center gap-2 sm:gap-3">
-            <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-white via-white/90 to-white/70 shadow-lg shadow-[#E54E3D]/20">
-              <img src="/images/logo.png" alt="CheckMyRide" className="h-10 w-10 object-contain" />
+          <Link href="/" className="relative flex items-center">
+            <div className="relative flex h-14 w-14 items-center justify-center sm:h-16 sm:w-16">
+              <img src="/images/logo.png" alt="CheckMyRide" className="h-full w-full object-contain" />
             </div>
             <span className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1f2a37]">
               Check<span className="text-[#E54E3D]">MyRide</span>
@@ -42,16 +41,12 @@ export default function SiteHeader({ navLinks, onBookInspection }: SiteHeaderPro
                 </Link>
               ))}
             </div>
-            <button
-              onClick={onBookInspection}
+            <Link
+              href="/book-appointment#booking-form"
               className="hidden md:inline-flex items-center gap-2 rounded-full bg-[#E54E3D] px-5 sm:px-6 py-2.5 text-sm sm:text-base font-semibold uppercase tracking-wide text-white shadow-lg shadow-[#E54E3D]/40 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#d14130]"
             >
               Book Inspection
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14" />
-                <path d="m13 6 6 6-6 6" />
-              </svg>
-            </button>
+            </Link>
             <button
               type="button"
               onClick={() => setIsMenuOpen((prev) => !prev)}
@@ -81,19 +76,13 @@ export default function SiteHeader({ navLinks, onBookInspection }: SiteHeaderPro
                     {item.label}
                   </Link>
                 ))}
-                <button
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    onBookInspection();
-                  }}
+                <Link
+                  href="/book-appointment#booking-form"
+                  onClick={() => setIsMenuOpen(false)}
                   className="mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-[#E54E3D] px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white shadow-md shadow-[#E54E3D]/30"
                 >
                   Book Inspection
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="m13 6 6 6-6 6" />
-                  </svg>
-                </button>
+                </Link>
               </nav>
             </div>
           )}
