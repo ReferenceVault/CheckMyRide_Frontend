@@ -11,11 +11,10 @@ const serviceLinks = [
 ];
 
 const companyLinks = [
-  { label: 'About Us', href: '#' },
-  { label: 'Our Team', href: '#' },
-  { label: 'Careers', href: '#' },
-  { label: 'Blog', href: '#' },
-  { label: 'FAQ', href: '#' },
+  { label: 'About Us', href: '/about' },
+  { label: 'Join Our Team', href: '/careers' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'FAQ', href: '/faq' },
 ];
 
 export default function SiteFooter() {
@@ -33,11 +32,11 @@ export default function SiteFooter() {
         <div className="mx-auto max-w-6xl grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-6">
             <div>
-              <Link href="/" className="inline-flex items-center gap-3">
-                <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 shadow-lg shadow-black/20">
-                  <img src="/images/logo.png" alt="CheckMyRide" className="h-10 w-10 object-contain" />
+              <Link href="/" className="inline-flex items-center">
+                <div className="relative flex h-14 w-14 items-center justify-center sm:h-16 sm:w-16">
+                  <img src="/images/logo.png" alt="CheckMyRide" className="h-full w-full object-contain" />
                 </div>
-                <span className="text-2xl font-bold tracking-tight text-[#152032]">
+                <span className="ml-1 text-2xl font-bold tracking-tight text-[#152032]">
                   Check<span className="text-[#E54E3D]">MyRide</span>
                 </span>
               </Link>
@@ -162,13 +161,9 @@ export default function SiteFooter() {
         <div className="mx-auto flex max-w-6xl flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:text-base text-[#687385]">
           <p>
             © 2025 CheckMyRide. All Rights Reserved.{' '}
-            <a className="hover:text-[#E54E3D]" href="#">
-              Privacy Policy
-            </a>
-            {' | '}
-            <a className="hover:text-[#E54E3D]" href="#">
-              Terms of Service
-            </a>
+            <Link className="hover:text-[#E54E3D]" href="/privacy-terms">
+              Privacy Policy and Terms of Service
+            </Link>
           </p>
           <div className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#475569]">
             <span>Vehicles</span>

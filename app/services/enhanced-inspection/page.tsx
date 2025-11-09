@@ -1,41 +1,83 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import BookingModal from '../../components/BookingModal';
 import SiteFooter from '../../components/layout/SiteFooter';
 import SiteHeader from '../../components/layout/SiteHeader';
 
-const checklist = [
-  '75+ point chassis, drivetrain, and interior evaluation',
-  'Advanced OBD-II scanning with freeze-frame data retention',
-  'Thermal imaging sweep for battery, brakes, and HVAC hotspots',
-  'Fluid sampling (engine oil + coolant) with contamination scoring',
-  'Underbody corrosion and leak documentation using lift imagery',
-  'Road test telemetry covering acceleration, braking, and NVH',
+const targetAudience = [
+  'Buyers considering vehicles with 80,000-150,000 km',
+  'Vehicles that are 5-10 years old',
+  'Buyers who want diagnostic computer scanning included',
+  'Vehicles with potential electrical or engine concerns',
+  'Buyers making a significant financial investment',
+  'Drivers who want our most popular, comprehensive option',
 ];
 
-const highlights = [
+const deliverables = [
+  'Comprehensive digital inspection report with findings',
+  'Ratings for each inspected component',
+  'Summary of inspector notes and comments',
+  'Recommendations for your purchase decision',
+];
+
+const inclusionSections = [
   {
-    title: 'Best for modern vehicles',
+    title: 'Advanced Body Inspection',
     description:
-      'Ideal if you are shopping late-model or high-mileage cars that rely on sophisticated electronics. We interrogate every module and fluid system for hidden warning signs.',
+      'Beyond surface checks, we analyze paint finish consistency and look for subtle signs of bodywork that can reveal undisclosed collision repairs.',
   },
   {
-    title: 'Inspection window',
+    title: 'Comprehensive Undercarriage Examination',
     description:
-      'We typically deploy within 24 hours. The diagnostics package extends the appointment by ~45 minutes so every subsystem is stress-tested.',
+      'We perform a deep review of the chassis for rust, cracks, or damage. Exhaust components receive enhanced scrutiny for leaks, corrosion, and abnormal noise.',
   },
   {
-    title: 'Deliverables',
+    title: 'Expanded Fluid Inspection',
     description:
-      'Interactive report, lab results, annotated photos, and a technician video recap to guide your next move.',
+      'In addition to standard fluids, we inspect transmission fluid level and condition—an essential indicator of transmission health and service history.',
   },
+  {
+    title: 'Belts & Hoses Inspection',
+    description:
+      'All accessible drive belts are checked for cracks or fraying while hoses are examined for swelling, leaks, or deterioration that could lead to breakdowns.',
+  },
+  {
+    title: 'Extended Test Drive',
+    description:
+      'A minimum five-mile evaluation across city and highway speeds measures acceleration smoothness, shift points, braking performance, and NVH characteristics.',
+  },
+];
+
+const diagnosticUpgrades = [
+  {
+    title: 'OBD-II Computer Scan',
+    description:
+      'We interrogate the onboard diagnostic system to capture current and pending trouble codes—surfacing emissions, sensor, or powertrain issues before lights appear.',
+  },
+  {
+    title: 'Battery Load Test',
+    description:
+      'A professional load test reveals the battery’s true condition and remaining lifespan, not just whether it starts the vehicle today.',
+  },
+  {
+    title: 'Alternator Output Test',
+    description:
+      'We verify the alternator is charging at the correct voltage under load to prevent unexpected no-start or electrical failures.',
+  },
+  {
+    title: 'Cooling System Pressure Test',
+    description:
+      'Pressurization checks for hidden leaks within the cooling system that can lead to overheating or major repairs if left undiscovered.',
+  },
+];
+
+const valueHighlights = [
+  'Popular choice for vehicles sitting in the 5-10 year, 80-150k km sweet spot',
+  'Diagnostic testing exposes electrical and emissions issues invisible to the eye',
+  'Balances depth and value—chosen by 65% of customers for added peace of mind',
 ];
 
 export default function EnhancedInspectionPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const navLinks = [
     { label: 'Home', href: '/' },
     { label: 'Services', href: '/#features' },
@@ -84,9 +126,9 @@ export default function EnhancedInspectionPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <BookingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-      <SiteHeader navLinks={navLinks} onBookInspection={() => setIsModalOpen(true)} />
+      <SiteHeader navLinks={navLinks} />
 
+      {/* Hero */}
       <section className="relative overflow-hidden bg-[#0f172a] px-[12%] sm:px-[14%] lg:px-[15%] pt-14 pb-16 sm:pt-16 sm:pb-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.22),transparent_60%),radial-gradient(circle_at_bottom_right,rgba(249,115,98,0.18),transparent_60%),radial-gradient(circle_at_center,rgba(252,165,143,0.14),transparent_65%)]" />
         <div className="pointer-events-none hidden lg:block">
@@ -108,17 +150,20 @@ export default function EnhancedInspectionPage() {
 
         <div className="relative mx-auto max-w-4xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-white/75">
-            Enhanced Inspection
+            Enhanced Inspection • $200
           </span>
           <h1 className="mt-6 text-3xl sm:text-4xl lg:text-[2.9rem] font-bold leading-tight text-white">
-            Deeper diagnostics for modern drivetrains
+            Comprehensive Diagnostics Before You Commit
           </h1>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-6 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-white shadow-lg shadow-black/20 ring-1 ring-white/30">
+            Inspection Duration: 60-90 Minutes
+          </div>
           <p className="mt-5 text-lg sm:text-xl leading-relaxed text-white/80">
-            Step beyond the basics with expanded diagnostics, fluid analysis, and underbody imaging. This package is engineered to reveal issues hiding behind sensors and dashboards.
+            The Enhanced Inspection is our most popular package, ideal for vehicles five to ten years old or with moderate mileage. With a 75+ point assessment and advanced diagnostics, it provides the extra assurance you need before making a significant investment.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <button
-              onClick={() => setIsModalOpen(true)}
+            <Link
+              href="/book-appointment?service=enhanced#booking-form"
               className="group inline-flex items-center gap-3 rounded-full bg-[#E54E3D] px-8 py-4 text-base font-semibold uppercase tracking-wide text-white shadow-lg shadow-[#E54E3D]/40 transition-all hover:-translate-y-0.5 hover:bg-[#d14130]"
             >
               Book This Inspection
@@ -126,7 +171,7 @@ export default function EnhancedInspectionPage() {
                 <path d="M5 12h14" />
                 <path d="m13 6 6 6-6 6" />
               </svg>
-            </button>
+            </Link>
             <Link
               href="/#features"
               className="inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white transition-all hover:-translate-y-0.5 hover:border-white"
@@ -140,60 +185,270 @@ export default function EnhancedInspectionPage() {
         </div>
       </section>
 
+      {/* Audience + Overview */}
       <section className="relative px-[12%] sm:px-[14%] lg:px-[15%] py-16 sm:py-20">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#fef4f1] via-transparent to-transparent" />
         <div className="relative mx-auto max-w-6xl">
-          <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold leading-tight text-[#0f172a]">
-              What <span className="text-[#E54E3D]">We Deliver</span>
-            </h2>
-            <p className="mt-4 text-base sm:text-lg leading-relaxed text-[#3a4a61]">
-              Expanded coverage to expose electrical, thermal, and mechanical risk before you buy.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/60 ring-1 ring-slate-100">
-              <h3 className="text-lg font-semibold text-[#152032]">Inspection Checklist</h3>
-              <ul className="mt-6 space-y-4 text-[#3f4756]">
-                {checklist.map((item) => (
-                  <li key={item} className="flex gap-3 text-sm sm:text-base">
-                    <span className="mt-1 flex h-2.5 w-2.5 rounded-full bg-[#E54E3D]" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="group inline-flex items-center justify-center gap-3 rounded-full bg-[#f36f51] px-7 py-3.5 text-sm font-semibold uppercase tracking-wide text-black shadow-lg shadow-[#f36f51]/30 transition-all hover:-translate-y-0.5 hover:bg-[#e75f3c]"
-                >
-                  Book Now
-                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="m13 6 6 6-6 6" />
-                  </svg>
-                </button>
-                <Link
-                  href="/#pricing"
-                  className="inline-flex items-center justify-center gap-3 rounded-full border border-[#CBD5F5]/60 px-7 py-3.5 text-sm font-semibold uppercase tracking-wide text-[#1f2a37] transition-all hover:-translate-y-0.5 hover:border-[#CBD5F5]"
-                >
-                  View Pricing
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="m13 6 6 6-6 6" />
-                  </svg>
-                </Link>
+          <div className="grid gap-8 lg:grid-cols-3">
+            <div className="relative overflow-hidden rounded-[2rem] bg-[#0f172a] p-10 text-white shadow-2xl shadow-[#0f172a]/30">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(248,113,96,0.28),transparent_55%)]" />
+              <div className="relative">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/70">
+                  Audience Fit
+                </span>
+                <h3 className="mt-4 text-2xl font-semibold text-white">Who It&apos;s For</h3>
+                <p className="mt-3 text-sm text-white/70">
+                  Tailor-made for shoppers evaluating more seasoned vehicles or those with emerging electronic concerns.
+                </p>
+                <ul className="mt-8 space-y-4 text-sm sm:text-base leading-relaxed text-white/90">
+                  {targetAudience.map((item) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <span className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-white/15 text-xs font-semibold text-[#FCD34D] shadow-inner shadow-black/20">
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path d="M8.5 13.38 5.53 10.4l-.71.7 3.68 3.68 6.89-6.9-.71-.7Z" />
+                        </svg>
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
 
-            <div className="flex flex-col gap-6">
-              {highlights.map((highlight) => (
-                <div key={highlight.title} className="rounded-3xl bg-[#fdf3ef] p-6 shadow-inner shadow-[#fcd8ce]/40">
-                  <h3 className="text-base font-semibold text-[#E54E3D] uppercase tracking-wide">{highlight.title}</h3>
-                  <p className="mt-3 text-sm sm:text-base leading-relaxed text-[#3f4756]">{highlight.description}</p>
+            <div className="relative overflow-hidden rounded-[2rem] border border-[#dbe4ff] bg-white p-10 shadow-xl shadow-[#c7d2fe]/40">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(15,23,42,0.08),transparent_60%)]" />
+              <div className="relative">
+                <span className="inline-flex items-center gap-2 rounded-full bg-[#f3f6ff] px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#4c5d81]">
+                  What You Can Expect
+                </span>
+                <h3 className="mt-4 text-2xl font-semibold text-[#0f172a]">Depth that goes beyond visual checks</h3>
+                <p className="mt-4 text-sm sm:text-base leading-relaxed text-[#3f4756]">
+                  Expect an expanded appointment that explores drivability, electronics, and component wear more thoroughly than the Standard package. Findings are prioritized so you know where to negotiate or walk away.
+                </p>
+                <p className="mt-8 text-xs font-semibold uppercase tracking-[0.35em] text-[#39496b]">
+                  Rapid turnaround with digital report in six hours or less.
+                </p>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[2rem] border border-[#fde2db] bg-gradient-to-br from-[#fff4f1] via-white to-[#fffafa] p-10 shadow-xl shadow-[#f8d8cf]/45">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.14),transparent_60%)]" />
+              <div className="relative">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/60 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#E54E3D]">
+                  Deliverables
+                </span>
+                <h3 className="mt-4 text-2xl font-semibold text-[#0f172a]">What You Receive</h3>
+                <p className="mt-3 text-sm text-[#3f4756]">
+                  Every conclusion is backed by evidence—photos, diagnostic snapshots, and technician commentary.
+                </p>
+                <ul className="mt-8 space-y-4 text-sm sm:text-base leading-relaxed text-[#3f4756]">
+                  {deliverables.map((item) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <span className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#E54E3D]/10 text-xs font-semibold text-[#E54E3D] shadow-inner shadow-[#fcd8ce]/50">
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path d="M8.5 13.38 5.53 10.4l-.71.7 3.68 3.68 6.89-6.9-.71-.7Z" />
+                        </svg>
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What's Included */}
+      <section className="relative bg-[#f9fbff] px-[12%] sm:px-[14%] lg:px-[15%] py-16 sm:py-20">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(229,78,61,0.08),transparent_60%)]" />
+        <div className="relative mx-auto max-w-6xl">
+          <div className="text-center">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-[#0f172a]">
+              Everything from Standard <span className="text-[#E54E3D]">Plus</span>
+            </h2>
+            <p className="mt-4 text-base sm:text-lg leading-relaxed text-[#3a4a61]">
+              Enhanced coverage that digs deeper into structural integrity, fluids, and on-road performance before you finalize the deal.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {inclusionSections.map((item) => (
+              <div key={item.title} className="relative overflow-hidden rounded-3xl bg-white p-7 shadow-lg shadow-slate-200/60 ring-1 ring-slate-100">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(15,23,42,0.08),transparent_60%)]" />
+                <div className="relative">
+                  <h3 className="text-lg font-semibold text-[#0f172a]">{item.title}</h3>
+                  <p className="mt-3 text-sm sm:text-base leading-relaxed text-[#3f4756]">{item.description}</p>
                 </div>
-              ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Diagnostic Testing */}
+      <section className="relative px-[12%] sm:px-[14%] lg:px-[15%] py-16 sm:py-20">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white via-transparent to-transparent" />
+        <div className="relative mx-auto max-w-6xl">
+          <div className="text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#E54E3D]/30 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-[#E54E3D]">
+              Diagnostic Testing • The Enhanced Difference
+            </span>
+            <h2 className="mt-5 text-2xl sm:text-3xl md:text-4xl font-bold leading-tight text-[#0f172a]">
+              Data-backed insights before you sign
+            </h2>
+            <p className="mt-4 text-base sm:text-lg leading-relaxed text-[#3a4a61]">
+              Advanced tests surface hidden electrical, cooling, and powertrain issues that traditional visual inspections can miss.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {diagnosticUpgrades.map((item) => (
+              <div key={item.title} className="relative overflow-hidden rounded-3xl bg-[#0f172a] p-7 text-white shadow-2xl shadow-[#0f172a]/30">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(94,146,255,0.22),transparent_60%)]" />
+                <div className="relative">
+                  <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+                  <p className="mt-3 text-sm sm:text-base leading-relaxed text-white/80">{item.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose + CTA */}
+      <section className="relative px-[12%] sm:px-[14%] lg:px-[15%] py-16 sm:py-20">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white via-transparent to-transparent" />
+        <div className="relative mx-auto max-w-6xl">
+          <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="relative overflow-hidden rounded-[2rem] border border-[#fde1da] bg-gradient-to-br from-[#fff4f1] via-white to-[#fff9f6] p-10 shadow-xl shadow-[#f8d8cf]/45">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,98,0.12),transparent_60%)]" />
+              <div className="relative">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-[#E54E3D]">
+                  Why Buyers Choose Enhanced
+                </span>
+                <h3 className="mt-4 text-2xl font-semibold text-[#0f172a]">Best value for deep diagnostics</h3>
+                <p className="mt-4 text-sm sm:text-base leading-relaxed text-[#3a4a61]">
+                  The Enhanced Inspection’s diagnostic suite can save thousands by revealing engine, transmission, or emissions issues you can’t spot visually. More than 65% of our customers select this package for the extra assurance.
+                </p>
+                <ul className="mt-8 space-y-4 text-sm sm:text-base leading-relaxed text-[#3f4756]">
+                  {valueHighlights.map((item) => (
+                    <li key={item} className="flex items-start gap-3">
+                      <span className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#E54E3D]/10 text-xs font-semibold text-[#E54E3D] shadow-inner shadow-[#fcd8ce]/40">
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path d="M8.5 13.38 5.53 10.4l-.71.7 3.68 3.68 6.89-6.9-.71-.7Z" />
+                        </svg>
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[2rem] bg-[#0f172a] p-10 text-white shadow-2xl shadow-[#0f172a]/35">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(94,146,255,0.25),transparent_60%)]" />
+              <div className="relative flex h-full flex-col">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/70">
+                  Ready to Upgrade
+                </span>
+                <h3 className="mt-4 text-2xl font-semibold leading-snug text-white">Reserve your Enhanced Inspection window</h3>
+                <p className="mt-4 text-sm sm:text-base leading-relaxed text-white/80">
+                  Coordinate timing with the seller, capture advanced diagnostics, and receive actionable insights within hours.
+                </p>
+                <div className="mt-6 flex flex-wrap items-center gap-4">
+                  <div className="rounded-2xl bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/80 ring-1 ring-white/20">
+                    Investment $200
+                  </div>
+                  <div className="rounded-2xl bg-[#E54E3D] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white shadow-lg shadow-[#E54E3D]/40">
+                    Report Ready in 6 Hours
+                  </div>
+                </div>
+                <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                  <Link
+                    href="/book-appointment?service=enhanced#booking-form"
+                    className="group inline-flex items-center justify-center gap-3 rounded-full bg-white px-7 py-3.5 text-sm font-semibold uppercase tracking-wide text-[#E54E3D] shadow-lg shadow-white/30 transition-all hover:-translate-y-0.5 hover:bg-[#f9f5f3]"
+                  >
+                    Book Now
+                    <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14" />
+                      <path d="m13 6 6 6-6 6" />
+                    </svg>
+                  </Link>
+                  <Link
+                    href="/#pricing"
+                    className="inline-flex items-center justify-center gap-3 rounded-full border border-white/30 px-7 py-3.5 text-sm font-semibold uppercase tracking-wide text-white transition-all hover:-translate-y-0.5 hover:border-white"
+                  >
+                    View Pricing
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14" />
+                      <path d="m13 6 6 6-6 6" />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison Summary */}
+      <section className="relative px-[12%] sm:px-[14%] lg:px-[15%] pt-16 pb-16 sm:pt-20 sm:pb-20">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#f7f9fc] via-transparent to-transparent" />
+        <div className="relative mx-auto max-w-5xl rounded-3xl bg-white p-0 shadow-lg shadow-slate-200/50 ring-1 ring-[#dbe4ff]">
+          <div className="rounded-t-3xl bg-[#1f3a8a] px-6 py-6 text-center text-white">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-wide">Comparison Summary</h2>
+            <p className="mt-2 text-sm sm:text-base text-white/80">Choosing the Right Inspection</p>
+          </div>
+
+          <div className="px-6 py-6">
+            <table className="w-full border-collapse text-sm sm:text-base">
+              <thead>
+                <tr className="bg-white text-[#1f2a37]">
+                  {['Package', 'Price', 'Best For', 'Duration'].map((heading) => (
+                    <th key={heading} className="border border-[#c7d2fe] px-4 py-3 font-semibold uppercase tracking-wide">
+                      {heading}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[{
+                  name: 'Standard',
+                  price: '$150',
+                  bestFor: 'Newer vehicles under 5 years, lower mileage',
+                  duration: '45-60 min',
+                  highlight: true,
+                }, {
+                  name: 'Enhanced',
+                  price: '$200',
+                  bestFor: 'Vehicles 5-10 years old, includes diagnostics (Most Popular)',
+                  duration: '60-90 min',
+                  highlight: true,
+                }, {
+                  name: 'Full-Spectrum',
+                  price: '$300',
+                  bestFor: 'High-value or older vehicles, includes negotiation help',
+                  duration: '90-120 min',
+                  highlight: true,
+                }, {
+                  name: 'Routine Check-Up',
+                  price: '$100',
+                  bestFor: 'Current owners wanting maintenance assessment',
+                  duration: '30-45 min',
+                }].map((row) => (
+                  <tr key={row.name} className={row.highlight ? 'bg-[#f1f6ff]' : 'bg-white'}>
+                    <td className="border border-[#c7d2fe] px-4 py-4 font-semibold text-[#152032]">{row.name}</td>
+                    <td className="border border-[#c7d2fe] px-4 py-4 text-[#152032]">{row.price}</td>
+                    <td className="border border-[#c7d2fe] px-4 py-4 text-[#3f4756]">{row.bestFor}</td>
+                    <td className="border border-[#c7d2fe] px-4 py-4 text-[#3f4756]">{row.duration}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="mt-6 rounded-2xl bg-[#0f172a] px-5 py-4 text-center text-sm sm:text-base font-semibold text-white shadow-lg shadow-[#0f172a]/30">
+              Still not sure? Call us at <a href="tel:6139815498" className="underline decoration-white/60 underline-offset-4 transition hover:decoration-white">(613) 981-5498</a> and we’ll help you choose the inspection package that fits best.
             </div>
           </div>
         </div>

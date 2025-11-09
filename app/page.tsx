@@ -1,14 +1,10 @@
 'use client';
 
-import Link from 'next/link';
-import { useState } from 'react';
-import BookingModal from './components/BookingModal';
 import SiteFooter from './components/layout/SiteFooter';
 import SiteHeader from './components/layout/SiteHeader';
+import Link from 'next/link';
 
 export default function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const homeNavLinks = [
     { label: 'Home', href: '#home' },
     { label: 'Services', href: '#features' },
@@ -57,8 +53,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-white">
-      <BookingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-      <SiteHeader navLinks={homeNavLinks} onBookInspection={() => setIsModalOpen(true)} />
+      <SiteHeader navLinks={homeNavLinks} />
 
       {/* Hero Section - Dark Background */}
       <section
@@ -113,13 +108,12 @@ export default function Home() {
                 Don't risk buying a lemon. Our certified mechanics will thoroughly inspect any vehicle before you purchase, giving you peace of mind and confidence in your decision.
               </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                className="group inline-flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-full bg-[#E54E3D] px-4 sm:px-8 py-2 sm:py-4 text-xs sm:text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-[#D43E2D] hover:shadow-xl"
-                >
+              <Link
+                href="/book-appointment#booking-form"
+                className="group inline-flex w-full sm:w-auto items-center justify-center rounded-full bg-[#E54E3D] px-4 sm:px-8 py-2 sm:py-4 text-xs sm:text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-[#D43E2D] hover:shadow-xl"
+              >
                 <span>Book An Inspection</span>
-                <span className="text-xl sm:text-2xl">↗</span>
-                </button>
+              </Link>
               <button className="hidden sm:inline-flex px-6 sm:px-8 py-3 sm:py-4 bg-transparent text-white border-2 border-gray-400 rounded-lg hover:border-gray-300 transition-all text-sm sm:text-lg font-semibold">
                   Learn More
                 </button>
@@ -343,6 +337,63 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Why Choose Section */}
+      <section id="why-choose" className="relative overflow-hidden bg-[#f7f9fc] px-[15%] pt-[40px] pb-20 sm:pt-[40px] sm:pb-24">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.1),transparent_60%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.08),transparent_60%),radial-gradient(circle_at_center,rgba(16,185,129,0.08),transparent_55%)]" />
+        <div className="mx-auto max-w-6xl relative">
+          <div className="text-center mb-14">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold leading-tight text-[#0f172a]">
+              Why Choose <span className="text-[#E54E3D]">CheckMyRide?</span>
+            </h2>
+            <p className="mt-4 text-base sm:text-lg leading-relaxed text-[#3a4a61] max-w-3xl mx-auto">
+              We’re committed to providing the most thorough and reliable vehicle inspections in the industry.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[{
+              title: 'Certified Mechanics',
+              desc: 'All our inspectors are ASE-certified with years of experience in automotive diagnostics.',
+              iconBg: 'bg-[#fff4e5]',
+              icon: '🎓',
+            }, {
+              title: 'Mobile Service',
+              desc: 'We come to you – whether it’s a dealership, private seller, or your home.',
+              iconBg: 'bg-[#e6f8ff]',
+              icon: '📱',
+            }, {
+              title: 'Detailed Reports',
+              desc: 'Comprehensive reports with photos, videos, and clear recommendations you can understand.',
+              iconBg: 'bg-[#f3ebff]',
+              icon: '📊',
+            }, {
+              title: 'Fast Turnaround',
+              desc: 'Receive your inspection report within 24 hours, so you can make quick decisions.',
+              iconBg: 'bg-[#fff5e9]',
+              icon: '⚡',
+            }, {
+              title: 'Save Money',
+              desc: 'Avoid costly repairs by identifying issues before purchase. Our inspections pay for themselves.',
+              iconBg: 'bg-[#fff9db]',
+              icon: '💰',
+            }, {
+              title: 'Satisfaction Guaranteed',
+              desc: 'We stand behind our work with a 100% satisfaction guarantee on all inspections.',
+              iconBg: 'bg-[#e5f8ed]',
+              icon: '✅',
+            }].map((feature) => (
+              <div key={feature.title} className="group relative flex flex-col gap-4 rounded-3xl border border-[#e2e8f0] bg-white p-8 shadow-lg shadow-slate-200/50 ring-1 ring-white transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
+                <span className={`flex h-12 w-12 items-center justify-center rounded-xl text-2xl transition-all duration-300 ${feature.iconBg} group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-[#E54E3D]/20`}>
+                  <span className="transition-transform duration-300 group-hover:-rotate-6">{feature.icon}</span>
+                </span>
+                <h3 className="text-lg font-semibold text-[#152032]">{feature.title}</h3>
+                <p className="text-sm sm:text-base leading-relaxed text-[#3f4756]">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section id="pricing" className="relative overflow-hidden bg-white px-[15%] pt-[40px] pb-20 sm:pt-[40px] sm:pb-28">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.14),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(249,115,98,0.12),transparent_55%),radial-gradient(circle_at_bottom_left,rgba(252,165,143,0.12),transparent_60%)]" />
@@ -365,6 +416,8 @@ export default function Home() {
               shadow: 'shadow-[#e54e3d]/18',
               badge: null,
               button: 'bg-[#E54E3D] text-white hover:bg-[#d14130]',
+              detailsHref: '/services/standard-inspection',
+              bookingValue: 'standard',
               features: ['50+ Point Inspection', 'Detailed Report', 'Professional Mechanic', "Service at Seller's Location"],
             },
             {
@@ -375,6 +428,8 @@ export default function Home() {
               shadow: 'shadow-[#0f172a]/20',
               badge: 'MOST POPULAR',
               button: 'bg-[#E54E3D] text-white hover:bg-[#d14130]',
+              detailsHref: '/services/enhanced-inspection',
+              bookingValue: 'enhanced',
               features: ['75+ Point Inspection', 'Comprehensive Report', 'Professional Mechanic', "Service at Seller's Location"],
             },
             {
@@ -384,7 +439,9 @@ export default function Home() {
               border: 'border-[#bae6fd]',
               shadow: 'shadow-[#0ea5e9]/20',
               badge: null,
-              button: 'bg-[#0ea5e9] text-white hover:bg-[#0284c7]',
+              button: 'bg-[#E54E3D] text-white hover:bg-[#d14130]',
+              detailsHref: '/services/full-spectrum-inspection',
+              bookingValue: 'full-spectrum',
               features: ['100+ Point Inspection', 'Elite Detailed Report', 'Professional Mechanic', "Service at Seller's Location"],
             },
             {
@@ -394,7 +451,9 @@ export default function Home() {
               border: 'border-[#bbf7d0]',
               shadow: 'shadow-[#16a34a]/18',
               badge: null,
-              button: 'bg-[#16a34a] text-white hover:bg-[#15803d]',
+              button: 'bg-[#E54E3D] text-white hover:bg-[#d14130]',
+              detailsHref: '/services/routine-check-up',
+              bookingValue: 'routine',
               features: ['Multi-Point Inspection', 'Fluid Levels Check', 'Tire & Brake Assessment', 'Battery Health Evaluation'],
             }].map((plan) => (
               <article
@@ -429,13 +488,25 @@ export default function Home() {
                   ))}
                   </ul>
 
-                <button className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-all ${plan.button}`}>
+                {plan.detailsHref && (
+                  <Link
+                    href={plan.detailsHref}
+                    className="mt-6 inline-flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#E54E3D] transition-colors hover:text-[#c63a2c]"
+                  >
+                    View Full Checklist
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14" />
+                      <path d="m13 6 6 6-6 6" />
+                    </svg>
+                  </Link>
+                )}
+
+                <Link
+                  href={`/book-appointment?service=${plan.bookingValue}#booking-form`}
+                  className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-all ${plan.button}`}
+                >
                   Book Now
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="m13 6 6 6-6 6" />
-                      </svg>
-                  </button>
+                </Link>
               </article>
             ))}
           </div>
@@ -466,18 +537,18 @@ export default function Home() {
             {[{
               quote: 'CheckMyRide saved me from buying a car with hidden transmission issues. The inspection was thorough and the mechanic explained everything clearly. Worth every penny!',
               name: 'Michael Johnson',
-              location: 'Toronto, ON',
+              location: 'Kanata, ON',
             },
             {
               quote: "The convenience of having someone go to the seller's location made the whole process so easy. Professional service and detailed report helped me negotiate a better price.",
               name: 'Sarah Williams',
-              location: 'Vancouver, BC',
+              location: 'Orleans, ON',
             },
             {
               quote: "As someone who knows nothing about cars, CheckMyRide gave me the confidence to make my purchase. Their inspector was knowledgeable and patient with all my questions.",
               name: 'David Chen',
-              location: 'Calgary, AB',
-            }].map((testimonial) => (
+              location: 'Barrhaven, ON',
+            }].map((testimonial, index) => (
               <article
                 key={testimonial.name}
                 className="group relative flex h-full flex-col rounded-3xl border border-white/60 bg-white/95 p-8 shadow-xl shadow-slate-300/40 transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl hover:border-[#E54E3D]/40"
@@ -532,8 +603,8 @@ export default function Home() {
           </p>
 
           <div className="mt-10 flex items-center justify-center">
-            <button
-              onClick={() => setIsModalOpen(true)}
+            <Link
+              href="/book-appointment#booking-form"
               className="group inline-flex items-center justify-center gap-3 rounded-full bg-white px-10 py-4 text-sm sm:text-base font-bold uppercase tracking-wide text-[#E54E3D] shadow-lg shadow-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:bg-[#f8f9ff]"
             >
               Book an Inspection Now
@@ -541,7 +612,7 @@ export default function Home() {
                 <path d="M5 12h14" />
                 <path d="m13 6 6 6-6 6" />
               </svg>
-            </button>
+            </Link>
           </div>
         </div>
       </section>
