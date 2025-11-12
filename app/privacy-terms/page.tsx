@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo } from 'react';
 import SiteFooter from '../components/layout/SiteFooter';
 import SiteHeader from '../components/layout/SiteHeader';
 
@@ -157,21 +156,11 @@ const sectionData = [
 ];
 
 export default function PrivacyTermsPage() {
-  const navLinks = useMemo(
-    () => [
-      { label: 'Home', href: '/#home' },
-      { label: 'Services', href: '/#features' },
-      { label: 'Vehicles For Sale', href: '/#about' },
-      { label: 'Contact', href: '/#contact' },
-    ],
-    []
-  );
-
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f9fc] text-[#0f172a]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.12),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.12),transparent_55%),radial-gradient(circle_at_center,rgba(59,130,246,0.08),transparent_60%)]" />
 
-      <SiteHeader navLinks={navLinks} />
+      <SiteHeader />
 
       <section className="relative mx-auto flex max-w-6xl flex-col gap-12 px-6 py-16 sm:px-10 sm:py-20 lg:py-24">
         <header className="space-y-5 text-center">
