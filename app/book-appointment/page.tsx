@@ -1,13 +1,19 @@
 'use client';
 
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, useMemo, useState, useRef, FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import SiteFooter from '../components/layout/SiteFooter';
 import SiteHeader from '../components/layout/SiteHeader';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 function AppointmentBookingForm() {
   const searchParams = useSearchParams();
+  const formRef = useRef<HTMLFormElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   
   const inspectionOptions = [
     { value: 'standard', label: 'Standard Inspection' },
@@ -19,6 +25,133 @@ function AppointmentBookingForm() {
   const selectedService = inspectionOptions.some((option) => option.value === searchParams.get('service'))
     ? (searchParams.get('service') as typeof inspectionOptions[number]['value'])
     : undefined;
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    const formData = new FormData(e.currentTarget);
+    
+    // Validate terms acceptance
+    if (formData.get('termsAccepted') !== 'on') {
+      setSubmitError('You must accept the Privacy Policy and Terms of Service to continue.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const formValues = {
+      personalInfo: {
+        fullName: formData.get('fullName') as string,
+        email: formData.get('email') as string,
+        phone: formData.get('phone') as string,
+      },
+      vehicleInfo: {
+        make: formData.get('vehicleMake') as string,
+        model: formData.get('vehicleModel') as string,
+        year: parseInt(formData.get('vehicleYear') as string),
+        mileage: formData.get('mileage') ? parseInt(formData.get('mileage') as string) : undefined,
+        vin: (formData.get('vin') as string)?.trim() || undefined,
+      },
+      inspectionDetails: {
+        type: formData.get('inspection-type') as string,
+        location: (formData.get('inspection-location') as string) === 'Mobile Inspection' ? 'mobile' : 'checkmyride',
+      },
+      appointmentDetails: {
+        preferredDate: formData.get('preferredDate') as string,
+        preferredTime: formData.get('preferredTime') as string,
+        address: formData.get('inspectionAddress') as string,
+      },
+      additionalInfo: {
+        notes: (formData.get('notes') as string)?.trim() || undefined,
+        paymentMethod: (formData.get('payment-method') as string) === 'Cash' ? 'cash' : 'e-transfer',
+        promoCode: (formData.get('promoCode') as string)?.trim() || undefined,
+      },
+      termsAccepted: true,
+    };
+
+    try {
+      // Create AbortController for timeout handling
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+      const response = await fetch(`${API_URL}/api/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formValues),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      // Handle non-JSON responses
+      let data;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        throw new Error(text || `Server returned ${response.status} ${response.statusText}`);
+      }
+
+      if (!response.ok) {
+        // Handle validation errors
+        if (response.status === 400 && data.errors && Array.isArray(data.errors)) {
+          const errorMessages = data.errors.map((err: any) => {
+            const field = err.field || 'field';
+            return `${field}: ${err.message}`;
+          }).join(', ');
+          throw new Error(`Validation Error: ${errorMessages}`);
+        }
+        
+        // Handle other error responses
+        throw new Error(data.message || data.error || `Failed to submit booking (${response.status})`);
+      }
+
+      // Success case
+      setSubmitSuccess(true);
+      
+      // Reset form using ref
+      if (formRef.current) {
+        formRef.current.reset();
+      }
+      
+      // Scroll to top to show success message
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setSubmitSuccess(false);
+      }, 5000);
+
+    } catch (error: any) {
+      // Handle different error types
+      if (error.name === 'AbortError') {
+        setSubmitError('Request timed out. Please check your connection and try again.');
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        setSubmitError('Network error. Please check your internet connection and try again.');
+      } else if (error.message) {
+        setSubmitError(error.message);
+      } else {
+        setSubmitError('An unexpected error occurred. Please try again later.');
+      }
+
+      // Scroll to error message
+      setTimeout(() => {
+        const errorElement = document.getElementById('error-message');
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -32,12 +165,48 @@ function AppointmentBookingForm() {
             <span className="text-[#E54E3D]">with Confidence</span>
           </h1>
           <p className="mx-auto max-w-3xl text-sm sm:text-base md:text-lg leading-relaxed text-[#3f4756]">
-            Provide a few details about you and the vehicle you’re considering. Our team will confirm availability and lock in the perfect inspection time—so you can move forward with clarity.
+            Provide a few details about you and the vehicle you're considering. Our team will confirm availability and lock in the perfect inspection time—so you can move forward with clarity.
           </p>
         </header>
 
+        {submitSuccess && (
+          <div className="rounded-2xl bg-green-50 border-2 border-green-200 p-6 text-center">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <h3 className="text-xl font-semibold text-green-800">Booking Submitted Successfully!</h3>
+            </div>
+            <p className="text-green-700">
+              Thank you for your booking. We'll contact you shortly to confirm your appointment.
+            </p>
+          </div>
+        )}
+
+        {submitError && (
+          <div id="error-message" className="rounded-2xl bg-red-50 border-2 border-red-200 p-6">
+            <div className="flex items-start gap-3">
+              <svg className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-red-800 mb-1">Error</h3>
+                <p className="text-red-700 text-sm leading-relaxed">{submitError}</p>
+                <button
+                  onClick={() => setSubmitError(null)}
+                  className="mt-3 text-sm text-red-600 hover:text-red-800 underline"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <form
+          ref={formRef}
           id="booking-form"
+          onSubmit={handleSubmit}
           className="space-y-12 rounded-[2.75rem] bg-white/95 p-8 sm:p-12 shadow-xl shadow-slate-200/60 ring-1 ring-slate-100"
         >
           <div className="grid gap-8 lg:grid-cols-2">
@@ -51,6 +220,7 @@ function AppointmentBookingForm() {
                   <span>Full Name *</span>
                   <input
                     type="text"
+                    name="fullName"
                     required
                     className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                     placeholder="Your full name"
@@ -60,6 +230,7 @@ function AppointmentBookingForm() {
                   <span>Email Address *</span>
                   <input
                     type="email"
+                    name="email"
                     required
                     className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                     placeholder="you@email.com"
@@ -69,6 +240,7 @@ function AppointmentBookingForm() {
                   <span>Phone Number *</span>
                   <input
                     type="tel"
+                    name="phone"
                     required
                     className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                     placeholder="(613) 123-4567"
@@ -87,6 +259,7 @@ function AppointmentBookingForm() {
                   <span>Make *</span>
                   <input
                     type="text"
+                    name="vehicleMake"
                     required
                     className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                     placeholder="e.g., Toyota"
@@ -96,6 +269,7 @@ function AppointmentBookingForm() {
                   <span>Model *</span>
                   <input
                     type="text"
+                    name="vehicleModel"
                     required
                     className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                     placeholder="e.g., Corolla"
@@ -105,7 +279,10 @@ function AppointmentBookingForm() {
                   <span>Year *</span>
                   <input
                     type="number"
+                    name="vehicleYear"
                     required
+                    min="1900"
+                    max={new Date().getFullYear() + 1}
                     className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                     placeholder="e.g., 2021"
                   />
@@ -114,6 +291,8 @@ function AppointmentBookingForm() {
                   <span>Mileage (km)</span>
                   <input
                     type="number"
+                    name="mileage"
+                    min="0"
                     className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                     placeholder="e.g., 45,000"
                   />
@@ -123,6 +302,8 @@ function AppointmentBookingForm() {
                 <span>VIN (optional)</span>
                 <input
                   type="text"
+                  name="vin"
+                  maxLength={17}
                   className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                   placeholder="17-character VIN"
                 />
@@ -186,7 +367,9 @@ function AppointmentBookingForm() {
                   <span>Preferred Appointment Date *</span>
                   <input
                     type="date"
+                    name="preferredDate"
                     required
+                    min={new Date().toISOString().split('T')[0]}
                     className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                   />
                 </label>
@@ -194,6 +377,7 @@ function AppointmentBookingForm() {
                   <span>Preferred Appointment Time *</span>
                   <input
                     type="time"
+                    name="preferredTime"
                     required
                     className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                   />
@@ -203,6 +387,7 @@ function AppointmentBookingForm() {
                 <span>Inspection Address *</span>
                 <input
                   type="text"
+                  name="inspectionAddress"
                   required
                   className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                   placeholder="Street, City, Province"
@@ -213,11 +398,12 @@ function AppointmentBookingForm() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-2xl font-semibold text-[#152032]">6. Additional Comments</h2>
-                <p className="mt-1 text-sm text-[#64748b]">Anything specific you’d like us to know?</p>
+                <p className="mt-1 text-sm text-[#64748b]">Anything specific you'd like us to know?</p>
               </div>
               <label className="space-y-2 text-sm font-semibold text-[#1f2a37]">
                 <span>Notes for the inspection team</span>
                 <textarea
+                  name="notes"
                   rows={6}
                   className="w-full resize-none rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                   placeholder="Share any special requests, concerns, or vehicle history details."
@@ -249,6 +435,7 @@ function AppointmentBookingForm() {
                 <span>Promo Code</span>
                 <input
                   type="text"
+                  name="promoCode"
                   className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                   placeholder="Enter promo or referral code (if applicable)"
                 />
@@ -265,7 +452,7 @@ function AppointmentBookingForm() {
               <p className="mt-1 text-sm text-[#64748b]">Please review your information before submitting.</p>
             </div>
             <label className="flex items-start gap-3 rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40">
-              <input type="checkbox" required className="mt-1 h-4 w-4 rounded border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
+              <input type="checkbox" name="termsAccepted" required className="mt-1 h-4 w-4 rounded border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
               <span>
                 I confirm that the information provided is accurate, and I agree to the{' '}
                 <Link href="/privacy-terms" className="font-semibold text-[#E54E3D] hover:text-[#d14130]">
@@ -276,9 +463,20 @@ function AppointmentBookingForm() {
             </label>
             <button
               type="submit"
-              className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#E54E3D] via-[#f97362] to-[#fb9f8a] px-6 py-4 text-base font-semibold uppercase tracking-wide text-white shadow-xl shadow-[#E54E3D]/40 transition hover:-translate-y-0.5 hover:shadow-2xl"
+              disabled={isSubmitting}
+              className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-[#E54E3D] via-[#f97362] to-[#fb9f8a] px-6 py-4 text-base font-semibold uppercase tracking-wide text-white shadow-xl shadow-[#E54E3D]/40 transition hover:-translate-y-0.5 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
-              Book My Appointment
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Submitting...
+                </>
+              ) : (
+                'Book My Appointment'
+              )}
             </button>
           </section>
         </form>
