@@ -28,7 +28,7 @@ export default function SiteFooter() {
         <div className="hero-wave rotate-180" />
       </div>
 
-      <div className="relative px-[15%] py-16 sm:py-20">
+      <div className="relative px-[10%] py-16 sm:py-20">
         <div className="mx-auto max-w-6xl grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div className="space-y-6">
             <div>
@@ -157,7 +157,7 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="relative border-t border-[#dbe0ef] px-[15%] py-6 text-center sm:text-left">
+      <div className="relative border-t border-[#dbe0ef] px-[10%] py-6 text-center sm:text-left">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:text-base text-[#687385]">
           <p>
             © 2025 CheckMyRide. All Rights Reserved.{' '}

@@ -70,13 +70,6 @@ const valueHighlights = [
 ];
 
 export default function RoutineCheckUpPage() {
-  const navLinks = [
-    { label: 'Home', href: '/' },
-    { label: 'Services', href: '/#features' },
-    { label: 'Pricing', href: '/#pricing' },
-    { label: 'Contact', href: '/#contact' },
-  ];
-
   const heroSocialLinks = [
     {
       label: 'Facebook',
@@ -118,10 +111,10 @@ export default function RoutineCheckUpPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <SiteHeader navLinks={navLinks} />
+      <SiteHeader />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-[#0f172a] px-[12%] sm:px-[14%] lg:px-[15%] pt-14 pb-16 sm:pt-16 sm:pb-20">
+      <section className="relative overflow-hidden bg-[#0f172a] px-[10%] pt-14 pb-16 sm:pt-16 sm:pb-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.22),transparent_60%),radial-gradient(circle_at_bottom_right,rgba(249,115,98,0.18),transparent_60%),radial-gradient(circle_at_center,rgba(252,165,143,0.14),transparent_65%)]" />
         <div className="pointer-events-none hidden lg:block">
           <div className="fixed left-6 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4">
@@ -177,7 +170,7 @@ export default function RoutineCheckUpPage() {
       </section>
 
       {/* Audience + Overview */}
-      <section className="relative px-[12%] sm:px-[14%] lg:px-[15%] py-16 sm:py-20">
+      <section className="relative px-[10%] py-16 sm:py-20">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#fef4f1] via-transparent to-transparent" />
         <div className="relative mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-3">
@@ -251,7 +244,7 @@ export default function RoutineCheckUpPage() {
       </section>
 
       {/* What&apos;s Included */}
-      <section className="relative bg-[#f9fbff] px-[12%] sm:px-[14%] lg:px-[15%] py-16 sm:py-20">
+      <section className="relative bg-[#f9fbff] px-[10%] py-16 sm:py-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(229,78,61,0.08),transparent_60%)]" />
         <div className="relative mx-auto max-w-6xl">
           <div className="text-center">
@@ -278,7 +271,7 @@ export default function RoutineCheckUpPage() {
       </section>
 
       {/* Care Modules */}
-      <section className="relative px-[12%] sm:px-[14%] lg:px-[15%] py-16 sm:py-20">
+      <section className="relative px-[10%] py-16 sm:py-20">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white via-transparent to-transparent" />
         <div className="relative mx-auto max-w-6xl">
           <div className="text-center">
@@ -346,7 +339,7 @@ export default function RoutineCheckUpPage() {
       </section>
 
       {/* Why Choose + CTA */}
-      <section className="relative px-[12%] sm:px-[14%] lg:px-[15%] py-16 sm:py-20">
+      <section className="relative px-[10%] py-16 sm:py-20">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white via-transparent to-transparent" />
         <div className="relative mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
@@ -422,7 +415,7 @@ export default function RoutineCheckUpPage() {
       </section>
 
       {/* Comparison Summary */}
-      <section className="relative px-[12%] sm:px-[14%] lg:px-[15%] pt-16 pb-16 sm:pt-20 sm:pb-20">
+      <section className="relative px-[10%] pt-16 pb-16 sm:pt-20 sm:pb-20">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#f7f9fc] via-transparent to-transparent" />
         <div className="relative mx-auto max-w-5xl rounded-3xl bg-white p-0 shadow-lg shadow-slate-200/50 ring-1 ring-[#dbe4ff]">
           <div className="rounded-t-3xl bg-[#1f3a8a] px-6 py-6 text-center text-white">
