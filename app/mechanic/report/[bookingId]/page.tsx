@@ -199,6 +199,56 @@ export default function InspectionReportPage() {
     });
   };
 
+  const calculateFormProgress = (): number => {
+    let totalFields = 0;
+    let filledFields = 0;
+
+    // General Info (required fields)
+    const generalInfoRequired = ['clientName', 'email', 'phone', 'appointmentDate', 'inspectionTime', 'inspectorName', 'inspectionLocation'];
+    totalFields += generalInfoRequired.length;
+    generalInfoRequired.forEach(field => {
+      if (formData.generalInfo[field as keyof typeof formData.generalInfo]?.toString().trim()) {
+        filledFields++;
+      }
+    });
+
+    // Vehicle Info (required fields)
+    const vehicleInfoRequired = ['year', 'make', 'model'];
+    totalFields += vehicleInfoRequired.length;
+    vehicleInfoRequired.forEach(field => {
+      if (formData.vehicleInfo[field as keyof typeof formData.vehicleInfo]?.toString().trim()) {
+        filledFields++;
+      }
+    });
+
+    // Body Condition (only if full-spectrum inspection)
+    if (selectedInspectionType === 'full-spectrum') {
+      formData.bodyCondition.forEach(item => {
+        totalFields++;
+        if (item.rating && item.rating.trim() !== '') {
+          filledFields++;
+        }
+      });
+    }
+
+    // Summary (required fields)
+    const summaryRequired = ['overallCondition', 'inspectionSummary', 'recommendations'];
+    totalFields += summaryRequired.length;
+    summaryRequired.forEach(field => {
+      if (formData.summary[field as keyof typeof formData.summary]?.toString().trim()) {
+        filledFields++;
+      }
+    });
+
+    // Value Assessment (required field)
+    totalFields++;
+    if (formData.valueAssessment.assessment?.trim()) {
+      filledFields++;
+    }
+
+    return totalFields > 0 ? Math.round((filledFields / totalFields) * 100) : 0;
+  };
+
   const validateForm = (isSubmit: boolean = false): string[] => {
     const errors: string[] = [];
     
@@ -453,6 +503,14 @@ export default function InspectionReportPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Progress Indicator */}
+      <div className="w-full bg-white h-1">
+        <div
+          className="bg-[#E54E3D] h-1 transition-all duration-500 ease-out"
+          style={{ width: `${calculateFormProgress()}%` }}
+        ></div>
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
