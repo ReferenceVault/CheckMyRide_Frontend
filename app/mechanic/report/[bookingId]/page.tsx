@@ -199,6 +199,87 @@ export default function InspectionReportPage() {
     });
   };
 
+  const generateInspectionSummary = (): string => {
+    const summaryParts: string[] = [];
+    
+    // Vehicle Information
+    const vehicle = formData.vehicleInfo;
+    if (vehicle.year && vehicle.make && vehicle.model) {
+      summaryParts.push(`This ${vehicle.year} ${vehicle.make} ${vehicle.model}${vehicle.trim ? ` ${vehicle.trim}` : ''}${vehicle.mileage ? ` with ${parseInt(vehicle.mileage).toLocaleString()} km` : ''} was inspected on ${formData.generalInfo.appointmentDate ? new Date(formData.generalInfo.appointmentDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'the scheduled date'}.`);
+    }
+    
+    // Overall Condition
+    if (formData.summary.overallCondition) {
+      const conditionLabels: { [key: string]: string } = {
+        'excellent': 'excellent',
+        'good': 'good',
+        'fair': 'fair',
+        'needs-attention': 'needs attention',
+        'critical': 'critical'
+      };
+      summaryParts.push(`Overall vehicle condition is rated as ${conditionLabels[formData.summary.overallCondition] || formData.summary.overallCondition}.`);
+    }
+    
+    // Body Condition findings (if full-spectrum)
+    if (selectedInspectionType === 'full-spectrum' && formData.bodyCondition.length > 0) {
+      const ratedItems = formData.bodyCondition.filter(item => item.rating && item.rating.trim() !== '');
+      if (ratedItems.length > 0) {
+        const criticalItems = ratedItems.filter(item => item.rating === 'critical' || item.rating === 'needs-attention');
+        const excellentItems = ratedItems.filter(item => item.rating === 'excellent' || item.rating === 'good');
+        
+        if (criticalItems.length > 0) {
+          summaryParts.push(`Key areas requiring attention include: ${criticalItems.map(item => item.item.toLowerCase()).slice(0, 3).join(', ')}.`);
+        }
+        
+        if (excellentItems.length > 0 && criticalItems.length === 0) {
+          summaryParts.push(`Notable positive aspects include: ${excellentItems.map(item => item.item.toLowerCase()).slice(0, 3).join(', ')} are in good condition.`);
+        }
+      }
+    }
+    
+    // Vehicle details
+    const details: string[] = [];
+    if (vehicle.color) details.push(`Color: ${vehicle.color}`);
+    if (vehicle.transmission) details.push(`Transmission: ${vehicle.transmission}`);
+    if (vehicle.drivetrain) details.push(`Drivetrain: ${vehicle.drivetrain}`);
+    if (vehicle.bodyStyle) details.push(`Body Style: ${vehicle.bodyStyle}`);
+    if (vehicle.fuelType) details.push(`Fuel Type: ${vehicle.fuelType}`);
+    if (vehicle.vin) details.push(`VIN: ${vehicle.vin}`);
+    
+    if (details.length > 0) {
+      summaryParts.push(`Vehicle specifications: ${details.join(', ')}.`);
+    }
+    
+    // Inspection location
+    if (formData.generalInfo.inspectionLocation) {
+      summaryParts.push(`Inspection was conducted at ${formData.generalInfo.inspectionLocation}.`);
+    }
+    
+    // Seller information
+    if (formData.generalInfo.sellerType && formData.generalInfo.sellerName) {
+      summaryParts.push(`Vehicle is being sold by ${formData.generalInfo.sellerType === 'private' ? 'a private seller' : formData.generalInfo.sellerType === 'dealer' ? 'a dealer' : 'an auction'}: ${formData.generalInfo.sellerName}.`);
+    }
+    
+    // Final statement
+    if (formData.summary.overallCondition) {
+      const condition = formData.summary.overallCondition;
+      if (condition === 'excellent' || condition === 'good') {
+        summaryParts.push(`The vehicle appears to be well-maintained and in good overall condition.`);
+      } else if (condition === 'fair') {
+        summaryParts.push(`The vehicle shows signs of normal wear and may require some maintenance in the near future.`);
+      } else if (condition === 'needs-attention' || condition === 'critical') {
+        summaryParts.push(`The vehicle requires immediate attention to address several issues identified during the inspection.`);
+      }
+    }
+    
+    return summaryParts.join(' ') || 'Please fill in the vehicle and inspection details to generate a summary.';
+  };
+
+  const handleGenerateSummary = () => {
+    const generatedSummary = generateInspectionSummary();
+    handleInputChange('summary', 'inspectionSummary', generatedSummary);
+  };
+
   const calculateFormProgress = (): number => {
     let totalFields = 0;
     let filledFields = 0;
@@ -934,6 +1015,16 @@ export default function InspectionReportPage() {
                   className="w-full rounded-lg border-2 border-[#e2e8f0] px-4 py-2 focus:border-[#E54E3D] focus:outline-none"
                   placeholder="Provide a comprehensive summary of the vehicle's condition based on inspection findings..."
                 />
+                <button
+                  type="button"
+                  onClick={handleGenerateSummary}
+                  className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#E54E3D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#d14130] transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Generate Summary from Inspection Data
+                </button>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-[#64748b] mb-2">Recommendations</label>
