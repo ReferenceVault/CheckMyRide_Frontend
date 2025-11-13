@@ -35,6 +35,13 @@ const BODY_CONDITION_ITEMS = [
   'Frame and structural integrity',
 ];
 
+const INSPECTION_TYPES = [
+  { value: 'standard', label: 'Standard Inspection' },
+  { value: 'enhanced', label: 'Enhanced Inspection' },
+  { value: 'full-spectrum', label: 'Full-Spectrum Inspection' },
+  { value: 'routine', label: 'Routine Check-Up' },
+];
+
 export default function InspectionReportPage() {
   const params = useParams();
   const router = useRouter();
@@ -48,6 +55,8 @@ export default function InspectionReportPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [booking, setBooking] = useState<any>(null);
   const [existingReport, setExistingReport] = useState<any>(null);
+  const [selectedInspectionType, setSelectedInspectionType] = useState<string>('standard');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   const [formData, setFormData] = useState({
     generalInfo: {
@@ -104,6 +113,9 @@ export default function InspectionReportPage() {
 
       const bookingData = await bookingRes.json();
       setBooking(bookingData.booking);
+      
+      // Set initial inspection type from booking
+      setSelectedInspectionType(bookingData.booking.inspectionDetails?.type || 'standard');
 
       // Pre-fill form with booking data
       setFormData(prev => ({
@@ -394,9 +406,51 @@ export default function InspectionReportPage() {
             Check<span className="text-[#E54E3D]">MyRide</span> Vehicle Inspection Report
           </h1>
           <div className="flex items-center gap-3">
-            <select className="bg-white text-[#1f2a37] px-4 py-2 rounded-lg font-semibold">
-              <option>FULL-SPECTRUM INSPECTION</option>
-            </select>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="bg-[#E54E3D] text-white px-6 py-2.5 pr-10 rounded-lg font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 hover:bg-[#d14130] transition-all duration-200 shadow-lg border-2 border-white/20 min-w-[240px] text-left flex items-center justify-between"
+              >
+                <span>{INSPECTION_TYPES.find(t => t.value === selectedInspectionType)?.label || 'Select Inspection Type'}</span>
+                <svg
+                  className={`w-5 h-5 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {isDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setIsDropdownOpen(false)}
+                  ></div>
+                  <div className="absolute right-0 mt-2 w-full bg-white rounded-lg shadow-xl border-2 border-[#e2e8f0] overflow-hidden z-20">
+                    {INSPECTION_TYPES.map((type) => (
+                      <button
+                        key={type.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedInspectionType(type.value);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`w-full border-b border-gray-300 px-6 py-2 text-left font-semibold transition-all duration-200 ${
+                          selectedInspectionType === type.value
+                            ? 'bg-[#E54E3D] text-white'
+                            : 'text-[#1f2a37] hover:bg-[#f8fafc] hover:text-[#E54E3D]'
+                        }`}
+                      >
+                        {type.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -748,49 +802,51 @@ export default function InspectionReportPage() {
             </div>
           </div>
 
-          {/* Body Condition */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-bold text-[#1f2a37] mb-4">Body Condition</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-[#f8fafc]">
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Item</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Rating</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Inspector Notes/Comments</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#e2e8f0]">
-                  {formData.bodyCondition.map((item, index) => (
-                    <tr key={index}>
-                      <td className="px-4 py-3 font-semibold text-[#1f2a37]">{item.item}</td>
-                      <td className="px-4 py-3">
-                        <select
-                          value={item.rating}
-                          onChange={(e) => handleBodyConditionChange(index, 'rating', e.target.value)}
-                          className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 text-sm focus:border-[#E54E3D] focus:outline-none"
-                        >
-                          <option value="">Select rating...</option>
-                          {RATING_OPTIONS.map(opt => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-4 py-3">
-                        <textarea
-                          value={item.notes}
-                          onChange={(e) => handleBodyConditionChange(index, 'notes', e.target.value)}
-                          rows={2}
-                          className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 text-sm focus:border-[#E54E3D] focus:outline-none"
-                          placeholder="Add notes..."
-                        />
-                      </td>
+          {/* Body Condition - Only show for Full-Spectrum Inspection */}
+          {selectedInspectionType === 'full-spectrum' && (
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-bold text-[#1f2a37] mb-4">Body Condition</h2>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-[#f8fafc]">
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Item</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Rating</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Inspector Notes/Comments</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-[#e2e8f0]">
+                    {formData.bodyCondition.map((item, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-3 font-semibold text-[#1f2a37]">{item.item}</td>
+                        <td className="px-4 py-3">
+                          <select
+                            value={item.rating}
+                            onChange={(e) => handleBodyConditionChange(index, 'rating', e.target.value)}
+                            className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 text-sm focus:border-[#E54E3D] focus:outline-none"
+                          >
+                            <option value="">Select rating...</option>
+                            {RATING_OPTIONS.map(opt => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="px-4 py-3">
+                          <textarea
+                            value={item.notes}
+                            onChange={(e) => handleBodyConditionChange(index, 'notes', e.target.value)}
+                            rows={2}
+                            className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 text-sm focus:border-[#E54E3D] focus:outline-none"
+                            placeholder="Add notes..."
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Summary and Recommendations */}
           <div className="bg-white rounded-lg shadow-lg p-6">
