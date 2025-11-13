@@ -35,6 +35,13 @@ const BODY_CONDITION_ITEMS = [
   'Frame and structural integrity',
 ];
 
+const INSPECTION_TYPES = [
+  { value: 'standard', label: 'Standard Inspection' },
+  { value: 'enhanced', label: 'Enhanced Inspection' },
+  { value: 'full-spectrum', label: 'Full-Spectrum Inspection' },
+  { value: 'routine', label: 'Routine Check-Up' },
+];
+
 export default function InspectionReportPage() {
   const params = useParams();
   const router = useRouter();
@@ -48,6 +55,8 @@ export default function InspectionReportPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [booking, setBooking] = useState<any>(null);
   const [existingReport, setExistingReport] = useState<any>(null);
+  const [selectedInspectionType, setSelectedInspectionType] = useState<string>('standard');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   const [formData, setFormData] = useState({
     generalInfo: {
@@ -104,6 +113,9 @@ export default function InspectionReportPage() {
 
       const bookingData = await bookingRes.json();
       setBooking(bookingData.booking);
+      
+      // Set initial inspection type from booking
+      setSelectedInspectionType(bookingData.booking.inspectionDetails?.type || 'standard');
 
       // Pre-fill form with booking data
       setFormData(prev => ({
@@ -185,6 +197,137 @@ export default function InspectionReportPage() {
         bodyCondition: newBodyCondition,
       };
     });
+  };
+
+  const generateInspectionSummary = (): string => {
+    const summaryParts: string[] = [];
+    
+    // Vehicle Information
+    const vehicle = formData.vehicleInfo;
+    if (vehicle.year && vehicle.make && vehicle.model) {
+      summaryParts.push(`This ${vehicle.year} ${vehicle.make} ${vehicle.model}${vehicle.trim ? ` ${vehicle.trim}` : ''}${vehicle.mileage ? ` with ${parseInt(vehicle.mileage).toLocaleString()} km` : ''} was inspected on ${formData.generalInfo.appointmentDate ? new Date(formData.generalInfo.appointmentDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'the scheduled date'}.`);
+    }
+    
+    // Overall Condition
+    if (formData.summary.overallCondition) {
+      const conditionLabels: { [key: string]: string } = {
+        'excellent': 'excellent',
+        'good': 'good',
+        'fair': 'fair',
+        'needs-attention': 'needs attention',
+        'critical': 'critical'
+      };
+      summaryParts.push(`Overall vehicle condition is rated as ${conditionLabels[formData.summary.overallCondition] || formData.summary.overallCondition}.`);
+    }
+    
+    // Body Condition findings (if full-spectrum)
+    if (selectedInspectionType === 'full-spectrum' && formData.bodyCondition.length > 0) {
+      const ratedItems = formData.bodyCondition.filter(item => item.rating && item.rating.trim() !== '');
+      if (ratedItems.length > 0) {
+        const criticalItems = ratedItems.filter(item => item.rating === 'critical' || item.rating === 'needs-attention');
+        const excellentItems = ratedItems.filter(item => item.rating === 'excellent' || item.rating === 'good');
+        
+        if (criticalItems.length > 0) {
+          summaryParts.push(`Key areas requiring attention include: ${criticalItems.map(item => item.item.toLowerCase()).slice(0, 3).join(', ')}.`);
+        }
+        
+        if (excellentItems.length > 0 && criticalItems.length === 0) {
+          summaryParts.push(`Notable positive aspects include: ${excellentItems.map(item => item.item.toLowerCase()).slice(0, 3).join(', ')} are in good condition.`);
+        }
+      }
+    }
+    
+    // Vehicle details
+    const details: string[] = [];
+    if (vehicle.color) details.push(`Color: ${vehicle.color}`);
+    if (vehicle.transmission) details.push(`Transmission: ${vehicle.transmission}`);
+    if (vehicle.drivetrain) details.push(`Drivetrain: ${vehicle.drivetrain}`);
+    if (vehicle.bodyStyle) details.push(`Body Style: ${vehicle.bodyStyle}`);
+    if (vehicle.fuelType) details.push(`Fuel Type: ${vehicle.fuelType}`);
+    if (vehicle.vin) details.push(`VIN: ${vehicle.vin}`);
+    
+    if (details.length > 0) {
+      summaryParts.push(`Vehicle specifications: ${details.join(', ')}.`);
+    }
+    
+    // Inspection location
+    if (formData.generalInfo.inspectionLocation) {
+      summaryParts.push(`Inspection was conducted at ${formData.generalInfo.inspectionLocation}.`);
+    }
+    
+    // Seller information
+    if (formData.generalInfo.sellerType && formData.generalInfo.sellerName) {
+      summaryParts.push(`Vehicle is being sold by ${formData.generalInfo.sellerType === 'private' ? 'a private seller' : formData.generalInfo.sellerType === 'dealer' ? 'a dealer' : 'an auction'}: ${formData.generalInfo.sellerName}.`);
+    }
+    
+    // Final statement
+    if (formData.summary.overallCondition) {
+      const condition = formData.summary.overallCondition;
+      if (condition === 'excellent' || condition === 'good') {
+        summaryParts.push(`The vehicle appears to be well-maintained and in good overall condition.`);
+      } else if (condition === 'fair') {
+        summaryParts.push(`The vehicle shows signs of normal wear and may require some maintenance in the near future.`);
+      } else if (condition === 'needs-attention' || condition === 'critical') {
+        summaryParts.push(`The vehicle requires immediate attention to address several issues identified during the inspection.`);
+      }
+    }
+    
+    return summaryParts.join(' ') || 'Please fill in the vehicle and inspection details to generate a summary.';
+  };
+
+  const handleGenerateSummary = () => {
+    const generatedSummary = generateInspectionSummary();
+    handleInputChange('summary', 'inspectionSummary', generatedSummary);
+  };
+
+  const calculateFormProgress = (): number => {
+    let totalFields = 0;
+    let filledFields = 0;
+
+    // General Info (required fields)
+    const generalInfoRequired = ['clientName', 'email', 'phone', 'appointmentDate', 'inspectionTime', 'inspectorName', 'inspectionLocation'];
+    totalFields += generalInfoRequired.length;
+    generalInfoRequired.forEach(field => {
+      if (formData.generalInfo[field as keyof typeof formData.generalInfo]?.toString().trim()) {
+        filledFields++;
+      }
+    });
+
+    // Vehicle Info (required fields)
+    const vehicleInfoRequired = ['year', 'make', 'model'];
+    totalFields += vehicleInfoRequired.length;
+    vehicleInfoRequired.forEach(field => {
+      if (formData.vehicleInfo[field as keyof typeof formData.vehicleInfo]?.toString().trim()) {
+        filledFields++;
+      }
+    });
+
+    // Body Condition (only if full-spectrum inspection)
+    if (selectedInspectionType === 'full-spectrum') {
+      formData.bodyCondition.forEach(item => {
+        totalFields++;
+        if (item.rating && item.rating.trim() !== '') {
+          filledFields++;
+        }
+      });
+    }
+
+    // Summary (required fields)
+    const summaryRequired = ['overallCondition', 'inspectionSummary', 'recommendations'];
+    totalFields += summaryRequired.length;
+    summaryRequired.forEach(field => {
+      if (formData.summary[field as keyof typeof formData.summary]?.toString().trim()) {
+        filledFields++;
+      }
+    });
+
+    // Value Assessment (required field)
+    totalFields++;
+    if (formData.valueAssessment.assessment?.trim()) {
+      filledFields++;
+    }
+
+    return totalFields > 0 ? Math.round((filledFields / totalFields) * 100) : 0;
   };
 
   const validateForm = (isSubmit: boolean = false): string[] => {
@@ -394,11 +537,61 @@ export default function InspectionReportPage() {
             Check<span className="text-[#E54E3D]">MyRide</span> Vehicle Inspection Report
           </h1>
           <div className="flex items-center gap-3">
-            <select className="bg-white text-[#1f2a37] px-4 py-2 rounded-lg font-semibold">
-              <option>FULL-SPECTRUM INSPECTION</option>
-            </select>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="bg-[#E54E3D] text-white px-6 py-2.5 pr-10 rounded-lg font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 hover:bg-[#d14130] transition-all duration-200 shadow-lg border-2 border-white/20 min-w-[240px] text-left flex items-center justify-between"
+              >
+                <span>{INSPECTION_TYPES.find(t => t.value === selectedInspectionType)?.label || 'Select Inspection Type'}</span>
+                <svg
+                  className={`w-5 h-5 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {isDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setIsDropdownOpen(false)}
+                  ></div>
+                  <div className="absolute right-0 mt-2 w-full bg-white rounded-lg shadow-xl border-2 border-[#e2e8f0] overflow-hidden z-20">
+                    {INSPECTION_TYPES.map((type) => (
+                      <button
+                        key={type.value}
+                        type="button"
+                        onClick={() => {
+                          setSelectedInspectionType(type.value);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`w-full border-b border-gray-300 px-6 py-2 text-left font-semibold transition-all duration-200 ${
+                          selectedInspectionType === type.value
+                            ? 'bg-[#E54E3D] text-white'
+                            : 'text-[#1f2a37] hover:bg-[#f8fafc] hover:text-[#E54E3D]'
+                        }`}
+                      >
+                        {type.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Progress Indicator */}
+      <div className="w-full bg-white h-1">
+        <div
+          className="bg-[#E54E3D] h-1 transition-all duration-500 ease-out"
+          style={{ width: `${calculateFormProgress()}%` }}
+        ></div>
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
@@ -748,49 +941,51 @@ export default function InspectionReportPage() {
             </div>
           </div>
 
-          {/* Body Condition */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-bold text-[#1f2a37] mb-4">Body Condition</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-[#f8fafc]">
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Item</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Rating</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Inspector Notes/Comments</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#e2e8f0]">
-                  {formData.bodyCondition.map((item, index) => (
-                    <tr key={index}>
-                      <td className="px-4 py-3 font-semibold text-[#1f2a37]">{item.item}</td>
-                      <td className="px-4 py-3">
-                        <select
-                          value={item.rating}
-                          onChange={(e) => handleBodyConditionChange(index, 'rating', e.target.value)}
-                          className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 text-sm focus:border-[#E54E3D] focus:outline-none"
-                        >
-                          <option value="">Select rating...</option>
-                          {RATING_OPTIONS.map(opt => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-4 py-3">
-                        <textarea
-                          value={item.notes}
-                          onChange={(e) => handleBodyConditionChange(index, 'notes', e.target.value)}
-                          rows={2}
-                          className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 text-sm focus:border-[#E54E3D] focus:outline-none"
-                          placeholder="Add notes..."
-                        />
-                      </td>
+          {/* Body Condition - Only show for Full-Spectrum Inspection */}
+          {selectedInspectionType === 'full-spectrum' && (
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-bold text-[#1f2a37] mb-4">Body Condition</h2>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-[#f8fafc]">
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Item</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Rating</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold text-[#64748b]">Inspector Notes/Comments</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-[#e2e8f0]">
+                    {formData.bodyCondition.map((item, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-3 font-semibold text-[#1f2a37]">{item.item}</td>
+                        <td className="px-4 py-3">
+                          <select
+                            value={item.rating}
+                            onChange={(e) => handleBodyConditionChange(index, 'rating', e.target.value)}
+                            className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 text-sm focus:border-[#E54E3D] focus:outline-none"
+                          >
+                            <option value="">Select rating...</option>
+                            {RATING_OPTIONS.map(opt => (
+                              <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="px-4 py-3">
+                          <textarea
+                            value={item.notes}
+                            onChange={(e) => handleBodyConditionChange(index, 'notes', e.target.value)}
+                            rows={2}
+                            className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 text-sm focus:border-[#E54E3D] focus:outline-none"
+                            placeholder="Add notes..."
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Summary and Recommendations */}
           <div className="bg-white rounded-lg shadow-lg p-6">
@@ -820,6 +1015,16 @@ export default function InspectionReportPage() {
                   className="w-full rounded-lg border-2 border-[#e2e8f0] px-4 py-2 focus:border-[#E54E3D] focus:outline-none"
                   placeholder="Provide a comprehensive summary of the vehicle's condition based on inspection findings..."
                 />
+                <button
+                  type="button"
+                  onClick={handleGenerateSummary}
+                  className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#E54E3D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#d14130] transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Generate Summary from Inspection Data
+                </button>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-[#64748b] mb-2">Recommendations</label>
