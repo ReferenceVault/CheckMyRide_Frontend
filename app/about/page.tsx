@@ -31,12 +31,12 @@ export default function AboutPage() {
             <p className="text-sm sm:text-base leading-relaxed text-[#3f4756]">
               Our mission is simple: to give car buyers peace of mind through professional, unbiased vehicle inspections. We serve as your trusted advisor in the car-buying process, helping you make informed decisions based on the true condition of a vehicle—not just what sellers claim.
             </p>
-            <div className="rounded-2xl bg-[#f8fafc] p-5 text-sm sm:text-base text-[#3f4756] shadow-inner shadow-slate-200/50">
+            <div className="rounded-2xl bg-[#f8fafc] p-5 text-sm sm:text-base text-[#3f4756] shadow-inner shadow-slate-200/50 min-h-[220px]">
               <p className="font-semibold text-[#1f2a37]">What sets us apart?</p>
               <ul className="mt-3 space-y-2">
                 <li className="flex items-start gap-3">
                   <span className="mt-1 block h-2.5 w-2.5 rounded-full bg-[#E54E3D]" />
-                  Fully ASE-certified inspectors who document every finding.
+                  Fully certified inspectors who document every finding.
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-1 block h-2.5 w-2.5 rounded-full bg-[#E54E3D]" />
@@ -55,7 +55,7 @@ export default function AboutPage() {
             <p className="text-sm sm:text-base leading-relaxed text-[#3f4756]">
               Led by co-founders Anthony Annan and Harrison Ackwah—who also serves as our head inspector—our team brings together automotive professionals passionate about vehicle safety and consumer protection. Every inspector undergoes rigorous training to uphold our standards of inspection quality.
             </p>
-            <div className="rounded-2xl bg-[#fef4f1] p-5 text-sm sm:text-base text-[#3f4756] shadow-inner shadow-slate-200/50">
+            <div className="rounded-2xl bg-[#fef4f1] p-5 text-sm sm:text-base text-[#3f4756] shadow-inner shadow-slate-200/50 min-h-[220px]">
               <p className="font-semibold text-[#E54E3D]">Our Commitment</p>
               <p className="mt-3">
                 We’re committed to saving you from the headaches and financial burdens that come with buying a problematic vehicle. Transparency builds trust: we document everything we find—both the good and the items that need attention—so you can move forward with confidence.

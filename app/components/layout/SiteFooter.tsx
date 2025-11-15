@@ -33,14 +33,14 @@ export default function SiteFooter() {
           <div className="space-y-6">
             <div>
               <Link href="/" className="inline-flex items-center">
-                <div className="relative flex h-14 w-14 items-center justify-center sm:h-16 sm:w-16">
-                  <img src="/images/logo.png" alt="CheckMyRide" className="h-full w-full object-contain" />
+                <div className="relative -ml-[18px] -mt-4 flex h-[72px] w-[72px] items-center justify-center sm:-ml-[18px] sm:-mt-4 sm:h-[92px] sm:w-[92px]">
+                  <img src="/images/logofooter1.png" alt="CheckMyRide" className="h-full w-full object-contain" />
                 </div>
-                <span className="ml-1 text-2xl font-bold tracking-tight text-[#152032]">
+                <span className="-ml-[25px] -mt-4 text-2xl font-bold tracking-tight text-[#152032]">
                   Check<span className="text-[#E54E3D]">MyRide</span>
                 </span>
               </Link>
-              <div className="mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#E54E3D] to-[#f97362]" />
+              <div className="-mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#E54E3D] to-[#f97362]" />
             </div>
             <p className="text-sm sm:text-base leading-relaxed text-[#4a5568]">
               Professional pre-purchase vehicle inspection services across Canada. Our experts help you make informed decisions and avoid costly mistakes.
