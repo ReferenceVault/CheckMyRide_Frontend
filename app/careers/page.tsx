@@ -88,7 +88,7 @@ export default function CareersPage() {
           </div>
         </div>
 
-        <div className="rounded-[2.25rem] bg-[#0f172a] px-8 py-10 text-white shadow-xl shadow-[#0f172a]/40">
+        <div className="w-full max-w-5xl rounded-[2.25rem] bg-[#0f172a] px-8 py-10 text-white shadow-xl shadow-[#0f172a]/40">
           <h2 className="text-2xl font-semibold">Want to collaborate on inspections?</h2>
           <p className="mt-3 max-w-3xl text-sm sm:text-base leading-relaxed text-white/80">
             We work with a trusted network of technicians and service providers. If you’re interested in partnership opportunities, send us your details and we’ll set up a conversation when new roles open up.

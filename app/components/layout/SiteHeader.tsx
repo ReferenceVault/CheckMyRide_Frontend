@@ -42,7 +42,7 @@ export default function SiteHeader({ navLinks }: SiteHeaderProps) {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="group relative inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-semibold text-[#374151] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E54E3D]/12 hover:text-[#E54E3D]"
+                  className="group relative inline-flex items-center justify-center rounded-full px-4 py-2 text-[19px] font-semibold text-[#374151] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#E54E3D]/12 hover:text-[#E54E3D]"
                 >
                   <span>{item.label}</span>
                   <span className="absolute inset-0 rounded-full border border-transparent transition-all duration-300 group-hover:border-[#E54E3D]/40" />
@@ -79,7 +79,7 @@ export default function SiteHeader({ navLinks }: SiteHeaderProps) {
                     key={item.label}
                     href={item.href}
                     onClick={() => setIsMenuOpen(false)}
-                    className="inline-flex items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold text-[#1f2a37] transition-colors hover:bg-[#E54E3D]/10 hover:text-[#E54E3D]"
+                    className="inline-flex items-center justify-between rounded-xl px-3 py-2 text-[19px] font-semibold text-[#1f2a37] transition-colors hover:bg-[#E54E3D]/10 hover:text-[#E54E3D]"
                   >
                     {item.label}
                   </Link>

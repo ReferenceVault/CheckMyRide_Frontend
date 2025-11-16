@@ -761,8 +761,8 @@ export default function Home() {
 
           <div className="relative grid gap-12 lg:grid-cols-[0.35fr_0.65fr] lg:items-start">
             <div className="relative hidden lg:block pt-[60px]">
-              <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-tr from-[#0f172a] via-[#1f2937] to-[#0ea5e9] p-1 shadow-2xl">
-                <div className="h-[620px] w-full rounded-[2.3rem] bg-cover bg-center" style={{ backgroundImage: "url('/images/service-driver.png')" }} />
+              <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-[#0d2a4a] bg-white shadow-2xl">
+                <div className="h-[690px] w-full rounded-[2.3rem] bg-cover bg-center" style={{ backgroundImage: "url('/images/service-driver.png')" }} />
                 <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-transparent via-[#0ea5e9]/15 to-[#0f172a]/70 mix-blend-screen" />
                     </div>
                   </div>
@@ -774,16 +774,16 @@ export default function Home() {
               </p>
             </div>
 
-              <div className="flex flex-col gap-3 md:grid md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-2">
                 {/* Standard Inspection Card */}
-                <div className="relative">
-                  <div className="relative max-w-[540px] overflow-hidden rounded-3xl border border-[#dde2f0] bg-white/95 p-6 sm:p-7 shadow-xl shadow-slate-200/50">
+                <div className="relative h-full">
+                  <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#dde2f0] bg-white/95 p-6 sm:p-7 shadow-xl shadow-slate-200/50">
                     <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-[#0d2a4a]" />
                     <div
                       className="absolute inset-0 opacity-90"
                       style={{ backgroundImage: 'radial-gradient(circle, #d9e2f1 1.2px, transparent 1.2px)', backgroundSize: '22px 22px' }}
                     />
-                    <div className="relative flex flex-col gap-4">
+                    <div className="relative flex h-full flex-col gap-4">
                       <div className="flex items-center gap-3">
                         <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
                           <svg className="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -796,7 +796,7 @@ export default function Home() {
                       <p className="text-sm leading-relaxed text-[#3f4756]">
                         Ideal for newer or low-mileage vehicles. A 50+ point inspection covering essential systems with attention to safety and performance.
                       </p>
-                      <ul className="space-y-2 text-sm text-[#334155]">
+                      <ul className="flex-1 space-y-2 text-sm text-[#334155]">
                         {["Exterior, lighting, tires & undercarriage checks", 'Engine, fluids, and dashboard control tests', 'Test drive evaluation and digital report', '45–60 minutes duration'].map((item) => (
                           <li key={item} className="flex items-start gap-2">
                             <span className="mt-2 block h-2 w-2 rounded-full bg-[#E64B37]" />
@@ -816,14 +816,14 @@ export default function Home() {
         </div>
 
                 {/* Enhanced Inspection Card */}
-                <div className="relative">
-                  <div className="relative max-w-[540px] overflow-hidden rounded-3xl border border-[#fbd4cb] bg-white/95 p-6 sm:p-7 shadow-xl shadow-[#f97362]/20">
+                <div className="relative h-full">
+                  <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#fbd4cb] bg-white/95 p-6 sm:p-7 shadow-xl shadow-[#f97362]/20">
                     <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-gradient-to-r from-[#f97362] via-[#E64B37] to-[#f97362]" />
                     <div
                       className="absolute inset-0 opacity-95"
                       style={{ backgroundImage: 'radial-gradient(circle, #f3dcd6 1.4px, transparent 1.4px)', backgroundSize: '24px 24px' }}
                     />
-                    <div className="relative flex flex-col gap-4">
+                    <div className="relative flex h-full flex-col gap-4">
                       <div className="flex items-center gap-3">
                         <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
                           <svg className="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -837,7 +837,7 @@ export default function Home() {
                       <p className="text-sm leading-relaxed text-[#324056]">
                         Our most popular 75+ point diagnostic inspection. Great for vehicles 5–10 years old or with moderate mileage needing detailed system analysis.
                       </p>
-                      <ul className="space-y-2 text-sm text-[#2f3a4c]">
+                      <ul className="flex-1 space-y-2 text-sm text-[#2f3a4c]">
                         {["Includes OBD-II scan and electrical diagnostics", 'Transmission and suspension assessments', 'Cooling system and battery performance test', '60–90 minutes duration'].map((item) => (
                           <li key={item} className="flex items-start gap-2">
                             <span className="mt-2 block h-2 w-2 rounded-full bg-[#E64B37]" />
@@ -862,14 +862,14 @@ export default function Home() {
                 </div>
 
                 {/* Full-Spectrum Inspection Card */}
-                <div className="relative">
-                  <div className="relative max-w-[540px] overflow-hidden rounded-3xl border border-[#fbd4cb] bg-white/95 p-6 sm:p-7 shadow-xl shadow-[#f97362]/20">
+                <div className="relative h-full">
+                  <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#fbd4cb] bg-white/95 p-6 sm:p-7 shadow-xl shadow-[#f97362]/20">
                     <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-gradient-to-r from-[#f97362] via-[#E64B37] to-[#f97362]" />
                     <div
                       className="absolute inset-0 opacity-95"
                       style={{ backgroundImage: 'radial-gradient(circle, #f3dcd6 1.4px, transparent 1.4px)', backgroundSize: '24px 24px' }}
                     />
-                    <div className="relative flex flex-col gap-4">
+                    <div className="relative flex h-full flex-col gap-4">
                       <div className="flex items-center gap-3">
                         <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
                           <svg className="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -884,7 +884,7 @@ export default function Home() {
                       <p className="text-sm leading-relaxed text-[#324056]">
                         A premium 100+ point comprehensive evaluation with compression testing, frame analysis, and emissions checks for complete peace of mind.
                       </p>
-                      <ul className="space-y-2 text-sm text-[#2f3a4c]">
+                      <ul className="flex-1 space-y-2 text-sm text-[#2f3a4c]">
                         {["Advanced engine diagnostics and performance scan", 'Frame, paint depth, and emissions evaluation', 'Negotiation insights for vehicle purchase', '90–120 minutes duration'].map((item) => (
                           <li key={item} className="flex items-start gap-2">
                             <span className="mt-2 block h-2 w-2 rounded-full bg-[#E64B37]" />
@@ -904,14 +904,14 @@ export default function Home() {
                 </div>
 
                 {/* Routine Check-Up Card */}
-                <div className="relative">
-                  <div className="relative max-w-[540px] overflow-hidden rounded-3xl border border-[#dde2f0] bg-white/95 p-6 sm:p-7 shadow-xl shadow-slate-200/50">
+                <div className="relative h-full">
+                  <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#dde2f0] bg-white/95 p-6 sm:p-7 shadow-xl shadow-slate-200/50">
                     <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-[#0d2a4a]" />
                     <div
                       className="absolute inset-0 opacity-90"
                       style={{ backgroundImage: 'radial-gradient(circle, #d9e2f1 1.2px, transparent 1.2px)', backgroundSize: '22px 22px' }}
                     />
-                    <div className="relative flex flex-col gap-4">
+                    <div className="relative flex h-full flex-col gap-4">
                       <div className="flex items-center gap-3">
                         <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
                           <svg className="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -924,7 +924,7 @@ export default function Home() {
                       <p className="text-sm leading-relaxed text-[#3f4756]">
                         For ongoing maintenance—helps car owners monitor health, prevent issues, and prepare vehicles for long journeys.
                       </p>
-                      <ul className="space-y-2 text-sm text-[#334155]">
+                      <ul className="flex-1 space-y-2 text-sm text-[#334155]">
                         {[
                           'Fluid level checks and visual wear assessment',
                           'Tire health and battery life review',
@@ -1354,7 +1354,7 @@ export default function Home() {
             >
               Book an Inspection Now
             </Link>
-            <p className="text-sm font-medium text-[#2f3a4c]">Call (613) 981-5498 for expert guidance.</p>
+            <p className="text-sm font-medium text-white/90">Call (613) 981-5498 for expert guidance.</p>
           </div>
         </div>
       </section>
@@ -1396,7 +1396,7 @@ export default function Home() {
               <div className="space-y-6 pr-1">
                 {checklist.sections.map((section) => (
                   <section key={section.title} className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] px-5 py-4 shadow-sm">
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]/70">{section.title}</h3>
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-[#0f172a]">{section.title}</h3>
                     <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-[#1f2937]">
                       {section.items.map((item) => (
                         <li key={item}>{item}</li>
