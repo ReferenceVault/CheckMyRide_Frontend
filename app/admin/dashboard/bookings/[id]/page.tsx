@@ -1,10 +1,80 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+}
+
+interface NavSection {
+  label: string;
+  items: NavItem[];
+}
+
+const navSections: NavSection[] = [
+  {
+    label: 'Overview',
+    items: [
+      {
+        label: 'Home',
+        href: '/admin/dashboard',
+        icon: (
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        ),
+      },
+    ],
+  },
+  {
+    label: 'Main',
+    items: [
+      {
+        label: 'Bookings',
+        href: '/admin/dashboard/bookings',
+        icon: (
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+        ),
+      },
+    ],
+  },
+  {
+    label: 'Financial',
+    items: [],
+  },
+  {
+    label: 'Account',
+    items: [
+      {
+        label: 'Users',
+        href: '/admin/dashboard/users',
+        icon: (
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        ),
+      },
+      {
+        label: 'Settings',
+        href: '/admin/dashboard/settings',
+        icon: (
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        ),
+      },
+    ],
+  },
+];
 
 interface Booking {
   _id: string;
@@ -47,7 +117,9 @@ interface Booking {
 export default function BookingDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const pathname = usePathname();
   const bookingId = params?.id as string;
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [booking, setBooking] = useState<Booking | null>(null);
@@ -201,12 +273,46 @@ export default function BookingDetailPage() {
     return styles[status as keyof typeof styles] || styles.pending;
   };
 
+  const getUserDisplayName = () => {
+    if (!user) return 'Admin';
+    
+    // Check for firstName and lastName
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    
+    // Check for name or fullName
+    const fullName = user.name || user.fullName;
+    if (fullName) {
+      return fullName;
+    }
+    
+    // Fallback to email prefix or Admin
+    if (user.email) {
+      const emailPrefix = user.email.split('@')[0];
+      // Capitalize first letter and replace dots/underscores with spaces
+      return emailPrefix
+        .replace(/[._]/g, ' ')
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+    
+    return 'Admin';
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    router.push('/admin/login');
+  };
+
   if (isLoading || isLoadingBooking) {
     return (
-      <div className="min-h-screen bg-[#f7f9fc] flex items-center justify-center">
+      <div className="min-h-screen bg-[#2B333B] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E54E3D] mx-auto mb-4"></div>
-          <p className="text-[#64748b]">Loading...</p>
+          <p className="text-slate-300">Loading...</p>
         </div>
       </div>
     );
@@ -214,13 +320,13 @@ export default function BookingDetailPage() {
 
   if (error || !booking) {
     return (
-      <div className="min-h-screen bg-[#f7f9fc] flex items-center justify-center">
+      <div className="min-h-screen bg-[#2B333B] flex items-center justify-center">
         <div className="text-center max-w-md">
-          <svg className="h-16 w-16 text-red-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-16 w-16 text-red-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h2 className="text-2xl font-bold text-[#1f2a37] mb-2">Error</h2>
-          <p className="text-[#64748b] mb-6">{error || 'Booking not found'}</p>
+          <h2 className="text-2xl font-bold text-white mb-2">Error</h2>
+          <p className="text-slate-300 mb-6">{error || 'Booking not found'}</p>
           <Link
             href="/admin/dashboard/bookings"
             className="inline-flex items-center gap-2 rounded-xl bg-[#E54E3D] px-6 py-3 text-sm font-semibold text-white hover:bg-[#d14130] transition-colors"
@@ -236,10 +342,106 @@ export default function BookingDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f9fc]">
-      <header className="bg-white shadow-sm border-b border-[#e2e8f0] sticky top-0 z-20">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-[#2B333B] flex">
+      {/* Sidebar */}
+      <aside
+        className={`${
+          isSidebarOpen ? 'w-64' : 'w-20'
+        } bg-slate-800/90 backdrop-blur-xl shadow-2xl border-r border-slate-700/50 transition-all duration-300 flex flex-col fixed h-full z-30`}
+      >
+        {/* Logo Section */}
+        <div className="pt-[8px] pr-6 pb-[8px] pl-0 border-b border-slate-200 bg-white">
+          <div className={`flex items-center ${isSidebarOpen ? 'justify-between' : 'justify-center'} gap-[7px]`}>
+            {isSidebarOpen && (
+              <div className="flex items-center flex-1">
+                <div className="relative flex h-14 w-14 items-center justify-center flex-shrink-0">
+                  <img src="/images/logo.png" alt="CheckMyRide" className="h-full w-full object-contain" />
+                </div>
+                <span className="text-2xl font-bold tracking-tight text-[#1f2a37]">
+                  Check<span className="text-[#E54E3D]">MyRide</span>
+                </span>
+              </div>
+            )}
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-2 rounded-lg text-[#1f2a37] hover:bg-slate-100 transition-colors flex-shrink-0"
+              aria-label="Toggle menu"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-4 overflow-y-auto custom-scrollbar">
+          <div className="space-y-6">
+            {navSections.map((section) => (
+              <div key={section.label}>
+                {isSidebarOpen && (
+                  <div className="px-4 mb-2">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                      {section.label}
+                    </p>
+                  </div>
+                )}
+                {section.items.length > 0 && (
+                  <div className="space-y-2">
+                    {section.items.map((item) => {
+                      const isActive = pathname === item.href || (item.href === '/admin/dashboard/bookings' && pathname?.includes('/bookings'));
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                            isActive
+                              ? 'bg-gradient-to-r from-[#E54E3D] to-[#f97362] text-white shadow-lg shadow-[#E54E3D]/30'
+                              : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                          }`}
+                        >
+                          <span className="flex-shrink-0">{item.icon}</span>
+                          {isSidebarOpen && <span className="font-semibold">{item.label}</span>}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </nav>
+
+        {/* User Section */}
+        {isSidebarOpen && user && (
+          <div className="p-4 border-t border-slate-700/50">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#E54E3D] to-[#f97362] flex items-center justify-center text-white font-semibold shadow-lg shadow-[#E54E3D]/30">
+                {user.email?.charAt(0).toUpperCase() || 'A'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-white truncate">Admin</p>
+                <p className="text-xs text-slate-400 truncate">{user.email}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+          </div>
+        )}
+      </aside>
+
+      {/* Main Content */}
+      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}>
+        {/* Top Header */}
+        <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-20">
+          <div className="px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
                 href="/admin/dashboard/bookings"
@@ -250,7 +452,7 @@ export default function BookingDetailPage() {
                 </svg>
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-[#0f172a]">Booking Details</h1>
+                <h1 className="text-xl font-bold text-[#0f172a]">Booking Details</h1>
                 <p className="text-sm text-[#64748b]">Booking ID: {booking._id}</p>
               </div>
             </div>
@@ -268,14 +470,13 @@ export default function BookingDetailPage() {
               </select>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="p-6">
-        <div className="max-w-5xl mx-auto space-y-6">
+        <main className="p-6">
+          <div className="max-w-5xl mx-auto space-y-6">
           {/* Personal Information */}
-          <div className="rounded-2xl bg-white shadow-lg shadow-slate-200/60 ring-1 ring-slate-100 p-6">
-            <h2 className="text-lg font-bold text-[#1f2a37] mb-4 flex items-center gap-2">
+          <div className="rounded-2xl bg-slate-800/60 backdrop-blur-xl shadow-xl border border-slate-700/50 p-6">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <svg className="h-5 w-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
@@ -283,23 +484,23 @@ export default function BookingDetailPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Full Name</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.personalInfo.fullName}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Full Name</label>
+                <p className="text-sm font-semibold text-white mt-1">{booking.personalInfo.fullName}</p>
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Email</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.personalInfo.email}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Email</label>
+                <p className="text-sm font-semibold text-white mt-1">{booking.personalInfo.email}</p>
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Phone</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.personalInfo.phone}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Phone</label>
+                <p className="text-sm font-semibold text-white mt-1">{booking.personalInfo.phone}</p>
               </div>
             </div>
           </div>
 
           {/* Vehicle Information */}
-          <div className="rounded-2xl bg-white shadow-lg shadow-slate-200/60 ring-1 ring-slate-100 p-6">
-            <h2 className="text-lg font-bold text-[#1f2a37] mb-4 flex items-center gap-2">
+          <div className="rounded-2xl bg-slate-800/60 backdrop-blur-xl shadow-xl border border-slate-700/50 p-6">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <svg className="h-5 w-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -307,35 +508,35 @@ export default function BookingDetailPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Make</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.vehicleInfo.make}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Make</label>
+                <p className="text-sm font-semibold text-white mt-1">{booking.vehicleInfo.make}</p>
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Model</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.vehicleInfo.model}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Model</label>
+                <p className="text-sm font-semibold text-white mt-1">{booking.vehicleInfo.model}</p>
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Year</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.vehicleInfo.year}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Year</label>
+                <p className="text-sm font-semibold text-white mt-1">{booking.vehicleInfo.year}</p>
               </div>
               {booking.vehicleInfo.mileage && (
                 <div>
-                  <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Mileage</label>
-                  <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.vehicleInfo.mileage.toLocaleString()} km</p>
+                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Mileage</label>
+                  <p className="text-sm font-semibold text-white mt-1">{booking.vehicleInfo.mileage.toLocaleString()} km</p>
                 </div>
               )}
               {booking.vehicleInfo.vin && (
                 <div className="md:col-span-2">
-                  <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">VIN</label>
-                  <p className="text-sm font-semibold text-[#1f2a37] mt-1 font-mono">{booking.vehicleInfo.vin}</p>
+                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">VIN</label>
+                  <p className="text-sm font-semibold text-white mt-1 font-mono">{booking.vehicleInfo.vin}</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Inspection Details */}
-          <div className="rounded-2xl bg-white shadow-lg shadow-slate-200/60 ring-1 ring-slate-100 p-6">
-            <h2 className="text-lg font-bold text-[#1f2a37] mb-4 flex items-center gap-2">
+          <div className="rounded-2xl bg-slate-800/60 backdrop-blur-xl shadow-xl border border-slate-700/50 p-6">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <svg className="h-5 w-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
@@ -343,19 +544,19 @@ export default function BookingDetailPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Type</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1 capitalize">{booking.inspectionDetails.type.replace('-', ' ')}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Type</label>
+                <p className="text-sm font-semibold text-white mt-1 capitalize">{booking.inspectionDetails.type.replace('-', ' ')}</p>
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Location</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1 capitalize">{booking.inspectionDetails.location}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Location</label>
+                <p className="text-sm font-semibold text-white mt-1 capitalize">{booking.inspectionDetails.location}</p>
               </div>
             </div>
           </div>
 
           {/* Appointment Details */}
-          <div className="rounded-2xl bg-white shadow-lg shadow-slate-200/60 ring-1 ring-slate-100 p-6">
-            <h2 className="text-lg font-bold text-[#1f2a37] mb-4 flex items-center gap-2">
+          <div className="rounded-2xl bg-slate-800/60 backdrop-blur-xl shadow-xl border border-slate-700/50 p-6">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <svg className="h-5 w-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -363,23 +564,23 @@ export default function BookingDetailPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Preferred Date</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{formatDate(booking.appointmentDetails.preferredDate)}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Preferred Date</label>
+                <p className="text-sm font-semibold text-white mt-1">{formatDate(booking.appointmentDetails.preferredDate)}</p>
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Preferred Time</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.appointmentDetails.preferredTime}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Preferred Time</label>
+                <p className="text-sm font-semibold text-white mt-1">{booking.appointmentDetails.preferredTime}</p>
               </div>
               <div className="md:col-span-2">
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Address</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.appointmentDetails.address}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Address</label>
+                <p className="text-sm font-semibold text-white mt-1">{booking.appointmentDetails.address}</p>
               </div>
             </div>
           </div>
 
           {/* Additional Information */}
-          <div className="rounded-2xl bg-white shadow-lg shadow-slate-200/60 ring-1 ring-slate-100 p-6">
-            <h2 className="text-lg font-bold text-[#1f2a37] mb-4 flex items-center gap-2">
+          <div className="rounded-2xl bg-slate-800/60 backdrop-blur-xl shadow-xl border border-slate-700/50 p-6">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <svg className="h-5 w-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -387,28 +588,28 @@ export default function BookingDetailPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Payment Method</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1 capitalize">{booking.additionalInfo.paymentMethod}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Payment Method</label>
+                <p className="text-sm font-semibold text-white mt-1 capitalize">{booking.additionalInfo.paymentMethod}</p>
               </div>
               {booking.additionalInfo.promoCode && (
                 <div>
-                  <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Promo Code</label>
-                  <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.additionalInfo.promoCode}</p>
+                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Promo Code</label>
+                  <p className="text-sm font-semibold text-white mt-1">{booking.additionalInfo.promoCode}</p>
                 </div>
               )}
               {booking.additionalInfo.notes && (
                 <div className="md:col-span-2">
-                  <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Notes</label>
-                  <p className="text-sm text-[#1f2a37] mt-1 whitespace-pre-wrap">{booking.additionalInfo.notes}</p>
+                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Notes</label>
+                  <p className="text-sm text-slate-300 mt-1 whitespace-pre-wrap">{booking.additionalInfo.notes}</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Assigned Mechanic */}
-          <div className="rounded-2xl bg-white shadow-lg shadow-slate-200/60 ring-1 ring-slate-100 p-6">
+          <div className="rounded-2xl bg-slate-800/60 backdrop-blur-xl shadow-xl border border-slate-700/50 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-[#1f2a37] flex items-center gap-2">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <svg className="h-5 w-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
@@ -430,16 +631,16 @@ export default function BookingDetailPage() {
             {booking.assignedMechanic ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Name</label>
-                  <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.assignedMechanic.name}</p>
+                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Name</label>
+                  <p className="text-sm font-semibold text-white mt-1">{booking.assignedMechanic.name}</p>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Email</label>
-                  <p className="text-sm font-semibold text-[#1f2a37] mt-1">{booking.assignedMechanic.email}</p>
+                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Email</label>
+                  <p className="text-sm font-semibold text-white mt-1">{booking.assignedMechanic.email}</p>
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Assigned At</label>
-                  <p className="text-sm font-semibold text-[#1f2a37] mt-1">{formatDateTime(booking.assignedMechanic.assignedAt)}</p>
+                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Assigned At</label>
+                  <p className="text-sm font-semibold text-white mt-1">{formatDateTime(booking.assignedMechanic.assignedAt)}</p>
                 </div>
                 <div className="flex items-end">
                   <button
@@ -458,17 +659,17 @@ export default function BookingDetailPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-[#64748b]">No mechanic assigned yet</p>
+              <p className="text-sm text-slate-400">No mechanic assigned yet</p>
             )}
 
             {showAssignForm && (
-              <form onSubmit={handleAssignMechanic} className="mt-6 p-4 bg-[#f8fafc] rounded-xl border-2 border-[#e2e8f0]">
-                <h3 className="text-sm font-semibold text-[#1f2a37] mb-4">
+              <form onSubmit={handleAssignMechanic} className="mt-6 p-4 bg-slate-700/30 rounded-xl border-2 border-slate-600/50">
+                <h3 className="text-sm font-semibold text-white mb-4">
                   {booking.assignedMechanic ? 'Reassign Mechanic' : 'Assign Mechanic'}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                       Mechanic Name
                     </label>
                     <input
@@ -476,12 +677,12 @@ export default function BookingDetailPage() {
                       value={mechanicName}
                       onChange={(e) => setMechanicName(e.target.value)}
                       required
-                      className="w-full rounded-lg border-2 border-[#e2e8f0] bg-white px-4 py-2 text-sm text-[#1f2a37] focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                      className="w-full rounded-lg border-2 border-slate-600/50 bg-slate-900/50 backdrop-blur-sm px-4 py-2 text-sm text-white placeholder-slate-500 focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                       placeholder="Enter mechanic name"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-2">
+                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
                       Mechanic Email
                     </label>
                     <input
@@ -489,7 +690,7 @@ export default function BookingDetailPage() {
                       value={mechanicEmail}
                       onChange={(e) => setMechanicEmail(e.target.value)}
                       required
-                      className="w-full rounded-lg border-2 border-[#e2e8f0] bg-white px-4 py-2 text-sm text-[#1f2a37] focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                      className="w-full rounded-lg border-2 border-slate-600/50 bg-slate-900/50 backdrop-blur-sm px-4 py-2 text-sm text-white placeholder-slate-500 focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
                       placeholder="mechanic@example.com"
                     />
                   </div>
@@ -521,7 +722,7 @@ export default function BookingDetailPage() {
                       setMechanicName('');
                       setMechanicEmail('');
                     }}
-                    className="inline-flex items-center gap-2 rounded-xl bg-white border-2 border-[#e2e8f0] px-4 py-2 text-sm font-semibold text-[#64748b] hover:bg-[#f8fafc] transition-colors"
+                    className="inline-flex items-center gap-2 rounded-xl bg-slate-700/50 border-2 border-slate-600/50 px-4 py-2 text-sm font-semibold text-slate-300 hover:bg-slate-700/70 hover:text-white transition-colors"
                   >
                     Cancel
                   </button>
@@ -531,8 +732,8 @@ export default function BookingDetailPage() {
           </div>
 
           {/* Timestamps */}
-          <div className="rounded-2xl bg-white shadow-lg shadow-slate-200/60 ring-1 ring-slate-100 p-6">
-            <h2 className="text-lg font-bold text-[#1f2a37] mb-4 flex items-center gap-2">
+          <div className="rounded-2xl bg-slate-800/60 backdrop-blur-xl shadow-xl border border-slate-700/50 p-6">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
               <svg className="h-5 w-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -540,17 +741,18 @@ export default function BookingDetailPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Created At</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{formatDateTime(booking.createdAt)}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Created At</label>
+                <p className="text-sm font-semibold text-white mt-1">{formatDateTime(booking.createdAt)}</p>
               </div>
               <div>
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">Last Updated</label>
-                <p className="text-sm font-semibold text-[#1f2a37] mt-1">{formatDateTime(booking.updatedAt)}</p>
+                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Last Updated</label>
+                <p className="text-sm font-semibold text-white mt-1">{formatDateTime(booking.updatedAt)}</p>
               </div>
             </div>
           </div>
         </div>
       </main>
+      </div>
     </div>
   );
 }
