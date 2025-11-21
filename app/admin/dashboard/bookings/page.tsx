@@ -51,7 +51,7 @@ export default function BookingsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
-    limit: 10,
+    limit: 5,
     total: 0,
     pages: 0,
   });
@@ -70,11 +70,11 @@ export default function BookingsPage() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading && user) {
+    if (!isLoading) {
       fetchBookings();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, currentPage]);
+  }, [statusFilter, currentPage, isLoading]);
 
 
   const fetchBookings = async () => {
@@ -85,7 +85,7 @@ export default function BookingsPage() {
       const token = localStorage.getItem('adminToken');
       const params = new URLSearchParams({
         page: currentPage.toString(),
-        limit: '10',
+        limit: '5',
       });
       if (statusFilter) {
         params.append('status', statusFilter);
@@ -103,7 +103,7 @@ export default function BookingsPage() {
 
       const data = await response.json();
       setBookings(data.bookings || []);
-      setPagination(data.pagination || { page: 1, limit: 10, total: 0, pages: 0 });
+      setPagination(data.pagination || { page: 1, limit: 5, total: 0, pages: 0 });
     } catch (error: any) {
       setError(error.message || 'Failed to load bookings');
       console.error('Error fetching bookings:', error);
@@ -322,50 +322,94 @@ export default function BookingsPage() {
                 </div>
 
                 {/* Pagination */}
-                {pagination.pages > 1 && (
-                  <div className="px-6 py-4 border-t border-slate-700/50 flex items-center justify-between">
+                {pagination.total > 0 && (
+                  <div className="px-6 py-4 border-t border-slate-700/50 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="text-sm text-slate-400">
-                      Showing {(currentPage - 1) * pagination.limit + 1} to {Math.min(currentPage * pagination.limit, pagination.total)} of {pagination.total} bookings
+                      Showing <span className="font-semibold text-white">{(currentPage - 1) * pagination.limit + 1}</span> to <span className="font-semibold text-white">{Math.min(currentPage * pagination.limit, pagination.total)}</span> of <span className="font-semibold text-white">{pagination.total}</span> bookings
                     </div>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 rounded-xl text-sm font-semibold text-white hover:bg-[#E54E3D]/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-slate-700/50 hover:bg-[#E54E3D] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-700/50 transition-colors"
                       >
                         Previous
                       </button>
                       <div className="flex items-center gap-1">
-                        {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
-                          let pageNum;
-                          if (pagination.pages <= 5) {
-                            pageNum = i + 1;
-                          } else if (currentPage <= 3) {
-                            pageNum = i + 1;
-                          } else if (currentPage >= pagination.pages - 2) {
-                            pageNum = pagination.pages - 4 + i;
-                          } else {
-                            pageNum = currentPage - 2 + i;
-                          }
-                          return (
+                        {pagination.pages <= 7 ? (
+                          // Show all pages if 7 or fewer
+                          Array.from({ length: pagination.pages }, (_, i) => {
+                            const pageNum = i + 1;
+                            return (
+                              <button
+                                key={pageNum}
+                                onClick={() => setCurrentPage(pageNum)}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors min-w-[36px] ${
+                                  currentPage === pageNum
+                                    ? 'bg-[#E54E3D] text-white'
+                                    : 'text-white bg-slate-700/50 hover:bg-[#E54E3D]/50'
+                                }`}
+                              >
+                                {pageNum}
+                              </button>
+                            );
+                          })
+                        ) : (
+                          // Show first, last, and pages around current
+                          <>
                             <button
-                              key={pageNum}
-                              onClick={() => setCurrentPage(pageNum)}
-                              className={`px-3 py-1 rounded-lg text-sm font-semibold transition-colors ${
-                                currentPage === pageNum
+                              onClick={() => setCurrentPage(1)}
+                              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors min-w-[36px] ${
+                                currentPage === 1
                                   ? 'bg-[#E54E3D] text-white'
-                                  : 'text-white hover:bg-[#E54E3D]/10'
+                                  : 'text-white bg-slate-700/50 hover:bg-[#E54E3D]/50'
                               }`}
                             >
-                              {pageNum}
+                              1
                             </button>
-                          );
-                        })}
+                            {currentPage > 3 && <span className="text-slate-400 px-1">...</span>}
+                            {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
+                              let pageNum;
+                              if (currentPage <= 3) {
+                                pageNum = i + 2;
+                              } else if (currentPage >= pagination.pages - 2) {
+                                pageNum = pagination.pages - 4 + i;
+                              } else {
+                                pageNum = currentPage - 2 + i;
+                              }
+                              if (pageNum <= 1 || pageNum >= pagination.pages) return null;
+                              return (
+                                <button
+                                  key={pageNum}
+                                  onClick={() => setCurrentPage(pageNum)}
+                                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors min-w-[36px] ${
+                                    currentPage === pageNum
+                                      ? 'bg-[#E54E3D] text-white'
+                                      : 'text-white bg-slate-700/50 hover:bg-[#E54E3D]/50'
+                                  }`}
+                                >
+                                  {pageNum}
+                                </button>
+                              );
+                            })}
+                            {currentPage < pagination.pages - 2 && <span className="text-slate-400 px-1">...</span>}
+                            <button
+                              onClick={() => setCurrentPage(pagination.pages)}
+                              className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors min-w-[36px] ${
+                                currentPage === pagination.pages
+                                  ? 'bg-[#E54E3D] text-white'
+                                  : 'text-white bg-slate-700/50 hover:bg-[#E54E3D]/50'
+                              }`}
+                            >
+                              {pagination.pages}
+                            </button>
+                          </>
+                        )}
                       </div>
                       <button
                         onClick={() => setCurrentPage((prev) => Math.min(pagination.pages, prev + 1))}
                         disabled={currentPage === pagination.pages}
-                        className="px-4 py-2 rounded-xl text-sm font-semibold text-white hover:bg-[#E54E3D]/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-slate-700/50 hover:bg-[#E54E3D] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-slate-700/50 transition-colors"
                       >
                         Next
                       </button>
