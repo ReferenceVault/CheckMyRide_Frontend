@@ -359,7 +359,7 @@ export default function AdminDashboard() {
       <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}>
         {/* Top Header */}
         <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-20">
-          <div className="px-6 py-4 flex items-center justify-between">
+          <div className="px-6 pt-[18px] pb-[18px] flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-[#0f172a]">Home</h1>
             </div>

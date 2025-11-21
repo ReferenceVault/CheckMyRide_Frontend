@@ -159,7 +159,7 @@ export default function AdminLayout({ children, pageTitle, pageSubtitle, headerA
       <aside
         className={`${
           isSidebarOpen ? 'w-64' : 'w-20'
-        } relative backdrop-blur-xl shadow-2xl border-r border-slate-700/50 transition-all duration-300 flex flex-col fixed h-full z-30 overflow-hidden`}
+        } relative backdrop-blur-xl shadow-2xl border-r border-slate-700/50 transition-all duration-300 flex flex-col fixed h-screen z-30 overflow-hidden`}
       >
         {/* Hero Section Gradient Background */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.2),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.18),transparent_50%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.22),transparent_45%)]" />
@@ -265,7 +265,7 @@ export default function AdminLayout({ children, pageTitle, pageSubtitle, headerA
       </aside>
 
       {/* Main Content */}
-      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-20'} relative min-h-screen flex flex-col overflow-x-hidden`}>
+      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-0' : 'ml-20'} relative min-h-screen flex flex-col overflow-x-hidden`}>
         {/* Hero Section Gradient Background */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.2),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.18),transparent_50%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.22),transparent_45%)]" />
         <div className="absolute inset-0 bg-[#2B333B]" />
@@ -280,7 +280,7 @@ export default function AdminLayout({ children, pageTitle, pageSubtitle, headerA
 
         {/* Top Header */}
         <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-20 relative">
-          <div className="px-6 py-4 flex items-center justify-between">
+          <div className="px-6 py-3 flex items-center justify-between">
             <div>
               {pageTitle && <h1 className="text-xl font-bold text-[#0f172a]">{pageTitle}</h1>}
               {pageSubtitle && <p className="text-sm text-[#64748b]">{pageSubtitle}</p>}

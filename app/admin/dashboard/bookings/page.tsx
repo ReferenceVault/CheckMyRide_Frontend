@@ -178,8 +178,8 @@ export default function BookingsPage() {
         </button>
       }
     >
-      <main className="p-6">
-          <div className="max-w-7xl mx-auto">
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto">
             {/* Filters */}
             <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
               <div className="flex items-center gap-4">
@@ -374,8 +374,8 @@ export default function BookingsPage() {
                 )}
               </div>
             )}
-          </div>
-      </main>
+        </div>
+      </div>
     </AdminLayout>
   );
 }
