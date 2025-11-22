@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, FormEvent, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import SiteHeader from '../../components/layout/SiteHeader';
@@ -8,7 +8,7 @@ import SiteFooter from '../../components/layout/SiteFooter';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [token, setToken] = useState('');
@@ -343,6 +343,33 @@ export default function ResetPasswordPage() {
 
       <SiteFooter />
     </main>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#2B333B]">
+          <SiteHeader />
+          <section className="relative overflow-hidden bg-[#2B333B] px-0 pt-24 pb-12 sm:pt-10 sm:pb-16 lg:pt-[30px] lg:pb-[1.25rem]">
+            <div className="relative flex items-center justify-center min-h-[60vh] px-4 sm:px-6 lg:px-8">
+              <div className="w-full max-w-md">
+                <div className="relative rounded-3xl bg-slate-800/60 backdrop-blur-xl p-8 shadow-2xl border border-slate-700/50">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+                    <p className="text-slate-300">Loading...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <SiteFooter />
+        </main>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
 
