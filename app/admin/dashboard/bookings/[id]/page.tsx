@@ -126,9 +126,10 @@ export default function BookingDetailPage() {
   const [isLoadingBooking, setIsLoadingBooking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAssignForm, setShowAssignForm] = useState(false);
-  const [mechanicName, setMechanicName] = useState('');
-  const [mechanicEmail, setMechanicEmail] = useState('');
   const [isAssigning, setIsAssigning] = useState(false);
+  const [mechanics, setMechanics] = useState<Array<{ id: string; email: string; name: string }>>([]);
+  const [selectedMechanicId, setSelectedMechanicId] = useState('');
+  const [isLoadingMechanics, setIsLoadingMechanics] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -205,12 +206,43 @@ export default function BookingDetailPage() {
     }
   };
 
+  const fetchMechanics = async () => {
+    setIsLoadingMechanics(true);
+    try {
+      const response = await fetch(`${API_URL}/api/auth/mechanics`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch mechanics');
+      }
+
+      const data = await response.json();
+      setMechanics(data.mechanics || []);
+    } catch (error: any) {
+      console.error('Error fetching mechanics:', error);
+      setError('Failed to load mechanics. Please try again.');
+    } finally {
+      setIsLoadingMechanics(false);
+    }
+  };
+
   const handleAssignMechanic = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!booking) return;
 
-    if (!mechanicName.trim() || !mechanicEmail.trim()) {
-      alert('Please fill in both mechanic name and email');
+    if (!selectedMechanicId) {
+      alert('Please select a mechanic');
+      return;
+    }
+
+    // Find selected mechanic
+    const selectedMechanic = mechanics.find((m) => m.id === selectedMechanicId);
+    if (!selectedMechanic) {
+      alert('Selected mechanic not found');
       return;
     }
 
@@ -222,8 +254,8 @@ export default function BookingDetailPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: mechanicName.trim(),
-          email: mechanicEmail.trim(),
+          name: selectedMechanic.name,
+          email: selectedMechanic.email,
         }),
       });
 
@@ -234,8 +266,7 @@ export default function BookingDetailPage() {
 
       const data = await response.json();
       setBooking(data.booking);
-      setMechanicName('');
-      setMechanicEmail('');
+      setSelectedMechanicId('');
       setShowAssignForm(false);
       alert('Mechanic assigned successfully! Email notification sent.');
     } catch (error: any) {
@@ -617,7 +648,10 @@ export default function BookingDetailPage() {
               </h2>
               {!booking.assignedMechanic && (
                 <button
-                  onClick={() => setShowAssignForm(true)}
+                  onClick={() => {
+                    setShowAssignForm(true);
+                    fetchMechanics();
+                  }}
                   className="inline-flex items-center gap-2 rounded-xl bg-[#E54E3D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#d14130] transition-colors"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -646,8 +680,14 @@ export default function BookingDetailPage() {
                   <button
                     onClick={() => {
                       setShowAssignForm(true);
-                      setMechanicName(booking.assignedMechanic!.name);
-                      setMechanicEmail(booking.assignedMechanic!.email);
+                      fetchMechanics();
+                      // Try to find and select current mechanic if exists in list
+                      const currentMechanic = mechanics.find(
+                        (m) => m.email === booking.assignedMechanic!.email
+                      );
+                      if (currentMechanic) {
+                        setSelectedMechanicId(currentMechanic.id);
+                      }
                     }}
                     className="inline-flex items-center gap-2 rounded-xl bg-[#E54E3D]/10 px-4 py-2 text-sm font-semibold text-[#E54E3D] hover:bg-[#E54E3D] hover:text-white transition-colors"
                   >
@@ -667,38 +707,52 @@ export default function BookingDetailPage() {
                 <h3 className="text-sm font-semibold text-white mb-4">
                   {booking.assignedMechanic ? 'Reassign Mechanic' : 'Assign Mechanic'}
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                      Mechanic Name
-                    </label>
-                    <input
-                      type="text"
-                      value={mechanicName}
-                      onChange={(e) => setMechanicName(e.target.value)}
+                <div className="mb-4">
+                  <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                    Select Mechanic <span className="text-red-400">*</span>
+                  </label>
+                  {isLoadingMechanics ? (
+                    <div className="flex items-center gap-2 text-slate-400">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#E54E3D]"></div>
+                      <span className="text-sm">Loading mechanics...</span>
+                    </div>
+                  ) : mechanics.length === 0 ? (
+                    <div className="rounded-lg border-2 border-yellow-600/50 bg-yellow-950/20 p-3">
+                      <p className="text-sm text-yellow-300">
+                        No mechanics found. Please create users with role "mechanic" first.
+                      </p>
+                    </div>
+                  ) : (
+                    <select
+                      value={selectedMechanicId}
+                      onChange={(e) => setSelectedMechanicId(e.target.value)}
                       required
-                      className="w-full rounded-lg border-2 border-slate-600/50 bg-slate-900/50 backdrop-blur-sm px-4 py-2 text-sm text-white placeholder-slate-500 focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
-                      placeholder="Enter mechanic name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                      Mechanic Email
-                    </label>
-                    <input
-                      type="email"
-                      value={mechanicEmail}
-                      onChange={(e) => setMechanicEmail(e.target.value)}
-                      required
-                      className="w-full rounded-lg border-2 border-slate-600/50 bg-slate-900/50 backdrop-blur-sm px-4 py-2 text-sm text-white placeholder-slate-500 focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
-                      placeholder="mechanic@example.com"
-                    />
-                  </div>
+                      className="w-full rounded-lg border-2 border-slate-600/50 bg-slate-900/50 backdrop-blur-sm px-4 py-2 text-sm text-white focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                    >
+                      <option value="">-- Select a mechanic --</option>
+                      {mechanics.map((mechanic) => (
+                        <option key={mechanic.id} value={mechanic.id}>
+                          {mechanic.name} ({mechanic.email})
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {selectedMechanicId && (
+                    <div className="mt-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                      <p className="text-xs text-slate-400 mb-1">Selected Mechanic:</p>
+                      <p className="text-sm font-semibold text-white">
+                        {mechanics.find((m) => m.id === selectedMechanicId)?.name}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {mechanics.find((m) => m.id === selectedMechanicId)?.email}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <button
                     type="submit"
-                    disabled={isAssigning}
+                    disabled={isAssigning || !selectedMechanicId || isLoadingMechanics}
                     className="inline-flex items-center gap-2 rounded-xl bg-[#E54E3D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#d14130] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isAssigning ? (
@@ -719,8 +773,7 @@ export default function BookingDetailPage() {
                     type="button"
                     onClick={() => {
                       setShowAssignForm(false);
-                      setMechanicName('');
-                      setMechanicEmail('');
+                      setSelectedMechanicId('');
                     }}
                     className="inline-flex items-center gap-2 rounded-xl bg-slate-700/50 border-2 border-slate-600/50 px-4 py-2 text-sm font-semibold text-slate-300 hover:bg-slate-700/70 hover:text-white transition-colors"
                   >
