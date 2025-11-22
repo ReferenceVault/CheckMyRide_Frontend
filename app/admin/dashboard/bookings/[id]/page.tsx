@@ -441,7 +441,7 @@ export default function BookingDetailPage() {
       <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-20'}`}>
         {/* Top Header */}
         <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-20">
-          <div className="px-6 py-4 flex items-center justify-between">
+          <div className="px-6 py-3 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link
                 href="/admin/dashboard/bookings"

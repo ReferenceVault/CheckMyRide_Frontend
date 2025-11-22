@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import SiteHeader from '../../components/layout/SiteHeader';
 import SiteFooter from '../../components/layout/SiteFooter';
 
@@ -267,12 +268,20 @@ export default function AdminLoginPage() {
 
                 {/* Password Field */}
                 <div>
-                  <label htmlFor="password" className="flex items-center gap-2 text-sm font-medium text-slate-300 mb-2">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    Password <span className="text-cyan-400">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label htmlFor="password" className="flex items-center gap-2 text-sm font-medium text-slate-300">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Password <span className="text-cyan-400">*</span>
+                    </label>
+                    <Link
+                      href="/admin/forgot-password"
+                      className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors"
+                    >
+                      Forgot?
+                    </Link>
+                  </div>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
