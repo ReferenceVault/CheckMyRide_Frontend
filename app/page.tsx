@@ -779,10 +779,6 @@ export default function Home() {
                 <div className="relative h-full">
                   <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#dde2f0] bg-white/95 p-6 sm:p-7 shadow-xl shadow-slate-200/50">
                     <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-[#0d2a4a]" />
-                    <div
-                      className="absolute inset-0 opacity-90"
-                      style={{ backgroundImage: 'radial-gradient(circle, #d9e2f1 1.2px, transparent 1.2px)', backgroundSize: '22px 22px' }}
-                    />
                     <div className="relative flex h-full flex-col gap-4">
                       <div className="flex items-center gap-3">
                         <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
@@ -819,10 +815,6 @@ export default function Home() {
                 <div className="relative h-full">
                   <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#fbd4cb] bg-white/95 p-6 sm:p-7 shadow-xl shadow-[#f97362]/20">
                     <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-gradient-to-r from-[#f97362] via-[#E64B37] to-[#f97362]" />
-                    <div
-                      className="absolute inset-0 opacity-95"
-                      style={{ backgroundImage: 'radial-gradient(circle, #f3dcd6 1.4px, transparent 1.4px)', backgroundSize: '24px 24px' }}
-                    />
                     <div className="relative flex h-full flex-col gap-4">
                       <div className="flex items-center gap-3">
                         <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
@@ -865,10 +857,6 @@ export default function Home() {
                 <div className="relative h-full">
                   <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#fbd4cb] bg-white/95 p-6 sm:p-7 shadow-xl shadow-[#f97362]/20">
                     <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-gradient-to-r from-[#f97362] via-[#E64B37] to-[#f97362]" />
-                    <div
-                      className="absolute inset-0 opacity-95"
-                      style={{ backgroundImage: 'radial-gradient(circle, #f3dcd6 1.4px, transparent 1.4px)', backgroundSize: '24px 24px' }}
-                    />
                     <div className="relative flex h-full flex-col gap-4">
                       <div className="flex items-center gap-3">
                         <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
@@ -907,10 +895,6 @@ export default function Home() {
                 <div className="relative h-full">
                   <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#dde2f0] bg-white/95 p-6 sm:p-7 shadow-xl shadow-slate-200/50">
                     <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-[#0d2a4a]" />
-                    <div
-                      className="absolute inset-0 opacity-90"
-                      style={{ backgroundImage: 'radial-gradient(circle, #d9e2f1 1.2px, transparent 1.2px)', backgroundSize: '22px 22px' }}
-                    />
                     <div className="relative flex h-full flex-col gap-4">
                       <div className="flex items-center gap-3">
                         <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
@@ -1024,7 +1008,9 @@ export default function Home() {
                   </svg>
             </Link>
             <Link
-              href="#sample-report"
+              href="/report-sample"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/5 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-[0_12px_28px_rgba(5,15,27,0.45)] transition hover:-translate-y-0.5 hover:bg-white/10"
             >
               View Sample Report
