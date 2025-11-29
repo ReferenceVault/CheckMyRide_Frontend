@@ -66,9 +66,12 @@ export function useInspectionForm({
 
   const fetchBookingAndReport = async () => {
     try {
+      // Use the defaultInspectionType from URL path, not from booking
+      const currentReportType = defaultInspectionType;
+      
       const [bookingRes, reportRes] = await Promise.all([
         fetch(`${API_URL}/api/bookings/${bookingId}`),
-        fetch(`${API_URL}/api/reports/booking/${bookingId}`).catch(() => null),
+        fetch(`${API_URL}/api/reports/booking/${bookingId}?reportType=${currentReportType}`).catch(() => null),
       ]);
 
       if (!bookingRes.ok) {
@@ -77,7 +80,7 @@ export function useInspectionForm({
 
       const bookingData = await bookingRes.json();
       setBooking(bookingData.booking);
-      setSelectedInspectionType(bookingData.booking.inspectionDetails?.type || defaultInspectionType);
+      setSelectedInspectionType(currentReportType);
 
       const initializedFormData = onFormDataInit
         ? onFormDataInit(bookingData.booking)
@@ -90,17 +93,34 @@ export function useInspectionForm({
         if (reportData.report) {
           setFormData((prev: any) => {
             const updated = { ...prev };
-            updated.generalInfo = { ...prev.generalInfo, ...reportData.report.generalInfo };
             
+            // Update generalInfo
+            if (reportData.report.generalInfo) {
+              updated.generalInfo = {
+                ...prev.generalInfo,
+                ...reportData.report.generalInfo,
+                appointmentDate: reportData.report.generalInfo.appointmentDate
+                  ? new Date(reportData.report.generalInfo.appointmentDate).toISOString().split('T')[0]
+                  : prev.generalInfo.appointmentDate,
+              };
+            }
+            
+            // Update sections from the sections object or directly from report
             sectionKeys.forEach((key) => {
-              if (reportData.report[key]?.length > 0) {
+              if (reportData.report.sections?.[key]?.length > 0) {
+                updated[key] = reportData.report.sections[key];
+              } else if (reportData.report[key]?.length > 0) {
+                // Fallback for old structure
                 updated[key] = reportData.report[key];
               }
             });
 
+            // Update summary
             if (reportData.report.summary) {
               updated.summary = reportData.report.summary;
             }
+            
+            // Update valueAssessment
             if (reportData.report.valueAssessment) {
               updated.valueAssessment = reportData.report.valueAssessment;
             }
@@ -181,15 +201,30 @@ export function useInspectionForm({
     setValidationErrors([]);
 
     try {
+      // Extract sections from formData
+      const { generalInfo, summary, valueAssessment, ...sections } = formData;
+      
+      // Build sections object (only include arrays that are sections)
+      const sectionsData: { [key: string]: any[] } = {};
+      sectionKeys.forEach((key) => {
+        if (sections[key] && Array.isArray(sections[key])) {
+          sectionsData[key] = sections[key];
+        }
+      });
+
       const response = await fetch(`${API_URL}/api/reports/booking/${bookingId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
+          reportType: selectedInspectionType,
+          status: 'draft',
           generalInfo: {
-            ...formData.generalInfo,
-            appointmentDate: new Date(formData.generalInfo.appointmentDate).toISOString(),
+            ...generalInfo,
+            appointmentDate: new Date(generalInfo.appointmentDate).toISOString(),
           },
+          summary,
+          valueAssessment,
+          ...sectionsData,
         }),
       });
 
@@ -225,15 +260,30 @@ export function useInspectionForm({
     }
 
     try {
+      // Extract sections from formData
+      const { generalInfo, summary, valueAssessment, ...sections } = formData;
+      
+      // Build sections object (only include arrays that are sections)
+      const sectionsData: { [key: string]: any[] } = {};
+      sectionKeys.forEach((key) => {
+        if (sections[key] && Array.isArray(sections[key])) {
+          sectionsData[key] = sections[key];
+        }
+      });
+
       const saveResponse = await fetch(`${API_URL}/api/reports/booking/${bookingId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...formData,
+          reportType: selectedInspectionType,
+          status: 'draft',
           generalInfo: {
-            ...formData.generalInfo,
-            appointmentDate: new Date(formData.generalInfo.appointmentDate).toISOString(),
+            ...generalInfo,
+            appointmentDate: new Date(generalInfo.appointmentDate).toISOString(),
           },
+          summary,
+          valueAssessment,
+          ...sectionsData,
         }),
       });
 
@@ -248,6 +298,10 @@ export function useInspectionForm({
 
       const submitResponse = await fetch(`${API_URL}/api/reports/booking/${bookingId}/submit`, {
         method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reportType: selectedInspectionType,
+        }),
       });
 
       if (!submitResponse.ok) {
