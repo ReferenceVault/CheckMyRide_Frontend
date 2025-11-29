@@ -140,10 +140,10 @@ export default function BookingModal({ isOpen, onClose, defaultInspectionType }:
                   <option value="" disabled>
                     Select a package
                   </option>
-                  <option value="Standard">Standard Inspection</option>
-                  <option value="Enhanced">Enhanced Inspection</option>
-                  <option value="Full-Spectrum">Full-Spectrum Inspection</option>
-                  <option value="Routine Check-Up">Routine Check-Up</option>
+                  <option value="standard">Standard Inspection</option>
+                  <option value="enhanced">Enhanced Inspection</option>
+                  <option value="full-spectrum">Full-Spectrum Inspection</option>
+                  <option value="routine">Routine Check-Up</option>
                 </select>
               </div>
 
