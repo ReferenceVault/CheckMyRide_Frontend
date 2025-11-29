@@ -209,14 +209,16 @@ export default function RoutineInspectionPage() {
   const onFormDataInit = (booking: any) => ({
     ...initialFormData,
     generalInfo: {
-      clientName: booking.personalInfo.fullName,
-      email: booking.personalInfo.email,
-      phone: booking.personalInfo.phone,
-      appointmentDate: new Date(booking.appointmentDetails.preferredDate).toISOString().split('T')[0],
-      inspectionTime: booking.appointmentDetails.preferredTime,
+      clientName: booking.personalInfo?.fullName || '',
+      email: booking.personalInfo?.email || '',
+      phone: booking.personalInfo?.phone || '',
+      appointmentDate: booking.appointmentDetails?.preferredDate
+        ? new Date(booking.appointmentDetails.preferredDate).toISOString().split('T')[0]
+        : '',
+      inspectionTime: booking.appointmentDetails?.preferredTime || '',
       inspectorName: booking.assignedMechanic?.mechanicId?.firstName && booking.assignedMechanic?.mechanicId?.lastName
         ? `${booking.assignedMechanic.mechanicId.firstName} ${booking.assignedMechanic.mechanicId.lastName}`
-        : booking.assignedMechanic?.name || '',
+        : '',
     },
   });
 
