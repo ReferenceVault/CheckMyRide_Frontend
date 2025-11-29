@@ -106,8 +106,12 @@ interface Booking {
   };
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   assignedMechanic?: {
-    name: string;
-    email: string;
+    mechanicId: {
+      _id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+    };
     assignedAt: string;
   };
   createdAt: string;
@@ -239,13 +243,6 @@ export default function BookingDetailPage() {
       return;
     }
 
-    // Find selected mechanic
-    const selectedMechanic = mechanics.find((m) => m.id === selectedMechanicId);
-    if (!selectedMechanic) {
-      alert('Selected mechanic not found');
-      return;
-    }
-
     setIsAssigning(true);
     try {
       const response = await fetch(`${API_URL}/api/bookings/${bookingId}/assign-mechanic`, {
@@ -254,8 +251,7 @@ export default function BookingDetailPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: selectedMechanic.name,
-          email: selectedMechanic.email,
+          mechanicId: selectedMechanicId,
         }),
       });
 
@@ -264,8 +260,7 @@ export default function BookingDetailPage() {
         throw new Error(errorData.message || 'Failed to assign mechanic');
       }
 
-      const data = await response.json();
-      setBooking(data.booking);
+      await fetchBooking();
       setSelectedMechanicId('');
       setShowAssignForm(false);
       alert('Mechanic assigned successfully! Email notification sent.');
@@ -666,11 +661,16 @@ export default function BookingDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Name</label>
-                  <p className="text-sm font-semibold text-white mt-1">{booking.assignedMechanic.name}</p>
+                  <p className="text-sm font-semibold text-white mt-1">
+                    {booking.assignedMechanic.mechanicId.firstName}{' '}
+                    {booking.assignedMechanic.mechanicId.lastName}
+                  </p>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Email</label>
-                  <p className="text-sm font-semibold text-white mt-1">{booking.assignedMechanic.email}</p>
+                  <p className="text-sm font-semibold text-white mt-1">
+                    {booking.assignedMechanic.mechanicId.email}
+                  </p>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Assigned At</label>
@@ -683,7 +683,7 @@ export default function BookingDetailPage() {
                       fetchMechanics();
                       // Try to find and select current mechanic if exists in list
                       const currentMechanic = mechanics.find(
-                        (m) => m.email === booking.assignedMechanic!.email
+                        (m) => m.id === booking.assignedMechanic!.mechanicId._id
                       );
                       if (currentMechanic) {
                         setSelectedMechanicId(currentMechanic.id);
