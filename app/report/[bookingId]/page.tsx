@@ -1,7 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 interface BodyConditionItem {
   item: string;
@@ -20,45 +23,6 @@ interface InspectionCategory {
   items: InspectionItem[];
 }
 
-interface ItemRequiringAttention {
-  priority: 'High' | 'Medium' | 'Low';
-  item: string;
-  recommendation: string;
-  estimatedCost: string;
-}
-
-interface RoadTestResult {
-  category: string;
-  rating: string;
-}
-
-interface RoadTestData {
-  results: RoadTestResult[];
-  testRoute: string;
-  notes: string;
-}
-
-interface ServiceHistoryData {
-  recordsReviewed: string;
-  lastService: string;
-  majorServices: string[];
-}
-
-interface InspectorComments {
-  overallAssessment: string;
-  strengths: string[];
-  areasOfNote: string[];
-  purchaseRecommendation: {
-    status: string;
-    text: string;
-  };
-}
-
-interface ReportMetadata {
-  reportGenerated: string;
-  reportId: string;
-}
-
 interface ReportData {
   generalInfo: {
     clientName: string;
@@ -67,54 +31,40 @@ interface ReportData {
     appointmentDate: string;
     inspectionTime: string;
     inspectorName: string;
-    sellerType: string;
-    sellerName: string;
-    inspectionLocation: string;
+    sellerType?: string;
+    sellerName?: string;
+    inspectionLocation?: string;
   };
   vehicleInfo: {
     year: number;
     make: string;
     model: string;
-    trim: string;
-    vin: string;
-    mileage: number;
-    color: string;
-    transmission: string;
-    drivetrain: string;
-    bodyStyle: string;
-    fuelType: string;
+    trim?: string;
+    vin?: string;
+    mileage?: number;
+    color?: string;
+    transmission?: string;
+    drivetrain?: string;
+    bodyStyle?: string;
+    fuelType?: string;
   };
-  bodyCondition: BodyConditionItem[];
+  bodyCondition?: BodyConditionItem[];
   summary: {
     overallCondition: string;
     inspectionSummary: string;
     recommendations: string;
-    recommendationNotes: string;
-    overallRating?: number;
-    criticalIssues?: number;
-    itemsNeedingAttention?: number;
-    overallConditionDescription?: string;
+    recommendationNotes?: string;
   };
   detailedInspection?: InspectionCategory[];
-  itemsRequiringAttention?: ItemRequiringAttention[];
-  roadTest?: RoadTestData;
-  serviceHistory?: ServiceHistoryData;
-  inspectorComments?: InspectorComments;
-  reportMetadata?: ReportMetadata;
-  valueAssessment: {
+  valueAssessment?: {
     assessment: string;
-    notes: string;
+    notes?: string;
+  };
+  reportMetadata?: {
+    reportGenerated: string;
+    reportId: string;
   };
 }
-
-const RATING_COLORS: { [key: string]: string } = {
-  'excellent': 'bg-green-500',
-  'good': 'bg-green-400',
-  'fair': 'bg-yellow-400',
-  'needs-attention': 'bg-orange-400',
-  'critical': 'bg-red-500',
-  'n/a': 'bg-gray-400',
-};
 
 const RATING_LABELS: { [key: string]: string } = {
   'excellent': 'Excellent',
@@ -125,95 +75,150 @@ const RATING_LABELS: { [key: string]: string } = {
   'n/a': 'N/A',
 };
 
-// Hardcoded sample report data
-const SAMPLE_REPORT: ReportData = {
-  generalInfo: {
-    clientName: 'John Smith',
-    email: 'john.smith@email.com',
-    phone: '(416) 555-0123',
-    appointmentDate: '2024-11-22',
-    inspectionTime: '10:00 AM',
-    inspectorName: 'Michael Johnson',
-    sellerType: 'private',
-    sellerName: 'Sarah Williams',
-    inspectionLocation: 'Mobile Inspection - Seller Location',
-  },
-  vehicleInfo: {
-    year: 2020,
-    make: 'Honda',
-    model: 'Civic',
-    trim: 'EX',
-    vin: '19XFC2F59LE123456',
-    mileage: 45000,
-    color: 'Silver',
-    transmission: 'automatic',
-    drivetrain: 'fwd',
-    bodyStyle: 'sedan',
-    fuelType: 'gasoline',
-  },
-  bodyCondition: [
-    {
-      item: 'Dents, scratches, rust on panels',
-      rating: 'good',
-      notes: 'Minor scratches on rear bumper, no rust detected',
-    },
-    {
-      item: 'Paint condition and finish quality',
-      rating: 'excellent',
-      notes: 'Paint is in excellent condition with no fading',
-    },
-    {
-      item: 'Glass condition (windshield, windows)',
-      rating: 'good',
-      notes: 'All glass is clear with minor chips on windshield',
-    },
-    {
-      item: 'Lights and electrical components',
-      rating: 'excellent',
-      notes: 'All lights functioning properly',
-    },
-    {
-      item: 'Tires and wheels condition',
-      rating: 'fair',
-      notes: 'Tires have 60% tread remaining, wheels show minor curb rash',
-    },
-    {
-      item: 'Interior condition and wear',
-      rating: 'good',
-      notes: 'Interior is well-maintained with minimal wear',
-    },
-  ],
-  summary: {
-    overallCondition: 'good',
-    inspectionSummary: 'This 2020 Honda Civic EX with 45,000 km was inspected on November 22, 2024. Overall vehicle condition is rated as good. The vehicle shows signs of normal wear and may require some maintenance in the near future. Vehicle specifications: Color: Silver, Transmission: automatic, Drivetrain: FWD, Body Style: sedan, Fuel Type: gasoline, VIN: 19XFC2F59LE123456. Inspection was conducted at Mobile Inspection - Seller Location. Vehicle is being sold by a private seller: Sarah Williams. The vehicle appears to be well-maintained and in good overall condition.',
-    recommendations: 'purchase-recommended',
-    recommendationNotes: 'This vehicle is in good condition and represents a solid value. Minor maintenance items such as tire replacement should be planned for within the next 6-12 months. The vehicle has been well-maintained and shows no signs of major mechanical issues.',
-  },
-  reportMetadata: {
-    reportGenerated: 'November 14, 2025',
-    reportId: 'CMR-2025-11-0421',
-  },
-  valueAssessment: {
-    assessment: 'at-market',
-    notes: 'The asking price is consistent with current market values for similar vehicles in the area. The vehicle\'s condition and mileage are appropriate for its age, making it a fair purchase at the listed price.',
-  },
+const SECTION_TITLES: { [key: string]: string } = {
+  'bodyCondition': 'Body Condition',
+  'lights': 'Lights',
+  'tires': 'Tires & Wheels',
+  'interior': 'Interior',
+  'engine': 'Engine',
+  'transmission': 'Transmission',
+  'brakes': 'Brakes',
+  'suspension': 'Suspension & Steering',
+  'electrical': 'Electrical Systems',
+  'bodyGlass': 'Body & Glass',
+  'underHood': 'Under the Hood',
+  'underCarriage': 'Undercarriage',
 };
 
 export default function InspectionReportViewPage() {
-  const [report] = useState<ReportData>(SAMPLE_REPORT);
+  const params = useParams();
+  const router = useRouter();
+  const bookingId = params?.bookingId as string;
+  
+  const [report, setReport] = useState<ReportData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!bookingId) return;
+
+    const fetchReport = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch report
+        const reportResponse = await fetch(`${API_URL}/api/reports/booking/${bookingId}`);
+        if (!reportResponse.ok) {
+          throw new Error('Failed to fetch report');
+        }
+        const reportData = await reportResponse.json();
+        
+        if (!reportData.report) {
+          setError('Report not found');
+          setLoading(false);
+          return;
+        }
+
+        // Fetch booking for vehicle info
+        const bookingResponse = await fetch(`${API_URL}/api/bookings/${bookingId}`);
+        if (!bookingResponse.ok) {
+          throw new Error('Failed to fetch booking');
+        }
+        const bookingData = await bookingResponse.json();
+
+        // Transform API data to ReportData format
+        const apiReport = reportData.report;
+        const booking = bookingData.booking;
+
+        // Transform sections
+        const sections = apiReport.sections || {};
+        const bodyCondition: BodyConditionItem[] = sections.bodyCondition || [];
+        const detailedInspection: InspectionCategory[] = [];
+
+        // Convert other sections to detailedInspection format
+        Object.keys(sections).forEach((key) => {
+          if (key !== 'bodyCondition' && Array.isArray(sections[key]) && sections[key].length > 0) {
+            const sectionTitle = SECTION_TITLES[key] || key.charAt(0).toUpperCase() + key.slice(1);
+            detailedInspection.push({
+              category: sectionTitle.toUpperCase(),
+              items: sections[key].map((item: any) => ({
+                component: item.item || item.component || '',
+                condition: item.rating ? RATING_LABELS[item.rating] || item.rating : item.condition || '',
+                notes: item.notes || '',
+              })),
+            });
+          }
+        });
+
+        const transformedReport: ReportData = {
+          generalInfo: {
+            clientName: apiReport.generalInfo?.clientName || '',
+            email: apiReport.generalInfo?.email || '',
+            phone: apiReport.generalInfo?.phone || '',
+            appointmentDate: apiReport.generalInfo?.appointmentDate || '',
+            inspectionTime: apiReport.generalInfo?.inspectionTime || '',
+            inspectorName: apiReport.generalInfo?.inspectorName || '',
+            inspectionLocation: booking?.appointmentDetails?.location || 'Mobile Inspection',
+          },
+          vehicleInfo: {
+            year: booking?.vehicleInfo?.year || 0,
+            make: booking?.vehicleInfo?.make || '',
+            model: booking?.vehicleInfo?.model || '',
+            trim: booking?.vehicleInfo?.trim,
+            vin: booking?.vehicleInfo?.vin,
+            mileage: booking?.vehicleInfo?.mileage,
+            color: booking?.vehicleInfo?.color,
+            transmission: booking?.vehicleInfo?.transmission,
+            drivetrain: booking?.vehicleInfo?.drivetrain,
+            bodyStyle: booking?.vehicleInfo?.bodyStyle,
+            fuelType: booking?.vehicleInfo?.fuelType,
+          },
+          bodyCondition: bodyCondition.length > 0 ? bodyCondition : undefined,
+          summary: {
+            overallCondition: apiReport.summary?.overallCondition || '',
+            inspectionSummary: apiReport.summary?.inspectionSummary || '',
+            recommendations: apiReport.summary?.recommendations || '',
+            recommendationNotes: apiReport.summary?.recommendationNotes,
+          },
+          detailedInspection: detailedInspection.length > 0 ? detailedInspection : undefined,
+          valueAssessment: apiReport.valueAssessment ? {
+            assessment: apiReport.valueAssessment.assessment || '',
+            notes: apiReport.valueAssessment.notes,
+          } : undefined,
+          reportMetadata: {
+            reportGenerated: apiReport.createdAt 
+              ? new Date(apiReport.createdAt).toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })
+              : new Date().toLocaleDateString('en-US', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                }),
+            reportId: apiReport._id || '',
+          },
+        };
+
+        setReport(transformedReport);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load report');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReport();
+  }, [bookingId]);
 
   const handlePrint = () => {
     window.print();
   };
 
   const handleExportPDF = () => {
-    // TODO: Implement PDF export functionality
     window.print();
-  };
-
-  const handleSaveDraft = () => {
-    // TODO: Implement save draft functionality
-    console.log('Save draft clicked');
   };
 
   const formatDate = (dateString: string) => {
@@ -229,22 +234,54 @@ export default function InspectionReportViewPage() {
   const formatRecommendation = (rec: string) => {
     const labels: { [key: string]: string } = {
       'purchase-recommended': 'Purchase Recommended',
-      'purchase-with-conditions': 'Purchase with Conditions',
+      'purchase-with-caution': 'Purchase with Caution',
       'negotiate-price': 'Negotiate Price',
-      'do-not-purchase': 'Do Not Purchase',
+      'major-repairs-needed': 'Major Repairs Needed',
+      'not-recommended': 'Not Recommended',
     };
     return labels[rec] || rec;
   };
 
   const formatValueAssessment = (assessment: string) => {
     const labels: { [key: string]: string } = {
-      'above-market': 'Above Market Value',
-      'at-market': 'At Market Value',
-      'below-market': 'Below Market Value',
-      'significantly-below': 'Significantly Below Market Value',
+      'excellent-value': 'Excellent Value',
+      'good-value': 'Good Value',
+      'fair-value': 'Fair Value',
+      'overpriced': 'Overpriced',
+      'undervalued': 'Undervalued',
     };
     return labels[assessment] || assessment;
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f7f9fc] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E54E3D] mx-auto mb-4"></div>
+          <p className="text-[#64748b]">Loading report...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !report) {
+    return (
+      <div className="min-h-screen bg-[#f7f9fc] flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-6">
+          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
+            <h2 className="text-xl font-bold text-red-800 mb-2">Error Loading Report</h2>
+            <p className="text-red-700 mb-4">{error || 'Report not found'}</p>
+            <button
+              onClick={() => router.push('/')}
+              className="px-6 py-2 bg-[#E54E3D] text-white rounded-lg font-semibold hover:bg-[#d14130] transition-colors"
+            >
+              Go Back Home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f7f9fc]">
@@ -284,118 +321,148 @@ export default function InspectionReportViewPage() {
                 <p className="text-[#1f2a37] text-sm mb-1"><span className="font-semibold">Date:</span> {formatDate(report.generalInfo.appointmentDate)}</p>
                 <p className="text-[#1f2a37] text-sm mb-1"><span className="font-semibold">Time:</span> {report.generalInfo.inspectionTime}</p>
                 <p className="text-[#1f2a37] text-sm mb-1"><span className="font-semibold">Inspector:</span> {report.generalInfo.inspectorName}</p>
-                <p className="text-[#1f2a37] text-sm"><span className="font-semibold">Location:</span> {report.generalInfo.inspectionLocation}</p>
+                {report.generalInfo.inspectionLocation && (
+                  <p className="text-[#1f2a37] text-sm"><span className="font-semibold">Location:</span> {report.generalInfo.inspectionLocation}</p>
+                )}
               </div>
             </div>
           </div>
 
           {/* Vehicle Information */}
-          <div className="px-[30px] py-[40px] border-b border-gray-200">
-            <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Vehicle Information</h2>
-            <hr className="border-gray-300 mb-6" />
-            <div className="bg-[#f8fafc] p-4 rounded-lg">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <div>
-                <p className="text-sm text-[#64748b]">Year</p>
-                  <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.year}</p>
-              </div>
-              <div>
-                <p className="text-sm text-[#64748b]">Make</p>
-                  <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.make}</p>
-              </div>
-              <div>
-                <p className="text-sm text-[#64748b]">Model</p>
-                  <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.model}</p>
-              </div>
-              {report.vehicleInfo.trim && (
-                <div>
-                  <p className="text-sm text-[#64748b]">Trim</p>
-                    <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.trim}</p>
+          {report.vehicleInfo.make && (
+            <div className="px-[30px] py-[40px] border-b border-gray-200">
+              <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Vehicle Information</h2>
+              <hr className="border-gray-300 mb-6" />
+              <div className="bg-[#f8fafc] p-4 rounded-lg">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {report.vehicleInfo.year && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">Year</p>
+                      <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.year}</p>
+                    </div>
+                  )}
+                  {report.vehicleInfo.make && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">Make</p>
+                      <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.make}</p>
+                    </div>
+                  )}
+                  {report.vehicleInfo.model && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">Model</p>
+                      <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.model}</p>
+                    </div>
+                  )}
+                  {report.vehicleInfo.trim && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">Trim</p>
+                      <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.trim}</p>
+                    </div>
+                  )}
+                  {report.vehicleInfo.vin && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">VIN</p>
+                      <p className="font-semibold text-[#1f2a37] font-mono text-sm">{report.vehicleInfo.vin}</p>
+                    </div>
+                  )}
+                  {report.vehicleInfo.mileage && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">Mileage</p>
+                      <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.mileage.toLocaleString()} km</p>
+                    </div>
+                  )}
+                  {report.vehicleInfo.color && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">Color</p>
+                      <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.color}</p>
+                    </div>
+                  )}
+                  {report.vehicleInfo.transmission && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">Transmission</p>
+                      <p className="font-semibold text-[#1f2a37] capitalize text-sm">{report.vehicleInfo.transmission}</p>
+                    </div>
+                  )}
+                  {report.vehicleInfo.drivetrain && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">Drivetrain</p>
+                      <p className="font-semibold text-[#1f2a37] uppercase text-sm">{report.vehicleInfo.drivetrain}</p>
+                    </div>
+                  )}
+                  {report.vehicleInfo.bodyStyle && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">Body Style</p>
+                      <p className="font-semibold text-[#1f2a37] capitalize text-sm">{report.vehicleInfo.bodyStyle}</p>
+                    </div>
+                  )}
+                  {report.vehicleInfo.fuelType && (
+                    <div>
+                      <p className="text-sm text-[#64748b]">Fuel Type</p>
+                      <p className="font-semibold text-[#1f2a37] capitalize text-sm">{report.vehicleInfo.fuelType}</p>
+                    </div>
+                  )}
                 </div>
-              )}
-              {report.vehicleInfo.vin && (
-                <div>
-                  <p className="text-sm text-[#64748b]">VIN</p>
-                    <p className="font-semibold text-[#1f2a37] font-mono text-sm">{report.vehicleInfo.vin}</p>
-                </div>
-              )}
-              {report.vehicleInfo.mileage && (
-                <div>
-                  <p className="text-sm text-[#64748b]">Mileage</p>
-                    <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.mileage.toLocaleString()} km</p>
-                </div>
-              )}
-              {report.vehicleInfo.color && (
-                <div>
-                  <p className="text-sm text-[#64748b]">Color</p>
-                    <p className="font-semibold text-[#1f2a37] text-sm">{report.vehicleInfo.color}</p>
-                </div>
-              )}
-              {report.vehicleInfo.transmission && (
-                <div>
-                  <p className="text-sm text-[#64748b]">Transmission</p>
-                    <p className="font-semibold text-[#1f2a37] capitalize text-sm">{report.vehicleInfo.transmission}</p>
-                </div>
-              )}
-              {report.vehicleInfo.drivetrain && (
-                <div>
-                  <p className="text-sm text-[#64748b]">Drivetrain</p>
-                    <p className="font-semibold text-[#1f2a37] uppercase text-sm">{report.vehicleInfo.drivetrain}</p>
-                </div>
-              )}
-              {report.vehicleInfo.bodyStyle && (
-                <div>
-                  <p className="text-sm text-[#64748b]">Body Style</p>
-                    <p className="font-semibold text-[#1f2a37] capitalize text-sm">{report.vehicleInfo.bodyStyle}</p>
-                </div>
-              )}
-              {report.vehicleInfo.fuelType && (
-                <div>
-                  <p className="text-sm text-[#64748b]">Fuel Type</p>
-                    <p className="font-semibold text-[#1f2a37] capitalize text-sm">{report.vehicleInfo.fuelType}</p>
-                </div>
-              )}
               </div>
             </div>
-          </div>
+          )}
 
           {/* Overall Assessment */}
-          <div className="px-[30px] py-[40px] border-b border-gray-200">
-            <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Overall Assessment</h2>
-            <hr className="border-gray-300 mb-6" />
-            
-            {/* Overall Condition Box */}
-            <div className="bg-blue-50 border-l-4 border-red-500 p-6 mb-6 rounded-r-lg">
-              <h3 className="text-sm font-bold text-[#1f2a37] mb-3">
-                Overall Condition: <span className="uppercase">{RATING_LABELS[report.summary.overallCondition] || report.summary.overallCondition}</span>
-              </h3>
-              <p className="text-[#64748b] leading-relaxed text-sm">
-                {report.summary.overallConditionDescription || report.summary.inspectionSummary}
-              </p>
-            </div>
+          {report.summary && (
+            <div className="px-[30px] py-[40px] border-b border-gray-200">
+              <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Overall Assessment</h2>
+              <hr className="border-gray-300 mb-6" />
+              
+              {/* Overall Condition Box */}
+              {report.summary.overallCondition && (
+                <div className="bg-blue-50 border-l-4 border-red-500 p-6 mb-6 rounded-r-lg">
+                  <h3 className="text-sm font-bold text-[#1f2a37] mb-3">
+                    Overall Condition: <span className="uppercase">{RATING_LABELS[report.summary.overallCondition] || report.summary.overallCondition}</span>
+                  </h3>
+                  {report.summary.inspectionSummary && (
+                    <p className="text-[#64748b] leading-relaxed text-sm">
+                      {report.summary.inspectionSummary}
+                    </p>
+                  )}
+                </div>
+              )}
 
-            {/* Summary Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <p className="text-sm uppercase tracking-wide text-[#64748b] mb-2">OVERALL RATING</p>
-                <p className="text-sm font-bold text-green-600">
-                  {report.summary.overallRating?.toFixed(1) || 'N/A'}/10
-                </p>
-              </div>
-              <div>
-                <p className="text-sm uppercase tracking-wide text-[#64748b] mb-2">CRITICAL ISSUES</p>
-                <p className="text-sm font-bold text-[#1f2a37]">
-                  {report.summary.criticalIssues ?? 0}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm uppercase tracking-wide text-[#64748b] mb-2">ITEMS NEEDING ATTENTION</p>
-                <p className="text-sm font-bold text-[#1f2a37]">
-                  {report.summary.itemsNeedingAttention ?? 0}
-                </p>
+              {/* Recommendations */}
+              {report.summary.recommendations && (
+                <div className="mb-4">
+                  <p className="text-sm font-semibold text-[#64748b] mb-2">Recommendation:</p>
+                  <p className="text-sm font-bold text-[#1f2a37]">{formatRecommendation(report.summary.recommendations)}</p>
+                  {report.summary.recommendationNotes && (
+                    <p className="text-sm text-[#64748b] mt-2">{report.summary.recommendationNotes}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Body Condition */}
+          {report.bodyCondition && report.bodyCondition.length > 0 && (
+            <div className="px-[30px] py-[40px] border-b border-gray-200">
+              <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Body Condition</h2>
+              <hr className="border-gray-300 mb-6" />
+              <div className="space-y-4">
+                {report.bodyCondition.map((item, index) => (
+                  <div key={index} className="bg-[#f8fafc] p-4 rounded-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <p className="font-semibold text-[#1f2a37] text-sm">{item.item}</p>
+                      {item.rating && (
+                        <span className="px-3 py-1 rounded text-xs font-semibold bg-orange-100 text-orange-800">
+                          {RATING_LABELS[item.rating] || item.rating}
+                        </span>
+                      )}
+                    </div>
+                    {item.notes && (
+                      <p className="text-sm text-[#64748b]">{item.notes}</p>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
+          )}
 
           {/* Detailed Inspection Results */}
           {report.detailedInspection && report.detailedInspection.length > 0 && (
@@ -432,151 +499,21 @@ export default function InspectionReportViewPage() {
                   </div>
                 ))}
               </div>
-
-              {/* Items Requiring Attention */}
-              {report.itemsRequiringAttention && report.itemsRequiringAttention.length > 0 && (
-                <div className="mt-8">
-                  <h3 className="font-bold text-[#1f2a37] mb-4" style={{ fontSize: '15px' }}>Items Requiring Attention</h3>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="bg-orange-50">
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-orange-600">Priority</th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-orange-600">Item</th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-orange-600">Recommendation</th>
-                          <th className="px-4 py-3 text-left text-sm font-semibold text-orange-600">Est. Cost</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {report.itemsRequiringAttention.map((item, index) => (
-                          <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-[#f8fafc]'}>
-                            <td className="px-4 py-3">
-                              <span className={`inline-block px-2 py-1 rounded text-sm font-semibold ${
-                                item.priority === 'High' ? 'bg-red-100 text-red-800' :
-                                item.priority === 'Medium' ? 'bg-orange-100 text-orange-800' :
-                                'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                {item.priority}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 font-medium text-[#1f2a37] text-sm">{item.item}</td>
-                            <td className="px-4 py-3 text-sm text-[#64748b]">{item.recommendation}</td>
-                            <td className="px-4 py-3 text-sm font-semibold text-[#1f2a37]">{item.estimatedCost}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
-          {/* Road Test Results */}
-          {report.roadTest && (
+          {/* Value Assessment */}
+          {report.valueAssessment && (
             <div className="px-[30px] py-[40px] border-b border-gray-200">
-              <h2 className="font-bold text-[#1f2a37] mb-4" style={{ fontSize: '15px' }}>Road Test Results</h2>
+              <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Value Assessment</h2>
               <hr className="border-gray-300 mb-6" />
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                {report.roadTest.results.map((result, index) => (
-                  <div key={index} className="bg-[#f8fafc] p-4 rounded-lg">
-                    <p className="text-sm uppercase tracking-wide text-[#64748b] mb-2">{result.category}</p>
-                    <p className="text-sm font-bold text-[#1f2a37]">{result.rating}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-semibold text-[#64748b] mb-1">Test Route:</p>
-                  <p className="text-[#1f2a37] text-sm">{report.roadTest.testRoute}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[#64748b] mb-1">Notes:</p>
-                  <p className="text-[#64748b] leading-relaxed text-sm">{report.roadTest.notes}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Service History Review */}
-          {report.serviceHistory && (
-            <div className="px-[30px] py-[40px] border-b border-gray-200">
-              <h2 className="font-bold text-[#1f2a37] mb-4" style={{ fontSize: '15px' }}>Service History Review</h2>
-              <hr className="border-gray-300 mb-6" />
-              
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-semibold text-[#64748b] mb-1">Records Reviewed:</p>
-                  <p className="text-[#1f2a37] text-sm">{report.serviceHistory.recordsReviewed}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm font-semibold text-[#64748b] mb-1">Last Service:</p>
-                  <p className="text-[#1f2a37] text-sm">{report.serviceHistory.lastService}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm font-semibold text-[#64748b] mb-3">Major Services Completed:</p>
-                  <ul className="space-y-2">
-                    {report.serviceHistory.majorServices.map((service, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="text-[#E54E3D] mr-2 mt-1">•</span>
-                        <span className="text-[#1f2a37] text-sm">{service}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Inspector's Comments & Recommendations */}
-          {report.inspectorComments && (
-            <div className="px-[30px] py-[40px] border-b border-gray-200">
-              <h2 className="font-bold text-[#1f2a37] mb-4" style={{ fontSize: '15px' }}>Inspector's Comments & Recommendations</h2>
-              <hr className="border-gray-300 mb-6" />
-              
-              <div className="bg-blue-50 border-l-4 border-red-500 p-6 rounded-r-lg space-y-6">
-                {/* Overall Assessment */}
-                <div>
-                  <h3 className="text-sm font-bold text-[#1f2a37] mb-3">Overall Assessment:</h3>
-                  <p className="text-[#64748b] leading-relaxed text-sm">{report.inspectorComments.overallAssessment}</p>
-                </div>
-
-                {/* Strengths */}
-                <div>
-                  <h3 className="text-sm font-bold text-[#1f2a37] mb-3">Strengths:</h3>
-                  <ul className="space-y-2">
-                    {report.inspectorComments.strengths.map((strength, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="text-[#E54E3D] mr-2 mt-1">•</span>
-                        <span className="text-[#1f2a37] text-sm">{strength}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Areas of Note */}
-                <div>
-                  <h3 className="text-sm font-bold text-[#1f2a37] mb-3">Areas of Note:</h3>
-                  <ul className="space-y-2">
-                    {report.inspectorComments.areasOfNote.map((area, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="text-[#E54E3D] mr-2 mt-1">•</span>
-                        <span className="text-[#1f2a37] text-sm">{area}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Purchase Recommendation */}
-                <div>
-                  <h3 className="text-sm font-bold text-[#1f2a37] mb-3">Purchase Recommendation:</h3>
-                  <p className="text-sm font-bold text-green-600 mb-2">{report.inspectorComments.purchaseRecommendation.status}</p>
-                  <p className="text-[#64748b] leading-relaxed text-sm">{report.inspectorComments.purchaseRecommendation.text}</p>
-                </div>
+              <div className="bg-[#f8fafc] p-4 rounded-lg">
+                <p className="text-sm font-semibold text-[#1f2a37] mb-2">
+                  {formatValueAssessment(report.valueAssessment.assessment)}
+                </p>
+                {report.valueAssessment.notes && (
+                  <p className="text-sm text-[#64748b]">{report.valueAssessment.notes}</p>
+                )}
               </div>
             </div>
           )}
@@ -650,15 +587,6 @@ export default function InspectionReportViewPage() {
           </svg>
           Print Report
         </button>
-        <button
-          onClick={handleSaveDraft}
-          className="flex items-center gap-2 px-6 py-3 bg-white text-[#1f2a37] border-2 border-[#1f2a37] rounded-lg font-semibold hover:bg-[#f7f9fc] transition-colors shadow-lg"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-          </svg>
-          Save Draft
-        </button>
       </div>
 
       {/* Print Styles */}
@@ -696,4 +624,3 @@ export default function InspectionReportViewPage() {
     </div>
   );
 }
-
