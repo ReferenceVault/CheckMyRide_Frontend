@@ -98,6 +98,19 @@ export default function InspectionReportViewPage() {
   const [report, setReport] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [sendSuccess, setSendSuccess] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check if user is admin
+    const adminToken = localStorage.getItem('adminToken');
+    const adminUser = localStorage.getItem('adminUser');
+    if (adminToken && adminUser) {
+      setIsAdmin(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (!bookingId) return;
@@ -219,6 +232,36 @@ export default function InspectionReportViewPage() {
 
   const handleExportPDF = () => {
     window.print();
+  };
+
+  const handleSendToCustomer = async () => {
+    if (!bookingId) return;
+    
+    setIsSending(true);
+    setSendError(null);
+    setSendSuccess(false);
+    
+    try {
+      const response = await fetch(`${API_URL}/api/reports/booking/${bookingId}/send-to-customer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to send report to customer');
+      }
+      
+      setSendSuccess(true);
+      setTimeout(() => setSendSuccess(false), 5000);
+    } catch (err: any) {
+      setSendError(err.message || 'Failed to send report to customer');
+      setTimeout(() => setSendError(null), 5000);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -567,8 +610,51 @@ export default function InspectionReportViewPage() {
         </div>
       </div>
 
+      {/* Success/Error Messages */}
+      {sendSuccess && (
+        <div className="fixed top-4 right-4 bg-green-50 border-2 border-green-200 rounded-lg p-4 shadow-lg z-50 max-w-md">
+          <div className="flex items-center gap-3">
+            <svg className="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-sm font-semibold text-green-800">Report sent to customer successfully!</p>
+          </div>
+        </div>
+      )}
+      {sendError && (
+        <div className="fixed top-4 right-4 bg-red-50 border-2 border-red-200 rounded-lg p-4 shadow-lg z-50 max-w-md">
+          <div className="flex items-center gap-3">
+            <svg className="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-sm font-semibold text-red-800">{sendError}</p>
+          </div>
+        </div>
+      )}
+
       {/* Action Buttons - Bottom Middle - Hidden when printing */}
       <div className="flex justify-center items-center gap-4 py-6 print:hidden">
+        {isAdmin && (
+          <button
+            onClick={handleSendToCustomer}
+            disabled={isSending}
+            className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSending ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                Sending...
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Send Report to Customer
+              </>
+            )}
+          </button>
+        )}
         <button
           onClick={handleExportPDF}
           className="flex items-center gap-2 px-6 py-3 bg-[#E54E3D] text-white rounded-lg font-semibold hover:bg-[#d14130] transition-colors shadow-lg"
