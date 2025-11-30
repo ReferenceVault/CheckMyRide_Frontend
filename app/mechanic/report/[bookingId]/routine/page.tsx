@@ -248,6 +248,7 @@ export default function RoutineInspectionPage() {
     isSubmitting,
     error,
     validationErrors,
+    fieldErrors,
     success,
     booking,
     selectedInspectionType,
@@ -340,6 +341,7 @@ export default function RoutineInspectionPage() {
                 summary: { ...prev.summary, [field]: value },
               }));
             }}
+            errors={fieldErrors.summary || []}
           />
 
           <ValueAssessmentSection
@@ -352,6 +354,7 @@ export default function RoutineInspectionPage() {
                 valueAssessment: { ...prev.valueAssessment, [field]: value },
               }));
             }}
+            errors={fieldErrors.valueAssessment || []}
           />
 
           <FormActions

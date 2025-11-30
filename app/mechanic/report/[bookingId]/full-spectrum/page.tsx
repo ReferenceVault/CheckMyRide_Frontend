@@ -321,6 +321,7 @@ export default function FullSpectrumInspectionPage() {
     isSubmitting,
     error,
     validationErrors,
+    fieldErrors,
     success,
     booking,
     selectedInspectionType,
@@ -413,6 +414,7 @@ export default function FullSpectrumInspectionPage() {
                 summary: { ...prev.summary, [field]: value },
               }));
             }}
+            errors={fieldErrors.summary || []}
           />
 
           <ValueAssessmentSection
@@ -425,6 +427,7 @@ export default function FullSpectrumInspectionPage() {
                 valueAssessment: { ...prev.valueAssessment, [field]: value },
               }));
             }}
+            errors={fieldErrors.valueAssessment || []}
           />
 
           <FormActions

@@ -48,6 +48,7 @@ export function useInspectionForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string[] }>({});
   const [success, setSuccess] = useState<string | null>(null);
   const [booking, setBooking] = useState<any>(null);
   const [selectedInspectionType, setSelectedInspectionType] = useState<string>(defaultInspectionType);
@@ -216,7 +217,7 @@ export function useInspectionForm({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          reportType: selectedInspectionType,
+          reportType: defaultInspectionType,
           status: 'draft',
           generalInfo: {
             ...generalInfo,
@@ -251,6 +252,7 @@ export function useInspectionForm({
     setIsSubmitting(true);
     setError(null);
     setValidationErrors([]);
+    setFieldErrors({});
 
     const frontendErrors = validateForm();
     if (frontendErrors.length > 0) {
@@ -271,11 +273,12 @@ export function useInspectionForm({
         }
       });
 
-      const saveResponse = await fetch(`${API_URL}/api/reports/booking/${bookingId}`, {
-        method: 'POST',
+      // Call submit API directly (it will save and validate)
+      const submitResponse = await fetch(`${API_URL}/api/reports/booking/${bookingId}/submit`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          reportType: selectedInspectionType,
+          reportType: defaultInspectionType,
           status: 'draft',
           generalInfo: {
             ...generalInfo,
@@ -287,27 +290,40 @@ export function useInspectionForm({
         }),
       });
 
-      if (!saveResponse.ok) {
-        const errorData = await saveResponse.json();
-        if (errorData.errors && Array.isArray(errorData.errors)) {
-          setValidationErrors(errorData.errors);
-          throw new Error(errorData.message || 'Validation failed');
-        }
-        throw new Error(errorData.message || 'Failed to save report');
-      }
-
-      const submitResponse = await fetch(`${API_URL}/api/reports/booking/${bookingId}/submit`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reportType: selectedInspectionType,
-        }),
-      });
-
       if (!submitResponse.ok) {
         const errorData = await submitResponse.json();
         if (errorData.errors && Array.isArray(errorData.errors)) {
           setValidationErrors(errorData.errors);
+          
+          // Map errors to specific sections/fields
+          const mappedErrors: { [key: string]: string[] } = {};
+          const sectionsToExpand: string[] = [];
+          
+          errorData.errors.forEach((err: string) => {
+            if (err.includes('Overall Vehicle Condition') || err.includes('Inspection Summary') || err.includes('Recommendations')) {
+              if (!mappedErrors.summary) mappedErrors.summary = [];
+              mappedErrors.summary.push(err);
+              if (!sectionsToExpand.includes('summary')) sectionsToExpand.push('summary');
+            } else if (err.includes('Value Assessment')) {
+              if (!mappedErrors.valueAssessment) mappedErrors.valueAssessment = [];
+              mappedErrors.valueAssessment.push(err);
+              if (!sectionsToExpand.includes('valueAssessment')) sectionsToExpand.push('valueAssessment');
+            } else if (err.includes('Client Name') || err.includes('Email') || err.includes('Phone') || err.includes('Appointment') || err.includes('Inspector Name')) {
+              if (!mappedErrors.generalInfo) mappedErrors.generalInfo = [];
+              mappedErrors.generalInfo.push(err);
+              if (!sectionsToExpand.includes('generalInfo')) sectionsToExpand.push('generalInfo');
+            }
+          });
+          
+          setFieldErrors(mappedErrors);
+          
+          // Auto-expand sections with errors
+          sectionsToExpand.forEach(section => {
+            if (!expandedSections[section]) {
+              toggleSection(section);
+            }
+          });
+          
           throw new Error(errorData.message || 'Validation failed');
         }
         throw new Error(errorData.message || 'Failed to submit report');
@@ -331,6 +347,7 @@ export function useInspectionForm({
     isSubmitting,
     error,
     validationErrors,
+    fieldErrors,
     success,
     booking,
     selectedInspectionType,

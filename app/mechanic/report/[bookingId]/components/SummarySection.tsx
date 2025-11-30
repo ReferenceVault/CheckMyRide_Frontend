@@ -10,6 +10,7 @@ interface SummarySectionProps {
   isExpanded: boolean;
   onToggle: () => void;
   onSummaryChange: (field: keyof SummarySectionProps['summary'], value: string) => void;
+  errors?: string[];
 }
 
 export default function SummarySection({
@@ -17,6 +18,7 @@ export default function SummarySection({
   isExpanded,
   onToggle,
   onSummaryChange,
+  errors = [],
 }: SummarySectionProps) {
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -43,12 +45,31 @@ export default function SummarySection({
 
       {isExpanded && (
         <div className="px-[30px] py-[40px] space-y-6">
+          {errors.length > 0 && (
+            <div className="mb-4 rounded-lg bg-red-50 border-2 border-red-200 p-3">
+              <p className="font-semibold text-red-800 mb-2 text-sm">Please fix the following:</p>
+              <ul className="list-disc list-inside text-red-700 text-sm space-y-1">
+                {errors.map((err, idx) => (
+                  <li key={idx}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div>
-            <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>Overall Vehicle Condition</label>
+            <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>
+              Overall Vehicle Condition
+              {errors.some(e => e.includes('Overall Vehicle Condition')) && (
+                <span className="text-red-600 ml-1">*</span>
+              )}
+            </label>
             <select
               value={summary.overallCondition}
               onChange={(e) => onSummaryChange('overallCondition', e.target.value)}
-              className="w-full rounded-lg border-2 border-[#e2e8f0] px-4 py-2 focus:border-[#E54E3D] focus:outline-none"
+              className={`w-full rounded-lg border-2 px-4 py-2 focus:outline-none ${
+                errors.some(e => e.includes('Overall Vehicle Condition'))
+                  ? 'border-red-500 focus:border-red-600'
+                  : 'border-[#e2e8f0] focus:border-[#E54E3D]'
+              }`}
               style={{ fontSize: '14px' }}
             >
               <option value="">Select...</option>
@@ -59,12 +80,21 @@ export default function SummarySection({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>Inspection Summary</label>
+            <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>
+              Inspection Summary
+              {errors.some(e => e.includes('Inspection Summary')) && (
+                <span className="text-red-600 ml-1">*</span>
+              )}
+            </label>
             <textarea
               value={summary.inspectionSummary}
               onChange={(e) => onSummaryChange('inspectionSummary', e.target.value)}
               rows={6}
-              className="w-full rounded-lg border-2 border-[#e2e8f0] px-4 py-2 focus:border-[#E54E3D] focus:outline-none"
+              className={`w-full rounded-lg border-2 px-4 py-2 focus:outline-none ${
+                errors.some(e => e.includes('Inspection Summary'))
+                  ? 'border-red-500 focus:border-red-600'
+                  : 'border-[#e2e8f0] focus:border-[#E54E3D]'
+              }`}
               placeholder="Provide a comprehensive summary of the vehicle's condition based on inspection findings..."
               style={{ fontSize: '14px' }}
             />
@@ -84,11 +114,20 @@ export default function SummarySection({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>Recommendations</label>
+            <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>
+              Recommendations
+              {errors.some(e => e.includes('Recommendations')) && (
+                <span className="text-red-600 ml-1">*</span>
+              )}
+            </label>
             <select
               value={summary.recommendations}
               onChange={(e) => onSummaryChange('recommendations', e.target.value)}
-              className="w-full rounded-lg border-2 border-[#e2e8f0] px-4 py-2 focus:border-[#E54E3D] focus:outline-none"
+              className={`w-full rounded-lg border-2 px-4 py-2 focus:outline-none ${
+                errors.some(e => e.includes('Recommendations'))
+                  ? 'border-red-500 focus:border-red-600'
+                  : 'border-[#e2e8f0] focus:border-[#E54E3D]'
+              }`}
               style={{ fontSize: '14px' }}
             >
               <option value="">Select...</option>

@@ -6,6 +6,7 @@ interface ValueAssessmentSectionProps {
   isExpanded: boolean;
   onToggle: () => void;
   onValueAssessmentChange: (field: keyof ValueAssessmentSectionProps['valueAssessment'], value: string) => void;
+  errors?: string[];
 }
 
 export default function ValueAssessmentSection({
@@ -13,6 +14,7 @@ export default function ValueAssessmentSection({
   isExpanded,
   onToggle,
   onValueAssessmentChange,
+  errors = [],
 }: ValueAssessmentSectionProps) {
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -39,12 +41,31 @@ export default function ValueAssessmentSection({
 
       {isExpanded && (
         <div className="px-[30px] py-[40px] space-y-6">
+          {errors.length > 0 && (
+            <div className="mb-4 rounded-lg bg-red-50 border-2 border-red-200 p-3">
+              <p className="font-semibold text-red-800 mb-2 text-sm">Please fix the following:</p>
+              <ul className="list-disc list-inside text-red-700 text-sm space-y-1">
+                {errors.map((err, idx) => (
+                  <li key={idx}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div>
-            <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>Select value assessment</label>
+            <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>
+              Select value assessment
+              {errors.some(e => e.includes('Value Assessment')) && (
+                <span className="text-red-600 ml-1">*</span>
+              )}
+            </label>
             <select
               value={valueAssessment.assessment}
               onChange={(e) => onValueAssessmentChange('assessment', e.target.value)}
-              className="w-full rounded-lg border-2 border-[#e2e8f0] px-4 py-2 focus:border-[#E54E3D] focus:outline-none"
+              className={`w-full rounded-lg border-2 px-4 py-2 focus:outline-none ${
+                errors.some(e => e.includes('Value Assessment'))
+                  ? 'border-red-500 focus:border-red-600'
+                  : 'border-[#e2e8f0] focus:border-[#E54E3D]'
+              }`}
               style={{ fontSize: '14px' }}
             >
               <option value="">Select...</option>
