@@ -134,6 +134,7 @@ export default function BookingDetailPage() {
   const [mechanics, setMechanics] = useState<Array<{ id: string; email: string; name: string }>>([]);
   const [selectedMechanicId, setSelectedMechanicId] = useState('');
   const [isLoadingMechanics, setIsLoadingMechanics] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
@@ -297,6 +298,24 @@ export default function BookingDetailPage() {
       cancelled: 'bg-red-100 text-red-800 border-red-200',
     };
     return styles[status as keyof typeof styles] || styles.pending;
+  };
+
+  const getReportSubmissionLink = (bookingId: string, inspectionType: string) => {
+    const frontendUrl = window.location.origin;
+    return `${frontendUrl}/mechanic/report/${bookingId}/${inspectionType}`;
+  };
+
+  const handleCopyReportLink = async () => {
+    if (!booking) return;
+    const link = getReportSubmissionLink(booking._id, booking.inspectionDetails.type);
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+      alert('Failed to copy link. Please try again.');
+    }
   };
 
   const getUserDisplayName = () => {
@@ -482,29 +501,73 @@ export default function BookingDetailPage() {
                 <p className="text-sm text-[#64748b]">Booking ID: {booking._id}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Link
-                href={`/report/${booking._id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600 transition-colors"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                View Report
-              </Link>
-              <span className="text-sm font-semibold text-[#64748b]">Status:</span>
-              <select
-                value={booking.status}
-                onChange={(e) => handleStatusChange(e.target.value)}
-                className={`rounded-lg border-2 px-4 py-2 text-sm font-semibold capitalize focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30 ${getStatusBadge(booking.status)}`}
-              >
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Primary Actions Group */}
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/report/${booking._id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-blue-500 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-600 transition-colors"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  View Report
+                </Link>
+              </div>
+              
+              {/* Report Form Actions Group */}
+              <div className="flex items-center gap-2 pl-2 border-l border-slate-300">
+                <button
+                  onClick={handleCopyReportLink}
+                  className="inline-flex items-center gap-2 rounded-xl bg-purple-500 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-600 transition-colors"
+                  title="Copy report form link to clipboard"
+                >
+                  {copiedLink ? (
+                    <>
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Copy Form Link
+                    </>
+                  )}
+                </button>
+                <Link
+                  href={`/mechanic/report/${booking._id}/${booking.inspectionDetails.type}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl bg-green-500 px-4 py-2 text-sm font-semibold text-white hover:bg-green-600 transition-colors"
+                  title="Open report submission form"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Go to Form
+                </Link>
+              </div>
+              
+              {/* Status Selector */}
+              <div className="flex items-center gap-2 pl-2 border-l border-slate-300">
+                <span className="text-sm font-semibold text-[#64748b]">Status:</span>
+                <select
+                  value={booking.status}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  className={`rounded-lg border-2 px-4 py-2 text-sm font-semibold capitalize focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30 ${getStatusBadge(booking.status)}`}
+                >
+                  <option value="pending">Pending</option>
+                  <option value="confirmed">Confirmed</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
             </div>
           </div>
         </header>

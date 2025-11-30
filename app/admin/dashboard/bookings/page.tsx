@@ -55,6 +55,7 @@ export default function BookingsPage() {
     total: 0,
     pages: 0,
   });
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
   useEffect(() => {
     // User is handled by AdminLayout, but we still need it for fetchBookings
@@ -159,6 +160,23 @@ export default function BookingsPage() {
       cancelled: 'bg-red-100 text-red-800 border-red-200',
     };
     return styles[status as keyof typeof styles] || styles.pending;
+  };
+
+  const getReportSubmissionLink = (bookingId: string, inspectionType: string) => {
+    const frontendUrl = window.location.origin;
+    return `${frontendUrl}/mechanic/report/${bookingId}/${inspectionType}`;
+  };
+
+  const handleCopyReportLink = async (bookingId: string, inspectionType: string) => {
+    const link = getReportSubmissionLink(bookingId, inspectionType);
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopiedLink(bookingId);
+      setTimeout(() => setCopiedLink(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+      alert('Failed to copy link. Please try again.');
+    }
   };
 
   return (
@@ -305,27 +323,67 @@ export default function BookingsPage() {
                             </select>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              <Link
-                                href={`/admin/dashboard/bookings/${booking._id}`}
-                                className="inline-flex items-center gap-1 rounded-lg bg-[#E54E3D]/10 px-3 py-1.5 text-xs font-semibold text-[#E54E3D] hover:bg-[#E54E3D] hover:text-white transition-colors"
-                              >
-                                View
-                                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                              </Link>
-                              <Link
-                                href={`/report/${booking._id}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-400 hover:bg-blue-500 hover:text-white transition-colors"
-                              >
-                                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                                Report
-                              </Link>
+                            <div className="flex flex-col gap-2">
+                              {/* Primary Actions */}
+                              <div className="flex items-center gap-2">
+                                <Link
+                                  href={`/admin/dashboard/bookings/${booking._id}`}
+                                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#E54E3D]/10 px-3 py-1.5 text-xs font-semibold text-[#E54E3D] hover:bg-[#E54E3D] hover:text-white transition-colors"
+                                >
+                                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                  </svg>
+                                  View Details
+                                </Link>
+                                <Link
+                                  href={`/report/${booking._id}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs font-semibold text-blue-400 hover:bg-blue-500 hover:text-white transition-colors"
+                                >
+                                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                  </svg>
+                                  View Report
+                                </Link>
+                              </div>
+                              {/* Report Form Actions */}
+                              <div className="flex items-center gap-2 pt-1 border-t border-slate-700/30">
+                                <button
+                                  onClick={() => handleCopyReportLink(booking._id, booking.inspectionDetails.type)}
+                                  className="inline-flex items-center gap-1.5 rounded-lg bg-purple-500/10 px-3 py-1.5 text-xs font-semibold text-purple-400 hover:bg-purple-500 hover:text-white transition-colors"
+                                  title="Copy report form link to clipboard"
+                                >
+                                  {copiedLink === booking._id ? (
+                                    <>
+                                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                      </svg>
+                                      Copied!
+                                    </>
+                                  ) : (
+                                    <>
+                                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                      </svg>
+                                      Copy Form Link
+                                    </>
+                                  )}
+                                </button>
+                                <Link
+                                  href={`/mechanic/report/${booking._id}/${booking.inspectionDetails.type}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 rounded-lg bg-green-500/10 px-3 py-1.5 text-xs font-semibold text-green-400 hover:bg-green-500 hover:text-white transition-colors"
+                                  title="Open report submission form"
+                                >
+                                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                  Go to Form
+                                </Link>
+                              </div>
                             </div>
                           </td>
                         </tr>
