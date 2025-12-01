@@ -106,9 +106,33 @@ export default function InspectionReportViewPage() {
   useEffect(() => {
     // Check if user is admin
     const adminToken = localStorage.getItem('adminToken');
-    const adminUser = localStorage.getItem('adminUser');
-    if (adminToken && adminUser) {
-      setIsAdmin(true);
+    const adminUserStr = localStorage.getItem('adminUser');
+    
+    if (adminToken && adminUserStr) {
+      try {
+        const adminUser = JSON.parse(adminUserStr);
+        // Check if user has admin role
+        if (adminUser.role === 'admin') {
+          setIsAdmin(true);
+        }
+      } catch (error) {
+        console.error('Error parsing admin user data:', error);
+      }
+    }
+    
+    // Also check regular user token (in case admin uses regular login)
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.role === 'admin') {
+          setIsAdmin(true);
+        }
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
     }
   }, []);
 
@@ -242,10 +266,18 @@ export default function InspectionReportViewPage() {
     setSendSuccess(false);
     
     try {
+      // Get token from localStorage (check both adminToken and token)
+      const token = localStorage.getItem('adminToken') || localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('Authentication required. Please login again.');
+      }
+      
       const response = await fetch(`${API_URL}/api/reports/booking/${bookingId}/send-to-customer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
       });
       

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AdminLayout from '../../../components/layout/AdminLayout';
+import { useAdminAuth } from '../../hooks/useAdminAuth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -42,8 +43,7 @@ interface Booking {
 
 export default function BookingsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isLoading: isAuthLoading } = useAdminAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoadingBookings, setIsLoadingBookings] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,24 +58,11 @@ export default function BookingsPage() {
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
   useEffect(() => {
-    // User is handled by AdminLayout, but we still need it for fetchBookings
-    const userData = localStorage.getItem('adminUser');
-    if (userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-      }
-    }
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    if (!isLoading) {
+    if (!isAuthLoading && user) {
       fetchBookings();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, currentPage, isLoading]);
+  }, [statusFilter, currentPage, isAuthLoading, user]);
 
 
   const fetchBookings = async () => {
@@ -84,6 +71,12 @@ export default function BookingsPage() {
 
     try {
       const token = localStorage.getItem('adminToken');
+      if (!token) {
+        setError('Authentication required. Please login again.');
+        setIsLoadingBookings(false);
+        return;
+      }
+
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '5',
@@ -95,6 +88,7 @@ export default function BookingsPage() {
       const response = await fetch(`${API_URL}/api/bookings?${params.toString()}`, {
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -115,10 +109,17 @@ export default function BookingsPage() {
 
   const handleStatusChange = async (bookingId: string, newStatus: string) => {
     try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        alert('Authentication required. Please login again.');
+        return;
+      }
+      
       const response = await fetch(`${API_URL}/api/bookings/${bookingId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ status: newStatus }),
       });

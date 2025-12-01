@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useAdminAuth } from '../hooks/useAdminAuth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -112,9 +113,8 @@ const navSections: NavSection[] = [
 export default function AdminDashboard() {
   const router = useRouter();
   const pathname = usePathname();
+  const { user, isLoading: isAuthLoading, logout } = useAdminAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     total: 0,
     pending: 0,
@@ -127,40 +127,28 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check authentication
-    const token = localStorage.getItem('adminToken');
-    const userData = localStorage.getItem('adminUser');
-
-    if (!token || !userData) {
-      router.push('/admin/login');
-      return;
-    }
-
-    try {
-      setUser(JSON.parse(userData));
-    } catch (error) {
-      console.error('Error parsing user data:', error);
-      router.push('/admin/login');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [router]);
-
-  useEffect(() => {
-    if (user) {
+    if (user && !isAuthLoading) {
       fetchDashboardData();
     }
-  }, [user]);
+  }, [user, isAuthLoading]);
 
   const fetchDashboardData = async () => {
     setIsLoadingStats(true);
     setError(null);
 
     try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        setError('Authentication required. Please login again.');
+        setIsLoadingStats(false);
+        return;
+      }
+
       // Fetch all bookings to calculate stats
       const response = await fetch(`${API_URL}/api/bookings?limit=1000`, {
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -195,11 +183,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    router.push('/admin/login');
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -247,7 +230,7 @@ export default function AdminDashboard() {
     return 'Admin';
   };
 
-  if (isLoading) {
+  if (isAuthLoading) {
     return (
       <div className="min-h-screen bg-[#2B333B] flex items-center justify-center">
         <div className="text-center">
@@ -256,6 +239,10 @@ export default function AdminDashboard() {
         </div>
       </div>
     );
+  }
+
+  if (!user) {
+    return null; // Will redirect to login
   }
 
   return (
@@ -342,7 +329,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <button
-              onClick={handleLogout}
+              onClick={logout}
               className="w-full flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -384,7 +371,7 @@ export default function AdminDashboard() {
               </button>
               {!isSidebarOpen && user && (
                 <button
-                  onClick={handleLogout}
+                  onClick={logout}
                   className="p-2 rounded-xl text-[#64748b] hover:bg-[#E54E3D]/10 hover:text-[#E54E3D] transition-colors"
                   title="Logout"
                 >

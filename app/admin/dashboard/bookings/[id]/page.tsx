@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useAdminAuth } from '../../../hooks/useAdminAuth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -123,9 +124,8 @@ export default function BookingDetailPage() {
   const params = useParams();
   const pathname = usePathname();
   const bookingId = params?.id as string;
+  const { user, isLoading: isAuthLoading, logout } = useAdminAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [booking, setBooking] = useState<Booking | null>(null);
   const [isLoadingBooking, setIsLoadingBooking] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -137,38 +137,27 @@ export default function BookingDetailPage() {
   const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    const userData = localStorage.getItem('adminUser');
-
-    if (!token || !userData) {
-      router.push('/admin/login');
-      return;
-    }
-
-    try {
-      setUser(JSON.parse(userData));
-    } catch (error) {
-      console.error('Error parsing user data:', error);
-      router.push('/admin/login');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [router]);
-
-  useEffect(() => {
-    if (user && bookingId) {
+    if (user && bookingId && !isAuthLoading) {
       fetchBooking();
     }
-  }, [user, bookingId]);
+  }, [user, bookingId, isAuthLoading]);
 
   const fetchBooking = async () => {
     setIsLoadingBooking(true);
     setError(null);
 
     try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        setError('Authentication required. Please login again.');
+        setIsLoadingBooking(false);
+        return;
+      }
+
       const response = await fetch(`${API_URL}/api/bookings/${bookingId}`, {
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -193,10 +182,17 @@ export default function BookingDetailPage() {
     if (!booking) return;
 
     try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        alert('Authentication required. Please login again.');
+        return;
+      }
+      
       const response = await fetch(`${API_URL}/api/bookings/${bookingId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ status: newStatus }),
       });
@@ -246,10 +242,18 @@ export default function BookingDetailPage() {
 
     setIsAssigning(true);
     try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        alert('Authentication required. Please login again.');
+        setIsAssigning(false);
+        return;
+      }
+      
       const response = await fetch(`${API_URL}/api/bookings/${bookingId}/assign-mechanic`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           mechanicId: selectedMechanicId,
@@ -346,13 +350,8 @@ export default function BookingDetailPage() {
     return 'Admin';
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    router.push('/admin/login');
-  };
 
-  if (isLoading || isLoadingBooking) {
+  if (isAuthLoading || isLoadingBooking) {
     return (
       <div className="min-h-screen bg-[#2B333B] flex items-center justify-center">
         <div className="text-center">
@@ -361,6 +360,10 @@ export default function BookingDetailPage() {
         </div>
       </div>
     );
+  }
+
+  if (!user) {
+    return null; // Will redirect to login
   }
 
   if (error || !booking) {
@@ -470,7 +473,7 @@ export default function BookingDetailPage() {
               </div>
             </div>
             <button
-              onClick={handleLogout}
+              onClick={logout}
               className="w-full flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
