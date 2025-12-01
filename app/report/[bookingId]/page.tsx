@@ -104,36 +104,72 @@ export default function InspectionReportViewPage() {
   const [sendError, setSendError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if user is admin
-    const adminToken = localStorage.getItem('adminToken');
-    const adminUserStr = localStorage.getItem('adminUser');
-    
-    if (adminToken && adminUserStr) {
-      try {
-        const adminUser = JSON.parse(adminUserStr);
-        // Check if user has admin role
-        if (adminUser.role === 'admin') {
-          setIsAdmin(true);
-        }
-      } catch (error) {
-        console.error('Error parsing admin user data:', error);
-      }
+    // Check if user is admin - only run on client side
+    if (typeof window === 'undefined') {
+      setIsAdmin(false);
+      return;
     }
     
-    // Also check regular user token (in case admin uses regular login)
-    const token = localStorage.getItem('token');
-    const userStr = localStorage.getItem('user');
-    
-    if (token && userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        if (user.role === 'admin') {
-          setIsAdmin(true);
+    const checkAdminStatus = () => {
+      // Check admin token first (preferred method)
+      const adminToken = localStorage.getItem('adminToken');
+      const adminUserStr = localStorage.getItem('adminUser');
+      
+      if (adminToken && adminUserStr) {
+        try {
+          const adminUser = JSON.parse(adminUserStr);
+          // Strictly check if user has admin role - must be exactly 'admin'
+          if (
+            adminUser && 
+            typeof adminUser === 'object' && 
+            adminUser.role === 'admin' &&
+            adminUser.role !== 'user' &&
+            adminUser.role !== 'mechanic'
+          ) {
+            console.log('Admin detected via adminToken:', adminUser);
+            return true;
+          } else {
+            console.log('Not admin - adminUser role:', adminUser?.role);
+          }
+        } catch (error) {
+          console.error('Error parsing admin user data:', error);
         }
-      } catch (error) {
-        console.error('Error parsing user data:', error);
+      } else {
+        console.log('No adminToken or adminUserStr found');
       }
-    }
+      
+      // Also check regular user token (in case admin uses regular login)
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      
+      if (token && userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          if (
+            user && 
+            typeof user === 'object' && 
+            user.role === 'admin' &&
+            user.role !== 'user' &&
+            user.role !== 'mechanic'
+          ) {
+            console.log('Admin detected via regular token:', user);
+            return true;
+          } else {
+            console.log('Not admin - user role:', user?.role);
+          }
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+        }
+      } else {
+        console.log('No token or userStr found');
+      }
+      
+      return false;
+    };
+    
+    const adminFound = checkAdminStatus();
+    console.log('Final admin check result:', adminFound);
+    setIsAdmin(adminFound);
   }, []);
 
   useEffect(() => {
@@ -666,7 +702,8 @@ export default function InspectionReportViewPage() {
 
       {/* Action Buttons - Bottom Middle - Hidden when printing */}
       <div className="flex justify-center items-center gap-4 py-6 print:hidden">
-        {isAdmin && (
+        {/* Only show button if isAdmin is explicitly true */}
+        {isAdmin === true ? (
           <button
             onClick={handleSendToCustomer}
             disabled={isSending}
@@ -686,7 +723,7 @@ export default function InspectionReportViewPage() {
               </>
             )}
           </button>
-        )}
+        ) : null}
         <button
           onClick={handleExportPDF}
           className="flex items-center gap-2 px-6 py-3 bg-[#E54E3D] text-white rounded-lg font-semibold hover:bg-[#d14130] transition-colors shadow-lg"

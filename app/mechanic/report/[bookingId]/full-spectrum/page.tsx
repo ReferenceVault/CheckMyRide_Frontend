@@ -240,42 +240,42 @@ export default function FullSpectrumInspectionPage() {
       appointmentDate: '',
       inspectionTime: '',
       inspectorName: '',
-    },
-    bodyCondition: FULL_SPECTRUM_BODY_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    lights: FULL_SPECTRUM_LIGHTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    wheelsTires: FULL_SPECTRUM_WHEELS_TIRES_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    exteriorComponents: FULL_SPECTRUM_EXTERIOR_COMPONENTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    undercarriage: FULL_SPECTRUM_UNDERCARRIAGE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    engine: FULL_SPECTRUM_ENGINE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    batteryAlternator: BATTERY_ALTERNATOR_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    fluidInspection: FULL_SPECTRUM_FLUID_INSPECTION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    beltsHoses: FULL_SPECTRUM_BELTS_HOSES_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    diagnosticTesting: FULL_SPECTRUM_DIAGNOSTIC_TESTING_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    dashboardControls: FULL_SPECTRUM_DASHBOARD_CONTROLS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    windowsMirrors: FULL_SPECTRUM_WINDOWS_MIRRORS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    safetyEquipment: FULL_SPECTRUM_SAFETY_EQUIPMENT_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    functionalTests: FULL_SPECTRUM_FUNCTIONAL_TESTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    interiorCondition: FULL_SPECTRUM_INTERIOR_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    seatsUpholstery: FULL_SPECTRUM_SEATS_UPHOLSTERY_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    drivingPerformance: FULL_SPECTRUM_DRIVING_PERFORMANCE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    audioEntertainment: AUDIO_ENTERTAINMENT_SYSTEM_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    emissionsEnvironmental: EMISSIONS_ENVIRONMENTAL_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    priceNegotiation: PRICE_NEGOTIATION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    summary: {
-      overallCondition: '',
-      inspectionSummary: '',
-      recommendations: '',
-      recommendationNotes: '',
-    },
-    valueAssessment: {
-      assessment: '',
-      notes: '',
-    },
+        },
+        bodyCondition: FULL_SPECTRUM_BODY_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        lights: FULL_SPECTRUM_LIGHTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        wheelsTires: FULL_SPECTRUM_WHEELS_TIRES_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        exteriorComponents: FULL_SPECTRUM_EXTERIOR_COMPONENTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        undercarriage: FULL_SPECTRUM_UNDERCARRIAGE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        engine: FULL_SPECTRUM_ENGINE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        batteryAlternator: BATTERY_ALTERNATOR_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        fluidInspection: FULL_SPECTRUM_FLUID_INSPECTION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        beltsHoses: FULL_SPECTRUM_BELTS_HOSES_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        diagnosticTesting: FULL_SPECTRUM_DIAGNOSTIC_TESTING_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        dashboardControls: FULL_SPECTRUM_DASHBOARD_CONTROLS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        windowsMirrors: FULL_SPECTRUM_WINDOWS_MIRRORS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        safetyEquipment: FULL_SPECTRUM_SAFETY_EQUIPMENT_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        functionalTests: FULL_SPECTRUM_FUNCTIONAL_TESTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        interiorCondition: FULL_SPECTRUM_INTERIOR_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        seatsUpholstery: FULL_SPECTRUM_SEATS_UPHOLSTERY_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        drivingPerformance: FULL_SPECTRUM_DRIVING_PERFORMANCE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        audioEntertainment: AUDIO_ENTERTAINMENT_SYSTEM_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        emissionsEnvironmental: EMISSIONS_ENVIRONMENTAL_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        priceNegotiation: PRICE_NEGOTIATION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        summary: {
+          overallCondition: '',
+          inspectionSummary: '',
+          recommendations: '',
+          recommendationNotes: '',
+        },
+        valueAssessment: {
+          assessment: '',
+          notes: '',
+        },
   };
 
   const onFormDataInit = (booking: any) => ({
     ...initialFormData,
-    generalInfo: {
+          generalInfo: {
       clientName: booking.personalInfo?.fullName || '',
       email: booking.personalInfo?.email || '',
       phone: booking.personalInfo?.phone || '',
@@ -415,7 +415,7 @@ export default function FullSpectrumInspectionPage() {
               }));
             }}
             errors={fieldErrors.summary || []}
-          />
+                  />
 
           <ValueAssessmentSection
             valueAssessment={formData.valueAssessment}
@@ -428,7 +428,7 @@ export default function FullSpectrumInspectionPage() {
               }));
             }}
             errors={fieldErrors.valueAssessment || []}
-          />
+                  />
 
           <FormActions
             onSaveDraft={handleSaveDraft}

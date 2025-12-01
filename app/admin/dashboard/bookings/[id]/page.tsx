@@ -322,6 +322,8 @@ export default function BookingDetailPage() {
     }
   };
 
+  console.log("booking==============", booking);
+  console.log("user==============", user);
   const getUserDisplayName = () => {
     if (!user) return 'Admin';
     
@@ -718,7 +720,32 @@ export default function BookingDetailPage() {
                 </svg>
                 Assigned Mechanic
               </h2>
-              {!booking.assignedMechanic && (
+              {booking.assignedMechanic && booking.assignedMechanic.mechanicId && typeof booking.assignedMechanic.mechanicId === 'object' ? (
+                <button
+                  onClick={() => {
+                    setShowAssignForm(true);
+                    fetchMechanics();
+                    // Try to find and select current mechanic if exists in list
+                    const mechanicId = booking.assignedMechanic?.mechanicId 
+                      ? (typeof booking.assignedMechanic.mechanicId === 'object' && '_id' in booking.assignedMechanic.mechanicId
+                          ? booking.assignedMechanic.mechanicId._id
+                          : booking.assignedMechanic.mechanicId)
+                      : null;
+                    const currentMechanic = mechanicId ? mechanics.find(
+                      (m) => m.id === mechanicId
+                    ) : undefined;
+                    if (currentMechanic) {
+                      setSelectedMechanicId(currentMechanic.id);
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#E54E3D]/10 px-4 py-2 text-sm font-semibold text-[#E54E3D] hover:bg-[#E54E3D] hover:text-white transition-colors"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Reassign Mechanic
+                </button>
+              ) : (
                 <button
                   onClick={() => {
                     setShowAssignForm(true);
@@ -734,45 +761,26 @@ export default function BookingDetailPage() {
               )}
             </div>
 
-            {booking.assignedMechanic ? (
+            {booking.assignedMechanic && booking.assignedMechanic.mechanicId && typeof booking.assignedMechanic.mechanicId === 'object' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Name</label>
-                  <p className="text-sm font-semibold text-white mt-1">
-                    {booking.assignedMechanic.mechanicId.firstName}{' '}
-                    {booking.assignedMechanic.mechanicId.lastName}
-                  </p>
-                </div>
+                {booking.assignedMechanic.mechanicId.firstName || booking.assignedMechanic.mechanicId.lastName ? (
+                  <div>
+                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Name</label>
+                    <p className="text-sm font-semibold text-white mt-1">
+                      {booking.assignedMechanic.mechanicId.firstName || ''}{' '}
+                      {booking.assignedMechanic.mechanicId.lastName || ''}
+                    </p>
+                  </div>
+                ) : null}
                 <div>
                   <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Email</label>
                   <p className="text-sm font-semibold text-white mt-1">
-                    {booking.assignedMechanic.mechanicId.email}
+                    {booking.assignedMechanic.mechanicId.email || 'N/A'}
                   </p>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Assigned At</label>
                   <p className="text-sm font-semibold text-white mt-1">{formatDateTime(booking.assignedMechanic.assignedAt)}</p>
-                </div>
-                <div className="flex items-end">
-                  <button
-                    onClick={() => {
-                      setShowAssignForm(true);
-                      fetchMechanics();
-                      // Try to find and select current mechanic if exists in list
-                      const currentMechanic = mechanics.find(
-                        (m) => m.id === booking.assignedMechanic!.mechanicId._id
-                      );
-                      if (currentMechanic) {
-                        setSelectedMechanicId(currentMechanic.id);
-                      }
-                    }}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[#E54E3D]/10 px-4 py-2 text-sm font-semibold text-[#E54E3D] hover:bg-[#E54E3D] hover:text-white transition-colors"
-                  >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Reassign
-                  </button>
                 </div>
               </div>
             ) : (
