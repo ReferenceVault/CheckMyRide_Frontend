@@ -7,6 +7,8 @@ interface AdminUser {
   role: string;
   firstName?: string;
   lastName?: string;
+  name?: string;
+  fullName?: string;
 }
 
 export function useAdminAuth() {
