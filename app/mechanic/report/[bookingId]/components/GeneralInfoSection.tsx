@@ -9,15 +9,17 @@ interface GeneralInfoSectionProps {
   };
   isExpanded: boolean;
   onToggle: () => void;
+  fieldErrors?: string[];
 }
 
 export default function GeneralInfoSection({
   generalInfo,
   isExpanded,
   onToggle,
+  fieldErrors = [],
 }: GeneralInfoSectionProps) {
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+    <div className={`bg-white rounded-lg shadow-lg border overflow-hidden ${fieldErrors.length > 0 ? 'border-red-300' : 'border-gray-200'}`}>
       <button
         type="button"
         onClick={onToggle}
@@ -28,6 +30,11 @@ export default function GeneralInfoSection({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
           General Information
+          {fieldErrors.length > 0 && (
+            <span className="ml-2 px-2 py-0.5 text-xs font-semibold text-red-600 bg-red-100 rounded-full">
+              {fieldErrors.length} error{fieldErrors.length > 1 ? 's' : ''}
+            </span>
+          )}
         </h2>
         <svg
           className={`w-5 h-5 text-[#64748b] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
@@ -41,6 +48,16 @@ export default function GeneralInfoSection({
 
       {isExpanded && (
         <div className="p-6 pt-0 transition-all duration-300 ease-in-out">
+          {fieldErrors.length > 0 && (
+            <div className="mb-4 rounded-lg bg-red-50 border-2 border-red-200 p-3">
+              <p className="text-sm font-semibold text-red-800 mb-1">Please fix the following errors:</p>
+              <ul className="list-disc list-inside text-red-700 text-xs space-y-0.5">
+                {fieldErrors.map((err, idx) => (
+                  <li key={idx}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>Client Name</label>

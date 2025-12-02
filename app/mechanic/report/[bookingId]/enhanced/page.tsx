@@ -350,6 +350,7 @@ export default function EnhancedInspectionPage() {
             generalInfo={formData.generalInfo}
             isExpanded={expandedSections.generalInfo || false}
             onToggle={() => toggleSection('generalInfo')}
+            fieldErrors={fieldErrors.generalInfo || []}
           />
 
           {SECTION_CONFIG.map((section) => {

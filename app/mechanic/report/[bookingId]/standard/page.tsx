@@ -170,35 +170,35 @@ export default function StandardInspectionPage() {
       appointmentDate: '',
       inspectionTime: '',
       inspectorName: '',
-    },
-    bodyCondition: BODY_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    lights: LIGHTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    exteriorComponents: EXTERIOR_COMPONENTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    undercarriage: UNDERCARRIAGE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    engine: ENGINE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    battery: BATTERY_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    fluidInspection: FLUID_INSPECTION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    dashboardControls: DASHBOARD_CONTROLS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    windowsMirrors: WINDOWS_MIRRORS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    safetyEquipment: SAFETY_EQUIPMENT_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    functionalTests: FUNCTIONAL_TESTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    interiorCondition: INTERIOR_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    drivingPerformance: DRIVING_PERFORMANCE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    summary: {
-      overallCondition: '',
-      inspectionSummary: '',
-      recommendations: '',
-      recommendationNotes: '',
-    },
-    valueAssessment: {
-      assessment: '',
-      notes: '',
-    },
+        },
+        bodyCondition: BODY_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        lights: LIGHTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        exteriorComponents: EXTERIOR_COMPONENTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        undercarriage: UNDERCARRIAGE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        engine: ENGINE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        battery: BATTERY_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        fluidInspection: FLUID_INSPECTION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        dashboardControls: DASHBOARD_CONTROLS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        windowsMirrors: WINDOWS_MIRRORS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        safetyEquipment: SAFETY_EQUIPMENT_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        functionalTests: FUNCTIONAL_TESTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        interiorCondition: INTERIOR_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        drivingPerformance: DRIVING_PERFORMANCE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        summary: {
+          overallCondition: '',
+          inspectionSummary: '',
+          recommendations: '',
+          recommendationNotes: '',
+        },
+        valueAssessment: {
+          assessment: '',
+          notes: '',
+        },
   };
 
   const onFormDataInit = (booking: any) => ({
     ...initialFormData,
-    generalInfo: {
+          generalInfo: {
       clientName: booking.personalInfo?.fullName || '',
       email: booking.personalInfo?.email || '',
       phone: booking.personalInfo?.phone || '',
@@ -302,6 +302,7 @@ export default function StandardInspectionPage() {
             generalInfo={formData.generalInfo}
             isExpanded={expandedSections.generalInfo || false}
             onToggle={() => toggleSection('generalInfo')}
+            fieldErrors={fieldErrors.generalInfo || []}
           />
 
           {SECTION_CONFIG.map((section) => {

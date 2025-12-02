@@ -232,8 +232,63 @@ export function useInspectionForm({
       if (!response.ok) {
         const errorData = await response.json();
         if (errorData.errors && Array.isArray(errorData.errors)) {
-          setValidationErrors(errorData.errors);
-          throw new Error(errorData.message || 'Validation failed');
+          // Parse and format error messages for better UX
+          const formattedErrors = errorData.errors.map((err: string) => {
+            // Remove technical prefixes like "Path `field`" and make it user-friendly
+            return err.replace(/Path `[^`]+` /g, '').replace(/generalInfo\./g, '').replace(/summary\./g, '').replace(/valueAssessment\./g, '');
+          });
+          setValidationErrors(formattedErrors);
+          
+          // Also map errors to specific fields for field-level display
+          const mappedFieldErrors: { [key: string]: string[] } = {};
+          errorData.errors.forEach((err: string) => {
+            // Extract field name from error message
+            if (err.includes('generalInfo.inspectorName')) {
+              if (!mappedFieldErrors.generalInfo) mappedFieldErrors.generalInfo = [];
+              mappedFieldErrors.generalInfo.push('Inspector Name is required');
+            } else if (err.includes('generalInfo.clientName')) {
+              if (!mappedFieldErrors.generalInfo) mappedFieldErrors.generalInfo = [];
+              mappedFieldErrors.generalInfo.push('Client Name is required');
+            } else if (err.includes('generalInfo.email')) {
+              if (!mappedFieldErrors.generalInfo) mappedFieldErrors.generalInfo = [];
+              mappedFieldErrors.generalInfo.push('Email is required');
+            } else if (err.includes('generalInfo.phone')) {
+              if (!mappedFieldErrors.generalInfo) mappedFieldErrors.generalInfo = [];
+              mappedFieldErrors.generalInfo.push('Phone is required');
+            } else if (err.includes('generalInfo.appointmentDate')) {
+              if (!mappedFieldErrors.generalInfo) mappedFieldErrors.generalInfo = [];
+              mappedFieldErrors.generalInfo.push('Appointment Date is required');
+            } else if (err.includes('generalInfo.inspectionTime')) {
+              if (!mappedFieldErrors.generalInfo) mappedFieldErrors.generalInfo = [];
+              mappedFieldErrors.generalInfo.push('Inspection Time is required');
+            } else if (err.includes('summary.overallCondition')) {
+              if (!mappedFieldErrors.summary) mappedFieldErrors.summary = [];
+              mappedFieldErrors.summary.push('Overall Vehicle Condition is required');
+            } else if (err.includes('summary.inspectionSummary')) {
+              if (!mappedFieldErrors.summary) mappedFieldErrors.summary = [];
+              mappedFieldErrors.summary.push('Inspection Summary is required');
+            } else if (err.includes('summary.recommendations')) {
+              if (!mappedFieldErrors.summary) mappedFieldErrors.summary = [];
+              mappedFieldErrors.summary.push('Recommendations is required');
+            } else if (err.includes('valueAssessment.assessment')) {
+              if (!mappedFieldErrors.valueAssessment) mappedFieldErrors.valueAssessment = [];
+              mappedFieldErrors.valueAssessment.push('Value Assessment is required');
+            }
+          });
+          
+          if (Object.keys(mappedFieldErrors).length > 0) {
+            setFieldErrors(mappedFieldErrors);
+            // Auto-expand sections with errors
+            setExpandedSections((prev) => {
+              const updated = { ...prev };
+              Object.keys(mappedFieldErrors).forEach((section) => {
+                updated[section] = true;
+              });
+              return updated;
+            });
+          }
+          
+          throw new Error('Please fix the validation errors below');
         }
         throw new Error(errorData.message || 'Failed to save draft');
       }
