@@ -53,6 +53,7 @@ export function useInspectionForm({
   const [booking, setBooking] = useState<any>(null);
   const [selectedInspectionType, setSelectedInspectionType] = useState<string>(defaultInspectionType);
   const [formData, setFormData] = useState(initialFormData);
+  const [reportStatus, setReportStatus] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
     initialExpandedSections || {
       generalInfo: true,
@@ -92,6 +93,16 @@ export function useInspectionForm({
       if (reportRes && reportRes.ok) {
         const reportData = await reportRes.json();
         if (reportData.report) {
+          // Set report status
+          setReportStatus(reportData.report.status || null);
+          
+          // If report is already submitted (complete), don't populate form data
+          // User will see a message that report is already submitted
+          if (reportData.report.status === 'complete') {
+            return; // Exit early, form will be disabled
+          }
+          
+          // For draft status, populate the form with existing data
           setFormData((prev: any) => {
             const updated = { ...prev };
             
@@ -452,6 +463,7 @@ export function useInspectionForm({
     calculateFormProgress,
     handleSaveDraft,
     handleSubmit,
+    reportStatus,
   };
 }
 

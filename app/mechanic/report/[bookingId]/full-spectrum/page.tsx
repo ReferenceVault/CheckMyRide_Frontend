@@ -34,6 +34,7 @@ import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
 import ValueAssessmentSection from '../components/ValueAssessmentSection';
 import FormActions from '../components/FormActions';
+import ReportSubmittedMessage from '../components/ReportSubmittedMessage';
 
 const INSPECTION_TYPES = [
   { value: 'standard', label: 'Standard Inspection' },
@@ -334,6 +335,7 @@ export default function FullSpectrumInspectionPage() {
     calculateFormProgress,
     handleSaveDraft,
     handleSubmit,
+    reportStatus,
   } = useInspectionForm({
     bookingId,
     defaultInspectionType: 'full-spectrum',
@@ -365,6 +367,11 @@ export default function FullSpectrumInspectionPage() {
     );
   }
 
+  // Show message if report is already submitted
+  if (reportStatus === 'complete') {
+    return <ReportSubmittedMessage bookingId={bookingId} />;
+  }
+
   return (
     <div className="min-h-screen bg-[#f7f9fc]">
       <InspectionHeader
@@ -381,7 +388,7 @@ export default function FullSpectrumInspectionPage() {
         <ErrorMessage error={error} validationErrors={validationErrors} />
         <SuccessMessage success={success} />
 
-        <form onSubmit={handleSubmit} className={`space-y-6 ${success ? 'opacity-50 pointer-events-none' : ''}`}>
+        <form onSubmit={handleSubmit} className={`space-y-6 ${success || reportStatus === 'complete' ? 'opacity-50 pointer-events-none' : ''}`}>
           <GeneralInfoSection
             generalInfo={formData.generalInfo}
             isExpanded={expandedSections.generalInfo || false}
