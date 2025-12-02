@@ -14,6 +14,7 @@ function AppointmentBookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   
   const inspectionOptions = [
     { value: 'standard', label: 'Standard Inspection' },
@@ -30,14 +31,67 @@ function AppointmentBookingForm() {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(null);
+    setFieldErrors({});
     setSubmitSuccess(false);
 
     const formData = new FormData(e.currentTarget);
     
-    // Validate terms acceptance
+    // Client-side validation
+    const errors: Record<string, string> = {};
+    
+    // Validate required fields
+    if (!formData.get('fullName')?.toString().trim()) {
+      errors.fullName = 'Full Name is required';
+    }
+    if (!formData.get('email')?.toString().trim()) {
+      errors.email = 'Email Address is required';
+    }
+    if (!formData.get('phone')?.toString().trim()) {
+      errors.phone = 'Phone Number is required';
+    }
+    if (!formData.get('vehicleMake')?.toString().trim()) {
+      errors.vehicleMake = 'Vehicle Make is required';
+    }
+    if (!formData.get('vehicleModel')?.toString().trim()) {
+      errors.vehicleModel = 'Vehicle Model is required';
+    }
+    if (!formData.get('vehicleYear')?.toString().trim()) {
+      errors.vehicleYear = 'Vehicle Year is required';
+    }
+    if (!formData.get('inspection-type')) {
+      errors['inspection-type'] = 'Inspection Type is required';
+    }
+    if (!formData.get('inspection-location')) {
+      errors['inspection-location'] = 'Inspection Location is required';
+    }
+    if (!formData.get('preferredDate')?.toString().trim()) {
+      errors.preferredDate = 'Preferred Appointment Date is required';
+    }
+    if (!formData.get('preferredTime')?.toString().trim()) {
+      errors.preferredTime = 'Preferred Appointment Time is required';
+    }
+    if (!formData.get('inspectionAddress')?.toString().trim()) {
+      errors.inspectionAddress = 'Inspection Address is required';
+    }
+    if (!formData.get('payment-method')) {
+      errors['payment-method'] = 'Payment Method is required';
+    }
     if (formData.get('termsAccepted') !== 'on') {
-      setSubmitError('You must accept the Privacy Policy and Terms of Service to continue.');
+      errors.termsAccepted = 'You must accept the Privacy Policy and Terms of Service to continue.';
+    }
+    
+    // If there are validation errors, show them and stop submission
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       setIsSubmitting(false);
+      // Scroll to first error field
+      setTimeout(() => {
+        const firstErrorField = Object.keys(errors)[0];
+        const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
       return;
     }
 
@@ -100,11 +154,45 @@ function AppointmentBookingForm() {
       if (!response.ok) {
         // Handle validation errors
         if (response.status === 400 && data.errors && Array.isArray(data.errors)) {
-          const errorMessages = data.errors.map((err: any) => {
-            const field = err.field || 'field';
-            return `${field}: ${err.message}`;
-          }).join(', ');
-          throw new Error(`Validation Error: ${errorMessages}`);
+          const errors: Record<string, string> = {};
+          
+          data.errors.forEach((err: any) => {
+            const field = err.field || '';
+            const message = err.message || '';
+            
+            // Map backend field names to form field names
+            const fieldMap: Record<string, string> = {
+              'personalInfo.fullName': 'fullName',
+              'personalInfo.email': 'email',
+              'personalInfo.phone': 'phone',
+              'vehicleInfo.make': 'vehicleMake',
+              'vehicleInfo.model': 'vehicleModel',
+              'vehicleInfo.year': 'vehicleYear',
+              'inspectionDetails.type': 'inspection-type',
+              'inspectionDetails.location': 'inspection-location',
+              'appointmentDetails.preferredDate': 'preferredDate',
+              'appointmentDetails.preferredTime': 'preferredTime',
+              'appointmentDetails.address': 'inspectionAddress',
+              'additionalInfo.paymentMethod': 'payment-method',
+            };
+            
+            const formFieldName = fieldMap[field] || field.split('.').pop() || field;
+            errors[formFieldName] = message;
+          });
+          
+          setFieldErrors(errors);
+          
+          // Scroll to first error field
+          setTimeout(() => {
+            const firstErrorField = Object.keys(errors)[0];
+            const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
+            if (errorElement) {
+              errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 100);
+          
+          setIsSubmitting(false);
+          return;
         }
         
         // Handle other error responses
@@ -113,6 +201,7 @@ function AppointmentBookingForm() {
 
       // Success case
       setSubmitSuccess(true);
+      setFieldErrors({});
       
       // Reset form using ref
       if (formRef.current) {
@@ -218,31 +307,37 @@ function AppointmentBookingForm() {
               <div className="grid gap-5">
                 <label className="space-y-2 text-sm font-semibold text-[#1f2a37]">
                   <span>Full Name *</span>
+                  {fieldErrors.fullName && (
+                    <p className="text-xs text-red-600 font-normal">{fieldErrors.fullName}</p>
+                  )}
                   <input
                     type="text"
                     name="fullName"
-                    required
-                    className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                    className={`w-full rounded-xl border ${fieldErrors.fullName ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30`}
                     placeholder="Your full name"
                   />
                 </label>
                 <label className="space-y-2 text-sm font-semibold text-[#1f2a37]">
                   <span>Email Address *</span>
+                  {fieldErrors.email && (
+                    <p className="text-xs text-red-600 font-normal">{fieldErrors.email}</p>
+                  )}
                   <input
                     type="email"
                     name="email"
-                    required
-                    className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                    className={`w-full rounded-xl border ${fieldErrors.email ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30`}
                     placeholder="you@email.com"
                   />
                 </label>
                 <label className="space-y-2 text-sm font-semibold text-[#1f2a37]">
                   <span>Phone Number *</span>
+                  {fieldErrors.phone && (
+                    <p className="text-xs text-red-600 font-normal">{fieldErrors.phone}</p>
+                  )}
                   <input
                     type="tel"
                     name="phone"
-                    required
-                    className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                    className={`w-full rounded-xl border ${fieldErrors.phone ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30`}
                     placeholder="(613) 123-4567"
                   />
                 </label>
@@ -257,33 +352,39 @@ function AppointmentBookingForm() {
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="space-y-2 text-sm font-semibold text-[#1f2a37]">
                   <span>Make *</span>
+                  {fieldErrors.vehicleMake && (
+                    <p className="text-xs text-red-600 font-normal">{fieldErrors.vehicleMake}</p>
+                  )}
                   <input
                     type="text"
                     name="vehicleMake"
-                    required
-                    className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                    className={`w-full rounded-xl border ${fieldErrors.vehicleMake ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30`}
                     placeholder="e.g., Toyota"
                   />
                 </label>
                 <label className="space-y-2 text-sm font-semibold text-[#1f2a37]">
                   <span>Model *</span>
+                  {fieldErrors.vehicleModel && (
+                    <p className="text-xs text-red-600 font-normal">{fieldErrors.vehicleModel}</p>
+                  )}
                   <input
                     type="text"
                     name="vehicleModel"
-                    required
-                    className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                    className={`w-full rounded-xl border ${fieldErrors.vehicleModel ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30`}
                     placeholder="e.g., Corolla"
                   />
                 </label>
                 <label className="space-y-2 text-sm font-semibold text-[#1f2a37]">
                   <span>Year *</span>
+                  {fieldErrors.vehicleYear && (
+                    <p className="text-xs text-red-600 font-normal">{fieldErrors.vehicleYear}</p>
+                  )}
                   <input
                     type="number"
                     name="vehicleYear"
-                    required
                     min="1900"
                     max={new Date().getFullYear() + 1}
-                    className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                    className={`w-full rounded-xl border ${fieldErrors.vehicleYear ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30`}
                     placeholder="e.g., 2021"
                   />
                 </label>
@@ -314,19 +415,21 @@ function AppointmentBookingForm() {
           <section className="grid gap-10 lg:grid-cols-2">
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-semibold text-[#152032]">3. Inspection Type</h2>
-                <p className="mt-1 text-sm text-[#64748b]">Choose the inspection package you’re interested in.</p>
+                <h2 className="text-2xl font-semibold text-[#152032]">3. Inspection Type *</h2>
+                <p className="mt-1 text-sm text-[#64748b]">Choose the inspection package you're interested in.</p>
               </div>
+              {fieldErrors['inspection-type'] && (
+                <p className="text-xs text-red-600 font-normal">{fieldErrors['inspection-type']}</p>
+              )}
               <div className="grid gap-3">
                 {inspectionOptions.map((option, index) => (
-                  <label key={option.value} className="flex items-start gap-3 rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40">
+                  <label key={option.value} className={`flex items-start gap-3 rounded-2xl border ${fieldErrors['inspection-type'] ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40`}>
                     <input
                       type="radio"
                       name="inspection-type"
                       value={option.value}
                       className="mt-1 h-4 w-4 border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]"
                       defaultChecked={selectedService === option.value}
-                      required={!selectedService && index === 0}
                     />
                     <span className="font-semibold">{option.label}</span>
                   </label>
@@ -336,18 +439,21 @@ function AppointmentBookingForm() {
 
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-semibold text-[#152032]">4. Inspection Location</h2>
-                <p className="mt-1 text-sm text-[#64748b]">Tell us where you’d like the inspection to happen.</p>
+                <h2 className="text-2xl font-semibold text-[#152032]">4. Inspection Location *</h2>
+                <p className="mt-1 text-sm text-[#64748b]">Tell us where you'd like the inspection to happen.</p>
               </div>
+              {fieldErrors['inspection-location'] && (
+                <p className="text-xs text-red-600 font-normal">{fieldErrors['inspection-location']}</p>
+              )}
               <div className="space-y-3">
-                <label className="flex items-start gap-3 rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40">
-                  <input type="radio" name="inspection-location" required className="mt-1 h-4 w-4 border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
+                <label className={`flex items-start gap-3 rounded-2xl border ${fieldErrors['inspection-location'] ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40`}>
+                  <input type="radio" name="inspection-location" value="Mobile Inspection" className="mt-1 h-4 w-4 border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
                   <span className="font-semibold">
                     Mobile Inspection <span className="block text-xs font-normal text-[#64748b]">On-site inspection at your location of choice.</span>
                   </span>
                 </label>
-                <label className="flex items-start gap-3 rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40">
-                  <input type="radio" name="inspection-location" className="mt-1 h-4 w-4 border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
+                <label className={`flex items-start gap-3 rounded-2xl border ${fieldErrors['inspection-location'] ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40`}>
+                  <input type="radio" name="inspection-location" value="Inspection at CheckMyRide" className="mt-1 h-4 w-4 border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
                   <span className="font-semibold">
                     Inspection at CheckMyRide <span className="block text-xs font-normal text-[#64748b]">Bring the vehicle to our location.</span>
                   </span>
@@ -365,31 +471,37 @@ function AppointmentBookingForm() {
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="space-y-2 text-sm font-semibold text-[#1f2a37]">
                   <span>Preferred Appointment Date *</span>
+                  {fieldErrors.preferredDate && (
+                    <p className="text-xs text-red-600 font-normal">{fieldErrors.preferredDate}</p>
+                  )}
                   <input
                     type="date"
                     name="preferredDate"
-                    required
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                    className={`w-full rounded-xl border ${fieldErrors.preferredDate ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30`}
                   />
                 </label>
                 <label className="space-y-2 text-sm font-semibold text-[#1f2a37]">
                   <span>Preferred Appointment Time *</span>
+                  {fieldErrors.preferredTime && (
+                    <p className="text-xs text-red-600 font-normal">{fieldErrors.preferredTime}</p>
+                  )}
                   <input
                     type="time"
                     name="preferredTime"
-                    required
-                    className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                    className={`w-full rounded-xl border ${fieldErrors.preferredTime ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30`}
                   />
                 </label>
               </div>
               <label className="space-y-2 text-sm font-semibold text-[#1f2a37]">
                 <span>Inspection Address *</span>
+                {fieldErrors.inspectionAddress && (
+                  <p className="text-xs text-red-600 font-normal">{fieldErrors.inspectionAddress}</p>
+                )}
                 <input
                   type="text"
                   name="inspectionAddress"
-                  required
-                  className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30"
+                  className={`w-full rounded-xl border ${fieldErrors.inspectionAddress ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#152032] shadow-inner shadow-slate-200/50 transition focus:border-[#E54E3D] focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/30`}
                   placeholder="Street, City, Province"
                 />
               </label>
@@ -415,16 +527,19 @@ function AppointmentBookingForm() {
           <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-semibold text-[#152032]">7. Payment Information</h2>
-                <p className="mt-1 text-sm text-[#64748b]">Let us know how you’d like to pay once the inspection is complete.</p>
+                <h2 className="text-2xl font-semibold text-[#152032]">7. Payment Information *</h2>
+                <p className="mt-1 text-sm text-[#64748b]">Let us know how you'd like to pay once the inspection is complete.</p>
               </div>
+              {fieldErrors['payment-method'] && (
+                <p className="text-xs text-red-600 font-normal">{fieldErrors['payment-method']}</p>
+              )}
               <div className="space-y-3">
-                <label className="flex items-start gap-3 rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40">
-                  <input type="radio" name="payment-method" required className="mt-1 h-4 w-4 border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
+                <label className={`flex items-start gap-3 rounded-2xl border ${fieldErrors['payment-method'] ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40`}>
+                  <input type="radio" name="payment-method" value="Cash" className="mt-1 h-4 w-4 border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
                   <span className="font-semibold">Cash</span>
                 </label>
-                <label className="flex items-start gap-3 rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40">
-                  <input type="radio" name="payment-method" className="mt-1 h-4 w-4 border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
+                <label className={`flex items-start gap-3 rounded-2xl border ${fieldErrors['payment-method'] ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40`}>
+                  <input type="radio" name="payment-method" value="E-transfer" className="mt-1 h-4 w-4 border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
                   <span className="font-semibold">E-transfer</span>
                 </label>
               </div>
@@ -451,8 +566,11 @@ function AppointmentBookingForm() {
               <h2 className="text-2xl font-semibold text-[#152032]">8. Confirmation</h2>
               <p className="mt-1 text-sm text-[#64748b]">Please review your information before submitting.</p>
             </div>
-            <label className="flex items-start gap-3 rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40">
-              <input type="checkbox" name="termsAccepted" required className="mt-1 h-4 w-4 rounded border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
+            {fieldErrors.termsAccepted && (
+              <p className="text-xs text-red-600 font-normal">{fieldErrors.termsAccepted}</p>
+            )}
+            <label className={`flex items-start gap-3 rounded-2xl border ${fieldErrors.termsAccepted ? 'border-red-300' : 'border-[#e2e8f0]'} bg-[#f8fafc] px-4 py-3 text-sm text-[#1f2a37] shadow-inner shadow-slate-200/40`}>
+              <input type="checkbox" name="termsAccepted" className="mt-1 h-4 w-4 rounded border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
               <span>
                 I confirm that the information provided is accurate, and I agree to the{' '}
                 <Link href="/privacy-terms" className="font-semibold text-[#E54E3D] hover:text-[#d14130]">
