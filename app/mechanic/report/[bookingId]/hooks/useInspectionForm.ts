@@ -288,6 +288,14 @@ export function useInspectionForm({
             });
           }
           
+          // Scroll to error message after state updates
+          setTimeout(() => {
+            const errorElement = document.getElementById('error-message');
+            if (errorElement) {
+              errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 100);
+          
           throw new Error('Please fix the validation errors below');
         }
         throw new Error(errorData.message || 'Failed to save draft');
@@ -297,6 +305,13 @@ export function useInspectionForm({
       setTimeout(() => setSuccess(null), 3000);
     } catch (error: any) {
       setError(error.message || 'Failed to save draft');
+      // Scroll to error message after state updates
+      setTimeout(() => {
+        const errorElement = document.getElementById('error-message');
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
     } finally {
       setIsSaving(false);
     }
@@ -313,6 +328,13 @@ export function useInspectionForm({
     if (frontendErrors.length > 0) {
       setValidationErrors(frontendErrors);
       setIsSubmitting(false);
+      // Scroll to error message after state updates
+      setTimeout(() => {
+        const errorElement = document.getElementById('error-message');
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
       return;
     }
 
@@ -379,6 +401,14 @@ export function useInspectionForm({
             }
           });
           
+          // Scroll to error message after state updates
+          setTimeout(() => {
+            const errorElement = document.getElementById('error-message');
+            if (errorElement) {
+              errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 100);
+          
           throw new Error(errorData.message || 'Validation failed');
         }
         throw new Error(errorData.message || 'Failed to submit report');
@@ -391,6 +421,13 @@ export function useInspectionForm({
       }, 5000);
     } catch (error: any) {
       setError(error.message || 'Failed to submit report');
+      // Scroll to error message after state updates
+      setTimeout(() => {
+        const errorElement = document.getElementById('error-message');
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
     } finally {
       setIsSubmitting(false);
     }

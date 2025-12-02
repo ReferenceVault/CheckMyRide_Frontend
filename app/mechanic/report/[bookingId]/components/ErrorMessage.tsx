@@ -21,7 +21,7 @@ export default function ErrorMessage({ error, validationErrors }: ErrorMessagePr
   return (
     <>
       {error && (
-        <div className="mb-6 rounded-lg bg-red-50 border-2 border-red-200 p-4">
+        <div id="error-message" className="mb-6 rounded-lg bg-red-50 border-2 border-red-200 p-4">
           <div className="flex items-start gap-3">
             <svg className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -41,7 +41,7 @@ export default function ErrorMessage({ error, validationErrors }: ErrorMessagePr
       )}
 
       {validationErrors.length > 0 && !error && (
-        <div className="mb-6 rounded-lg bg-red-50 border-2 border-red-200 p-4">
+        <div id="error-message" className="mb-6 rounded-lg bg-red-50 border-2 border-red-200 p-4">
           <div className="flex items-start gap-3">
             <svg className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
