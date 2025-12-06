@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Suspense, useMemo, useState, useRef, FormEvent } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import SiteFooter from '../components/layout/SiteFooter';
 import SiteHeader from '../components/layout/SiteHeader';
 
@@ -10,6 +10,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 function AppointmentBookingForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -213,11 +214,6 @@ function AppointmentBookingForm() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 100);
 
-      // Clear success message after 5 seconds
-      setTimeout(() => {
-        setSubmitSuccess(false);
-      }, 5000);
-
     } catch (error: any) {
       // Handle different error types
       if (error.name === 'AbortError') {
@@ -266,9 +262,15 @@ function AppointmentBookingForm() {
               </svg>
               <h3 className="text-xl font-semibold text-green-800">Booking Submitted Successfully!</h3>
             </div>
-            <p className="text-green-700">
+            <p className="text-green-700 mb-4">
               Thank you for your booking. We'll contact you shortly to confirm your appointment.
             </p>
+            <button
+              onClick={() => router.push('/')}
+              className="inline-flex items-center justify-center rounded-full bg-green-600 hover:bg-green-700 px-6 py-3 text-sm font-semibold text-white transition shadow-md hover:shadow-lg"
+            >
+              Go to Home Page
+            </button>
           </div>
         )}
 
