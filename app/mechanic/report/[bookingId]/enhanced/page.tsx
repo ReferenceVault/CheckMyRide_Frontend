@@ -30,6 +30,7 @@ import GeneralInfoSection from '../components/GeneralInfoSection';
 import RatingGuidelines from '../components/RatingGuidelines';
 import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
+import Disclaimer from '../components/Disclaimer';
 import FormActions from '../components/FormActions';
 import ReportSubmittedMessage from '../components/ReportSubmittedMessage';
 
@@ -385,6 +386,8 @@ export default function EnhancedInspectionPage() {
             }}
             errors={fieldErrors.summary || []}
           />
+
+          <Disclaimer />
 
           <FormActions
             onSaveDraft={handleSaveDraft}
