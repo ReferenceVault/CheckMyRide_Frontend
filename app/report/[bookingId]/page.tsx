@@ -173,6 +173,7 @@ export default function InspectionReportViewPage() {
   }, []);
 
   useEffect(() => {
+    console.log('bookingId:', bookingId);
     if (!bookingId) return;
 
     const fetchReport = async () => {
@@ -185,10 +186,11 @@ export default function InspectionReportViewPage() {
         if (!reportResponse.ok) {
           throw new Error('Failed to fetch report');
         }
+
         const reportData = await reportResponse.json();
-        
+        console.log('reportData:', reportData);
         if (!reportData.report) {
-          setError('Report not found');
+          setError('The inspection report for this booking is not available yet.');
           setLoading(false);
           return;
         }
@@ -380,8 +382,8 @@ export default function InspectionReportViewPage() {
       <div className="min-h-screen bg-[#f7f9fc] flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-6">
           <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
-            <h2 className="text-xl font-bold text-red-800 mb-2">Error Loading Report</h2>
-            <p className="text-red-700 mb-4">{error || 'Report not found'}</p>
+            <h2 className="text-xl font-bold text-red-800 mb-2">Report Not Available</h2>
+            <p className="text-red-700 mb-4">{error || 'The inspection report for this booking is not available yet.'}</p>
             <button
               onClick={() => router.push('/')}
               className="px-6 py-2 bg-[#E54E3D] text-white rounded-lg font-semibold hover:bg-[#d14130] transition-colors"
