@@ -5,6 +5,7 @@ import {
   BodyConditionItem,
   BODY_CONDITION_ITEMS,
   LIGHTS_ITEMS,
+  STANDARD_WHEELS_TIRES_ITEMS,
   EXTERIOR_COMPONENTS_ITEMS,
   UNDERCARRIAGE_ITEMS,
   ENGINE_ITEMS,
@@ -15,7 +16,7 @@ import {
   SAFETY_EQUIPMENT_ITEMS,
   FUNCTIONAL_TESTS_ITEMS,
   INTERIOR_CONDITION_ITEMS,
-  DRIVING_PERFORMANCE_ITEMS,
+  ROAD_TEST_RESULTS_ITEMS,
 } from '../types';
 import { useInspectionForm } from '../hooks/useInspectionForm';
 import InspectionHeader from '../components/InspectionHeader';
@@ -26,7 +27,6 @@ import GeneralInfoSection from '../components/GeneralInfoSection';
 import RatingGuidelines from '../components/RatingGuidelines';
 import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
-import ValueAssessmentSection from '../components/ValueAssessmentSection';
 import FormActions from '../components/FormActions';
 import ReportSubmittedMessage from '../components/ReportSubmittedMessage';
 
@@ -53,6 +53,15 @@ const SECTION_CONFIG = [
     icon: (
       <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'wheelsTires',
+    title: 'Wheels & Tires',
+    icon: (
+      <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.55 23.55 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 4v12.75C16 17.86 15.75 18 15.375 18H9.75c-.375 0-.625-.14-.625-.25V4m12 0h-3.375c-.375 0-.625.14-.625.25v12.75C18 17.86 17.75 18 17.375 18H2.625C2.25 18 2 17.86 2 17.75V4m12 0h-3.375c-.375 0-.625.14-.625.25v12.75C15 17.86 14.75 18 14.375 18H-.625C-.25 18 0 17.86 0 17.75V4" />
       </svg>
     ),
   },
@@ -149,7 +158,7 @@ const SECTION_CONFIG = [
   },
   {
     key: 'drivingPerformance',
-    title: 'Driving Performance',
+    title: 'Road Test Results',
     icon: (
       <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -175,6 +184,7 @@ export default function StandardInspectionPage() {
         },
         bodyCondition: BODY_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         lights: LIGHTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        wheelsTires: STANDARD_WHEELS_TIRES_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         exteriorComponents: EXTERIOR_COMPONENTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         undercarriage: UNDERCARRIAGE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         engine: ENGINE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
@@ -185,16 +195,12 @@ export default function StandardInspectionPage() {
         safetyEquipment: SAFETY_EQUIPMENT_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         functionalTests: FUNCTIONAL_TESTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         interiorCondition: INTERIOR_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-        drivingPerformance: DRIVING_PERFORMANCE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        drivingPerformance: ROAD_TEST_RESULTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         summary: {
           overallCondition: '',
           inspectionSummary: '',
           recommendations: '',
           recommendationNotes: '',
-        },
-        valueAssessment: {
-          assessment: '',
-          notes: '',
         },
   };
 
@@ -218,6 +224,7 @@ export default function StandardInspectionPage() {
     generalInfo: true,
     bodyCondition: false,
     lights: false,
+    wheelsTires: false,
     exteriorComponents: false,
     undercarriage: false,
     engine: false,
@@ -230,7 +237,6 @@ export default function StandardInspectionPage() {
     interiorCondition: false,
     drivingPerformance: false,
     summary: false,
-    valueAssessment: false,
   };
 
   const {
@@ -342,19 +348,6 @@ export default function StandardInspectionPage() {
               }));
             }}
             errors={fieldErrors.summary || []}
-          />
-
-          <ValueAssessmentSection
-            valueAssessment={formData.valueAssessment}
-            isExpanded={expandedSections.valueAssessment || false}
-            onToggle={() => toggleSection('valueAssessment')}
-            onValueAssessmentChange={(field, value) => {
-              setFormData((prev: any) => ({
-                ...prev,
-                valueAssessment: { ...prev.valueAssessment, [field]: value },
-              }));
-            }}
-            errors={fieldErrors.valueAssessment || []}
           />
 
           <FormActions

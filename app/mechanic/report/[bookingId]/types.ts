@@ -30,6 +30,14 @@ export const LIGHTS_ITEMS = [
   'Light housings for cracks or moisture',
 ];
 
+export const STANDARD_WHEELS_TIRES_ITEMS = [
+  'Tires: Sidewalls inspected for cracks/bulges',
+  'Tires: Uniform tire size',
+  'Wheels/Rims: No cracks/damage',
+  'Wheels/Rims: No corrosion',
+  'Spare tire condition',
+];
+
 export const EXTERIOR_COMPONENTS_ITEMS = [
   'Doors: Smooth opening/closing',
   'Hood/trunk release operational',
@@ -102,12 +110,20 @@ export const INTERIOR_CONDITION_ITEMS = [
   'Interior lights',
 ];
 
-export const DRIVING_PERFORMANCE_ITEMS = [
-  'Steering & Suspension: Shock absorbers intact',
-  'Steering & Suspension: Smooth steering, no noise',
-  'Braking System: Parking brake operational',
-  'Braking System: Brake pads/shoes inspection',
-  'Handling: Stable cornering/turns',
+export const ROAD_TEST_RESULTS_ITEMS = [
+  'Acceleration',
+  'Braking performance',
+  'Handling and stability',
+  'Steering response',
+  'Transmission shifting',
+  'Suspension comfort',
+  'Noise level',
+  'Vibration',
+  'Warning lights during operation',
+  'Parking brake operation',
+  'Engine performace',
+  'Climate control operation',
+  'Overall driving experience',
 ];
 
 // Enhanced Inspection Items
@@ -121,8 +137,8 @@ export const ENHANCED_BODY_CONDITION_ITEMS = [
 ];
 
 export const WHEELS_TIRES_ITEMS = [
-  'Sidewalls inspected for cracks/bulges',
-  'Uniform tire size',
+  'Tires: Sidewalls inspected for cracks/bulges',
+  'Tires: Uniform tire size',
   'Wheels/Rims: No cracks/damage',
   'Wheels/Rims: No corrosion',
   'Spare tire condition',
@@ -233,8 +249,8 @@ export const FULL_SPECTRUM_LIGHTS_ITEMS = [
 ];
 
 export const FULL_SPECTRUM_WHEELS_TIRES_ITEMS = [
-  'Sidewalls inspected for cracks/bulges',
-  'Uniform tire size',
+  'Tires: Sidewalls inspected for cracks/bulges',
+  'Tires: Uniform tire size',
   'Wheels/Rims: No cracks/damage',
   'Wheels/Rims: No corrosion',
   'Spare tire condition',
@@ -309,6 +325,26 @@ export const FULL_SPECTRUM_BELTS_HOSES_ITEMS = [
   'Belts & Hoses: Hoses intact, no leaks',
   'Tensioner operation',
   'Belt routing verification',
+];
+
+export const FULL_SPECTRUM_ROAD_TEST_RESULTS_ITEMS = [
+  'Acceleration',
+  'Braking performance at various speeds',
+  'Handling and stability',
+  'Steering response and alignment',
+  'Transmission shifting smoothness',
+  'Transmission shift points',
+  'Clutch engagement (manual transmissions)',
+  'Suspension comfort',
+  'Suspension noise during varied terrain',
+  'Noise level',
+  'Vibration',
+  'Warning lights during operation',
+  'Parking brake operation',
+  'Engine performance under load',
+  'Climate control operation',
+  'High-speed stability',
+  'Overall driving experience',
 ];
 
 export const FULL_SPECTRUM_DIAGNOSTIC_TESTING_ITEMS = [
@@ -511,6 +547,15 @@ export const ROUTINE_SAFETY_SYSTEMS_ITEMS = [
   'Seat belt operation',
   'Warning light check',
   'Mirror condition and adjustment',
+];
+
+export const ROUTINE_ROAD_TEST_RESULTS_ITEMS = [
+  'Acceleration',
+  'Braking',
+  'Handling',
+  'Noise level',
+  'Vibration',
+  'Warning lights',
 ];
 
 export const ROUTINE_CUSTOMER_CONCERNS_ITEMS = [

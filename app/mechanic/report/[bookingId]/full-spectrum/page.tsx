@@ -12,6 +12,7 @@ import {
   BATTERY_ALTERNATOR_ITEMS,
   FULL_SPECTRUM_FLUID_INSPECTION_ITEMS,
   FULL_SPECTRUM_BELTS_HOSES_ITEMS,
+  FULL_SPECTRUM_ROAD_TEST_RESULTS_ITEMS,
   FULL_SPECTRUM_DIAGNOSTIC_TESTING_ITEMS,
   FULL_SPECTRUM_DASHBOARD_CONTROLS_ITEMS,
   FULL_SPECTRUM_WINDOWS_MIRRORS_ITEMS,
@@ -19,7 +20,6 @@ import {
   FULL_SPECTRUM_FUNCTIONAL_TESTS_ITEMS,
   FULL_SPECTRUM_INTERIOR_CONDITION_ITEMS,
   FULL_SPECTRUM_SEATS_UPHOLSTERY_ITEMS,
-  FULL_SPECTRUM_DRIVING_PERFORMANCE_ITEMS,
   AUDIO_ENTERTAINMENT_SYSTEM_ITEMS,
   EMISSIONS_ENVIRONMENTAL_ITEMS,
   PRICE_NEGOTIATION_ITEMS,
@@ -33,7 +33,6 @@ import GeneralInfoSection from '../components/GeneralInfoSection';
 import RatingGuidelines from '../components/RatingGuidelines';
 import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
-import ValueAssessmentSection from '../components/ValueAssessmentSection';
 import FormActions from '../components/FormActions';
 import ReportSubmittedMessage from '../components/ReportSubmittedMessage';
 
@@ -127,6 +126,15 @@ const SECTION_CONFIG = [
     ),
   },
   {
+    key: 'roadTestResults',
+    title: 'Road Test Results',
+    icon: (
+      <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+  },
+  {
     key: 'diagnosticTesting',
     title: 'Diagnostic Testing',
     icon: (
@@ -191,15 +199,6 @@ const SECTION_CONFIG = [
     ),
   },
   {
-    key: 'drivingPerformance',
-    title: 'Driving Performance',
-    icon: (
-      <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-    ),
-  },
-  {
     key: 'audioEntertainment',
     title: 'Audio/Entertainment System',
     icon: (
@@ -252,6 +251,7 @@ export default function FullSpectrumInspectionPage() {
         batteryAlternator: BATTERY_ALTERNATOR_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         fluidInspection: FULL_SPECTRUM_FLUID_INSPECTION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         beltsHoses: FULL_SPECTRUM_BELTS_HOSES_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        roadTestResults: FULL_SPECTRUM_ROAD_TEST_RESULTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         diagnosticTesting: FULL_SPECTRUM_DIAGNOSTIC_TESTING_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         dashboardControls: FULL_SPECTRUM_DASHBOARD_CONTROLS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         windowsMirrors: FULL_SPECTRUM_WINDOWS_MIRRORS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
@@ -259,7 +259,6 @@ export default function FullSpectrumInspectionPage() {
         functionalTests: FULL_SPECTRUM_FUNCTIONAL_TESTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         interiorCondition: FULL_SPECTRUM_INTERIOR_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         seatsUpholstery: FULL_SPECTRUM_SEATS_UPHOLSTERY_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-        drivingPerformance: FULL_SPECTRUM_DRIVING_PERFORMANCE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         audioEntertainment: AUDIO_ENTERTAINMENT_SYSTEM_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         emissionsEnvironmental: EMISSIONS_ENVIRONMENTAL_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         priceNegotiation: PRICE_NEGOTIATION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
@@ -268,10 +267,6 @@ export default function FullSpectrumInspectionPage() {
           inspectionSummary: '',
           recommendations: '',
           recommendationNotes: '',
-        },
-        valueAssessment: {
-          assessment: '',
-          notes: '',
         },
   };
 
@@ -302,6 +297,7 @@ export default function FullSpectrumInspectionPage() {
     batteryAlternator: false,
     fluidInspection: false,
     beltsHoses: false,
+    roadTestResults: false,
     diagnosticTesting: false,
     dashboardControls: false,
     windowsMirrors: false,
@@ -309,12 +305,10 @@ export default function FullSpectrumInspectionPage() {
     functionalTests: false,
     interiorCondition: false,
     seatsUpholstery: false,
-    drivingPerformance: false,
     audioEntertainment: false,
     emissionsEnvironmental: false,
     priceNegotiation: false,
     summary: false,
-    valueAssessment: false,
   };
 
   const {
@@ -426,19 +420,6 @@ export default function FullSpectrumInspectionPage() {
               }));
             }}
             errors={fieldErrors.summary || []}
-                  />
-
-          <ValueAssessmentSection
-            valueAssessment={formData.valueAssessment}
-            isExpanded={expandedSections.valueAssessment || false}
-            onToggle={() => toggleSection('valueAssessment')}
-            onValueAssessmentChange={(field, value) => {
-              setFormData((prev: any) => ({
-                ...prev,
-                valueAssessment: { ...prev.valueAssessment, [field]: value },
-              }));
-            }}
-            errors={fieldErrors.valueAssessment || []}
                   />
 
           <FormActions
