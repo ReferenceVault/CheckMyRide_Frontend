@@ -27,6 +27,7 @@ import ProgressIndicator from '../components/ProgressIndicator';
 import ErrorMessage from '../components/ErrorMessage';
 import SuccessMessage from '../components/SuccessMessage';
 import GeneralInfoSection from '../components/GeneralInfoSection';
+import RatingGuidelines from '../components/RatingGuidelines';
 import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
 import ValueAssessmentSection from '../components/ValueAssessmentSection';
@@ -359,6 +360,8 @@ export default function EnhancedInspectionPage() {
             onToggle={() => toggleSection('generalInfo')}
             fieldErrors={fieldErrors.generalInfo || []}
           />
+
+          <RatingGuidelines />
 
           {SECTION_CONFIG.map((section) => {
             const handler = createSectionHandler(section.key);
