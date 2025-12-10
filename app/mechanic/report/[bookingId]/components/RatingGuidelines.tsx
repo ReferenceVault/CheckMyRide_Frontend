@@ -19,14 +19,14 @@ export default function RatingGuidelines() {
     {
       rating: 'Fair',
       icon: '⚠',
-      iconColor: 'text-orange-600',
+      iconColor: 'text-orange-400',
       description: 'Component shows signs of wear but is still functional.',
       recommendation: 'Monitor and plan for future replacement.',
     },
     {
       rating: 'Needs Attention',
       icon: '⚠',
-      iconColor: 'text-orange-600',
+      iconColor: 'text-orange-400',
       description: 'Component requires repair or replacement soon.',
       recommendation: 'Address within 30-90 days.',
     },

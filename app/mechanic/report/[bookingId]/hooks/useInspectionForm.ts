@@ -1,6 +1,27 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { BodyConditionItem } from '../types';
+import { isAdminUser } from '../utils/auth';
+
+// Helper function to get auth token
+const getAuthToken = (): string | null => {
+  if (typeof window === 'undefined') return null;
+  // Try admin token first
+  const adminToken = localStorage.getItem('adminToken');
+  if (adminToken) return adminToken;
+  // Fallback to regular token
+  return localStorage.getItem('token');
+};
+
+// Helper function to get auth headers
+const getAuthHeaders = (): HeadersInit => {
+  const token = getAuthToken();
+  const headers: HeadersInit = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+};
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -54,6 +75,7 @@ export function useInspectionForm({
   const [selectedInspectionType, setSelectedInspectionType] = useState<string>(defaultInspectionType);
   const [formData, setFormData] = useState(initialFormData);
   const [reportStatus, setReportStatus] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
     initialExpandedSections || {
       generalInfo: true,
@@ -61,6 +83,11 @@ export function useInspectionForm({
       valueAssessment: false,
     }
   );
+
+  // Check if user is admin on mount
+  useEffect(() => {
+    setIsAdmin(isAdminUser());
+  }, []);
 
   useEffect(() => {
     fetchBookingAndReport();
@@ -96,13 +123,16 @@ export function useInspectionForm({
           // Set report status
           setReportStatus(reportData.report.status || null);
           
-          // If report is already submitted (complete), don't populate form data
-          // User will see a message that report is already submitted
-          if (reportData.report.status === 'complete') {
-            return; // Exit early, form will be disabled
+          const userIsAdmin = isAdminUser();
+          
+          // Admin users: always populate form data and allow editing, regardless of status
+          // Normal users: only populate and allow editing when status is 'draft'
+          if (!userIsAdmin && reportData.report.status === 'complete') {
+            // Normal user with completed report - don't populate, form will be disabled
+            return;
           }
           
-          // For draft status, populate the form with existing data
+          // Populate the form with existing data (for both admin and normal users with draft)
           setFormData((prev: any) => {
             const updated = { ...prev };
             
@@ -239,7 +269,7 @@ export function useInspectionForm({
 
       const response = await fetch(`${API_URL}/api/reports/booking/${bookingId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           reportType: defaultInspectionType,
           status: 'draft',
@@ -327,7 +357,15 @@ export function useInspectionForm({
       }
 
       setSuccess('Draft saved successfully!');
-      setTimeout(() => setSuccess(null), 3000);
+      // Scroll to success message after state updates
+      setTimeout(() => {
+        const successElement = document.getElementById('success-message');
+        if (successElement) {
+          successElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      // Keep message visible for 10 seconds
+      setTimeout(() => setSuccess(null), 10000);
     } catch (error: any) {
       setError(error.message || 'Failed to save draft');
       // Scroll to error message after state updates
@@ -378,7 +416,7 @@ export function useInspectionForm({
       // Call submit API directly (it will save and validate)
       const submitResponse = await fetch(`${API_URL}/api/reports/booking/${bookingId}/submit`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           reportType: defaultInspectionType,
           status: 'draft',
@@ -479,6 +517,7 @@ export function useInspectionForm({
     handleSaveDraft,
     handleSubmit,
     reportStatus,
+    isAdmin,
   };
 }
 

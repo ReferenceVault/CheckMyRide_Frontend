@@ -344,6 +344,7 @@ export default function FullSpectrumInspectionPage() {
     handleSaveDraft,
     handleSubmit,
     reportStatus,
+    isAdmin,
   } = useInspectionForm({
     bookingId,
     defaultInspectionType: 'full-spectrum',
@@ -375,8 +376,8 @@ export default function FullSpectrumInspectionPage() {
     );
   }
 
-  // Show message if report is already submitted
-  if (reportStatus === 'complete') {
+  // Show message if report is already submitted (only for normal users)
+  if (reportStatus === 'complete' && !isAdmin) {
     return <ReportSubmittedMessage bookingId={bookingId} />;
   }
 
@@ -396,7 +397,7 @@ export default function FullSpectrumInspectionPage() {
         <ErrorMessage error={error} validationErrors={validationErrors} />
         <SuccessMessage success={success} />
 
-        <form onSubmit={handleSubmit} className={`space-y-6 ${success || reportStatus === 'complete' ? 'opacity-50 pointer-events-none' : ''}`}>
+        <form onSubmit={handleSubmit} className={`space-y-6 ${success || (reportStatus === 'complete' && !isAdmin) ? 'opacity-50 pointer-events-none' : ''}`}>
           <GeneralInfoSection
             generalInfo={formData.generalInfo}
             isExpanded={expandedSections.generalInfo || false}
@@ -429,18 +430,20 @@ export default function FullSpectrumInspectionPage() {
               return (
                 <div key={`${section.key}-wrapper`}>
                   {sectionElement}
-                  <PriceNegotiationSection
-                    priceNegotiation={formData.priceNegotiation}
-                    isExpanded={expandedSections.priceNegotiation || false}
-                    onToggle={() => toggleSection('priceNegotiation')}
-                    onPriceNegotiationChange={(field, value) => {
-                      setFormData((prev: any) => ({
-                        ...prev,
-                        priceNegotiation: { ...prev.priceNegotiation, [field]: value },
-                      }));
-                    }}
-                    errors={fieldErrors.priceNegotiation || []}
-                  />
+                  <div className="mt-6">
+                    <PriceNegotiationSection
+                      priceNegotiation={formData.priceNegotiation}
+                      isExpanded={expandedSections.priceNegotiation || false}
+                      onToggle={() => toggleSection('priceNegotiation')}
+                      onPriceNegotiationChange={(field, value) => {
+                        setFormData((prev: any) => ({
+                          ...prev,
+                          priceNegotiation: { ...prev.priceNegotiation, [field]: value },
+                        }));
+                      }}
+                      errors={fieldErrors.priceNegotiation || []}
+                    />
+                  </div>
                 </div>
               );
             }

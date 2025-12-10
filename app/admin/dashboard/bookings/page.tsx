@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import AdminLayout from '../../../components/layout/AdminLayout';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
 
@@ -111,7 +112,7 @@ export default function BookingsPage() {
     try {
       const token = localStorage.getItem('adminToken');
       if (!token) {
-        alert('Authentication required. Please login again.');
+        toast.error('Authentication required. Please login again.');
         return;
       }
       
@@ -130,8 +131,9 @@ export default function BookingsPage() {
 
       // Refresh bookings
       fetchBookings();
+      toast.success('Status updated successfully');
     } catch (error: any) {
-      alert(error.message || 'Failed to update status');
+      toast.error(error.message || 'Failed to update status');
     }
   };
 
@@ -173,10 +175,11 @@ export default function BookingsPage() {
     try {
       await navigator.clipboard.writeText(link);
       setCopiedLink(bookingId);
+      toast.success('Link copied to clipboard');
       setTimeout(() => setCopiedLink(null), 2000);
     } catch (err) {
       console.error('Failed to copy link:', err);
-      alert('Failed to copy link. Please try again.');
+      toast.error('Failed to copy link. Please try again.');
     }
   };
 
