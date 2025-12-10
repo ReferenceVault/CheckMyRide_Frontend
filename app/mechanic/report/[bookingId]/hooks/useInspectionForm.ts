@@ -137,6 +137,13 @@ export function useInspectionForm({
               updated.valueAssessment = reportData.report.valueAssessment;
             }
 
+            // Update priceNegotiation (object structure, not array)
+            if (reportData.report.priceNegotiation) {
+              updated.priceNegotiation = reportData.report.priceNegotiation;
+            } else if (reportData.report.sections?.priceNegotiation) {
+              updated.priceNegotiation = reportData.report.sections.priceNegotiation;
+            }
+
             return updated;
           });
         }
@@ -183,13 +190,19 @@ export function useInspectionForm({
     });
 
     sectionKeys.forEach((section) => {
+      // Skip priceNegotiation as it's an object, not an array
+      if (section === 'priceNegotiation') {
+        return;
+      }
       const sectionData = formData[section] as BodyConditionItem[];
-      sectionData.forEach((item) => {
-        totalFields++;
-        if (item.rating && item.rating.trim() !== '') {
-          filledFields++;
-        }
-      });
+      if (Array.isArray(sectionData)) {
+        sectionData.forEach((item) => {
+          totalFields++;
+          if (item.rating && item.rating.trim() !== '') {
+            filledFields++;
+          }
+        });
+      }
     });
 
     return totalFields > 0 ? Math.round((filledFields / totalFields) * 100) : 0;
@@ -214,7 +227,7 @@ export function useInspectionForm({
 
     try {
       // Extract sections from formData
-      const { generalInfo, summary, valueAssessment, ...sections } = formData;
+      const { generalInfo, summary, valueAssessment, priceNegotiation, ...sections } = formData;
       
       // Build sections object (only include arrays that are sections)
       const sectionsData: { [key: string]: any[] } = {};
@@ -236,6 +249,7 @@ export function useInspectionForm({
           },
           summary,
           valueAssessment,
+          priceNegotiation,
           ...sectionsData,
         }),
       });
@@ -351,7 +365,7 @@ export function useInspectionForm({
 
     try {
       // Extract sections from formData
-      const { generalInfo, summary, valueAssessment, ...sections } = formData;
+      const { generalInfo, summary, valueAssessment, priceNegotiation, ...sections } = formData;
       
       // Build sections object (only include arrays that are sections)
       const sectionsData: { [key: string]: any[] } = {};
@@ -374,6 +388,7 @@ export function useInspectionForm({
           },
           summary,
           valueAssessment,
+          priceNegotiation,
           ...sectionsData,
         }),
       });

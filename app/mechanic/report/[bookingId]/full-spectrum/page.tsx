@@ -33,6 +33,7 @@ import GeneralInfoSection from '../components/GeneralInfoSection';
 import RatingGuidelines from '../components/RatingGuidelines';
 import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
+import PriceNegotiationSection from '../components/PriceNegotiationSection';
 import Disclaimer from '../components/Disclaimer';
 import FormActions from '../components/FormActions';
 import ReportSubmittedMessage from '../components/ReportSubmittedMessage';
@@ -262,7 +263,18 @@ export default function FullSpectrumInspectionPage() {
         seatsUpholstery: FULL_SPECTRUM_SEATS_UPHOLSTERY_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         audioEntertainment: AUDIO_ENTERTAINMENT_SYSTEM_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         emissionsEnvironmental: EMISSIONS_ENVIRONMENTAL_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-        priceNegotiation: PRICE_NEGOTIATION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        priceNegotiation: {
+          priceReductionRequested: '',
+          amountRequested: '',
+          negotiationOutcome: '',
+          finalOutcomeDetails: '',
+          originalAskingPrice: '',
+          originalAskingPriceNotes: '',
+          finalNegotiatedPrice: '',
+          savingsAmount: '',
+          estimatedSavingsAchieved: '',
+          estimatedSavingsDetails: '',
+        },
         summary: {
           overallCondition: '',
           inspectionSummary: '',
@@ -395,8 +407,11 @@ export default function FullSpectrumInspectionPage() {
           <RatingGuidelines />
 
           {SECTION_CONFIG.map((section) => {
+            if (section.key === 'priceNegotiation') {
+              return null;
+            }
             const handler = createSectionHandler(section.key);
-            return (
+            const sectionElement = (
               <InspectionSection
                 key={section.key}
                 sectionKey={section.key}
@@ -408,6 +423,29 @@ export default function FullSpectrumInspectionPage() {
                 onChange={handler}
               />
             );
+            
+            // Insert Price Negotiation section right after Emissions & Environmental
+            if (section.key === 'emissionsEnvironmental') {
+              return (
+                <div key={`${section.key}-wrapper`}>
+                  {sectionElement}
+                  <PriceNegotiationSection
+                    priceNegotiation={formData.priceNegotiation}
+                    isExpanded={expandedSections.priceNegotiation || false}
+                    onToggle={() => toggleSection('priceNegotiation')}
+                    onPriceNegotiationChange={(field, value) => {
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        priceNegotiation: { ...prev.priceNegotiation, [field]: value },
+                      }));
+                    }}
+                    errors={fieldErrors.priceNegotiation || []}
+                  />
+                </div>
+              );
+            }
+            
+            return sectionElement;
           })}
 
           <SummarySection
