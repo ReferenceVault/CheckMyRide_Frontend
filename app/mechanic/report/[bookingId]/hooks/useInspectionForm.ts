@@ -226,12 +226,12 @@ export function useInspectionForm({
       }
       const sectionData = formData[section] as BodyConditionItem[];
       if (Array.isArray(sectionData)) {
-        sectionData.forEach((item) => {
-          totalFields++;
-          if (item.rating && item.rating.trim() !== '') {
-            filledFields++;
-          }
-        });
+      sectionData.forEach((item) => {
+        totalFields++;
+        if (item.rating && item.rating.trim() !== '') {
+          filledFields++;
+        }
+      });
       }
     });
 
