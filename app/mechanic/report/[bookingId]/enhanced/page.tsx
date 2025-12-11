@@ -18,7 +18,7 @@ import {
   ENHANCED_FUNCTIONAL_TESTS_ITEMS,
   INTERIOR_CONDITION_ITEMS,
   SEATS_UPHOLSTERY_ITEMS,
-  ENHANCED_DRIVING_PERFORMANCE_ITEMS,
+  ROAD_TEST_RESULTS_ITEMS,
   DIAGNOSTIC_TESTING_ITEMS,
 } from '../types';
 import { useInspectionForm } from '../hooks/useInspectionForm';
@@ -27,9 +27,10 @@ import ProgressIndicator from '../components/ProgressIndicator';
 import ErrorMessage from '../components/ErrorMessage';
 import SuccessMessage from '../components/SuccessMessage';
 import GeneralInfoSection from '../components/GeneralInfoSection';
+import RatingGuidelines from '../components/RatingGuidelines';
 import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
-import ValueAssessmentSection from '../components/ValueAssessmentSection';
+import Disclaimer from '../components/Disclaimer';
 import FormActions from '../components/FormActions';
 import ReportSubmittedMessage from '../components/ReportSubmittedMessage';
 
@@ -179,7 +180,7 @@ const SECTION_CONFIG = [
   },
   {
     key: 'drivingPerformance',
-    title: 'Driving Performance',
+    title: 'Road Test Results',
     icon: (
       <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -227,17 +228,13 @@ export default function EnhancedInspectionPage() {
     functionalTests: ENHANCED_FUNCTIONAL_TESTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     interiorCondition: INTERIOR_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     seatsUpholstery: SEATS_UPHOLSTERY_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    drivingPerformance: ENHANCED_DRIVING_PERFORMANCE_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+    drivingPerformance: ROAD_TEST_RESULTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     diagnosticTesting: DIAGNOSTIC_TESTING_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     summary: {
       overallCondition: '',
       inspectionSummary: '',
       recommendations: '',
       recommendationNotes: '',
-    },
-    valueAssessment: {
-      assessment: '',
-      notes: '',
     },
   };
 
@@ -277,7 +274,6 @@ export default function EnhancedInspectionPage() {
     drivingPerformance: false,
     diagnosticTesting: false,
     summary: false,
-    valueAssessment: false,
   };
 
   const {
@@ -300,6 +296,7 @@ export default function EnhancedInspectionPage() {
     handleSaveDraft,
     handleSubmit,
     reportStatus,
+    isAdmin,
   } = useInspectionForm({
     bookingId,
     defaultInspectionType: 'enhanced',
@@ -331,8 +328,8 @@ export default function EnhancedInspectionPage() {
     );
   }
 
-  // Show message if report is already submitted
-  if (reportStatus === 'complete') {
+  // Show message if report is already submitted (only for normal users)
+  if (reportStatus === 'complete' && !isAdmin) {
     return <ReportSubmittedMessage bookingId={bookingId} />;
   }
 
@@ -352,13 +349,15 @@ export default function EnhancedInspectionPage() {
         <ErrorMessage error={error} validationErrors={validationErrors} />
         <SuccessMessage success={success} />
 
-        <form onSubmit={handleSubmit} className={`space-y-6 ${success || reportStatus === 'complete' ? 'opacity-50 pointer-events-none' : ''}`}>
+        <form onSubmit={handleSubmit} className={`space-y-6 ${success || (reportStatus === 'complete' && !isAdmin) ? 'opacity-50 pointer-events-none' : ''}`}>
           <GeneralInfoSection
             generalInfo={formData.generalInfo}
             isExpanded={expandedSections.generalInfo || false}
             onToggle={() => toggleSection('generalInfo')}
             fieldErrors={fieldErrors.generalInfo || []}
           />
+
+          <RatingGuidelines />
 
           {SECTION_CONFIG.map((section) => {
             const handler = createSectionHandler(section.key);
@@ -389,18 +388,7 @@ export default function EnhancedInspectionPage() {
             errors={fieldErrors.summary || []}
           />
 
-          <ValueAssessmentSection
-            valueAssessment={formData.valueAssessment}
-            isExpanded={expandedSections.valueAssessment || false}
-            onToggle={() => toggleSection('valueAssessment')}
-            onValueAssessmentChange={(field, value) => {
-              setFormData((prev: any) => ({
-                ...prev,
-                valueAssessment: { ...prev.valueAssessment, [field]: value },
-              }));
-            }}
-            errors={fieldErrors.valueAssessment || []}
-          />
+          <Disclaimer />
 
           <FormActions
             onSaveDraft={handleSaveDraft}

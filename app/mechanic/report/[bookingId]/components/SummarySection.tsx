@@ -1,4 +1,5 @@
 import { RATING_OPTIONS } from '../types';
+import toast from 'react-hot-toast';
 
 interface SummarySectionProps {
   summary: {
@@ -101,7 +102,9 @@ export default function SummarySection({
             <button
               type="button"
               onClick={() => {
-                alert('AI summary generation will be implemented soon');
+                toast('AI summary generation will be implemented soon', {
+                  icon: 'ℹ️',
+                });
               }}
               className="mt-3 px-4 py-2 bg-[#E54E3D] text-white rounded-lg font-semibold hover:bg-[#d14130] transition-colors flex items-center gap-2"
               style={{ fontSize: '14px' }}

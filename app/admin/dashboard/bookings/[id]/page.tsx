@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { useAdminAuth } from '../../../hooks/useAdminAuth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
@@ -184,7 +185,7 @@ export default function BookingDetailPage() {
     try {
       const token = localStorage.getItem('adminToken');
       if (!token) {
-        alert('Authentication required. Please login again.');
+        toast.error('Authentication required. Please login again.');
         return;
       }
       
@@ -202,8 +203,9 @@ export default function BookingDetailPage() {
       }
 
       setBooking({ ...booking, status: newStatus as any });
+      toast.success('Status updated successfully');
     } catch (error: any) {
-      alert(error.message || 'Failed to update status');
+      toast.error(error.message || 'Failed to update status');
     }
   };
 
@@ -236,7 +238,7 @@ export default function BookingDetailPage() {
     if (!booking) return;
 
     if (!selectedMechanicId) {
-      alert('Please select a mechanic');
+      toast.error('Please select a mechanic');
       return;
     }
 
@@ -244,7 +246,7 @@ export default function BookingDetailPage() {
     try {
       const token = localStorage.getItem('adminToken');
       if (!token) {
-        alert('Authentication required. Please login again.');
+        toast.error('Authentication required. Please login again.');
         setIsAssigning(false);
         return;
       }
@@ -268,9 +270,9 @@ export default function BookingDetailPage() {
       await fetchBooking();
       setSelectedMechanicId('');
       setShowAssignForm(false);
-      alert('Mechanic assigned successfully! Email notification sent.');
+      toast.success('Mechanic assigned successfully! Email notification sent.');
     } catch (error: any) {
-      alert(error.message || 'Failed to assign mechanic');
+      toast.error(error.message || 'Failed to assign mechanic');
     } finally {
       setIsAssigning(false);
     }
@@ -315,10 +317,11 @@ export default function BookingDetailPage() {
     try {
       await navigator.clipboard.writeText(link);
       setCopiedLink(true);
+      toast.success('Link copied to clipboard');
       setTimeout(() => setCopiedLink(false), 2000);
     } catch (err) {
       console.error('Failed to copy link:', err);
-      alert('Failed to copy link. Please try again.');
+      toast.error('Failed to copy link. Please try again.');
     }
   };
 

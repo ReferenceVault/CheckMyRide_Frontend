@@ -16,6 +16,7 @@ import {
   ROUTINE_COMPUTER_DIAGNOSIS_ITEMS,
   ROUTINE_CONTROLS_ITEMS,
   ROUTINE_SAFETY_SYSTEMS_ITEMS,
+  ROUTINE_ROAD_TEST_RESULTS_ITEMS,
   ROUTINE_CUSTOMER_CONCERNS_ITEMS,
 } from '../types';
 import { useInspectionForm } from '../hooks/useInspectionForm';
@@ -24,9 +25,10 @@ import ProgressIndicator from '../components/ProgressIndicator';
 import ErrorMessage from '../components/ErrorMessage';
 import SuccessMessage from '../components/SuccessMessage';
 import GeneralInfoSection from '../components/GeneralInfoSection';
+import RatingGuidelines from '../components/RatingGuidelines';
 import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
-import ValueAssessmentSection from '../components/ValueAssessmentSection';
+import Disclaimer from '../components/Disclaimer';
 import FormActions from '../components/FormActions';
 import ReportSubmittedMessage from '../components/ReportSubmittedMessage';
 
@@ -156,6 +158,15 @@ const SECTION_CONFIG = [
     ),
   },
   {
+    key: 'roadTestResults',
+    title: 'Road Test Results',
+    icon: (
+      <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+  },
+  {
     key: 'customerConcerns',
     title: 'Customer Concerns',
     icon: (
@@ -194,16 +205,13 @@ export default function RoutineInspectionPage() {
     computerDiagnosis: ROUTINE_COMPUTER_DIAGNOSIS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     controls: ROUTINE_CONTROLS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     safetySystems: ROUTINE_SAFETY_SYSTEMS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+    roadTestResults: ROUTINE_ROAD_TEST_RESULTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     customerConcerns: ROUTINE_CUSTOMER_CONCERNS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     summary: {
       overallCondition: '',
       inspectionSummary: '',
       recommendations: '',
       recommendationNotes: '',
-    },
-    valueAssessment: {
-      assessment: '',
-      notes: '',
     },
   };
 
@@ -238,9 +246,9 @@ export default function RoutineInspectionPage() {
     computerDiagnosis: false,
     controls: false,
     safetySystems: false,
+    roadTestResults: false,
     customerConcerns: false,
     summary: false,
-    valueAssessment: false,
   };
 
   const {
@@ -263,6 +271,7 @@ export default function RoutineInspectionPage() {
     handleSaveDraft,
     handleSubmit,
     reportStatus,
+    isAdmin,
   } = useInspectionForm({
     bookingId,
     defaultInspectionType: 'routine',
@@ -294,8 +303,8 @@ export default function RoutineInspectionPage() {
     );
   }
 
-  // Show message if report is already submitted
-  if (reportStatus === 'complete') {
+  // Show message if report is already submitted (only for normal users)
+  if (reportStatus === 'complete' && !isAdmin) {
     return <ReportSubmittedMessage bookingId={bookingId} />;
   }
 
@@ -315,13 +324,15 @@ export default function RoutineInspectionPage() {
         <ErrorMessage error={error} validationErrors={validationErrors} />
         <SuccessMessage success={success} />
 
-        <form onSubmit={handleSubmit} className={`space-y-6 ${success || reportStatus === 'complete' ? 'opacity-50 pointer-events-none' : ''}`}>
+        <form onSubmit={handleSubmit} className={`space-y-6 ${success || (reportStatus === 'complete' && !isAdmin) ? 'opacity-50 pointer-events-none' : ''}`}>
           <GeneralInfoSection
             generalInfo={formData.generalInfo}
             isExpanded={expandedSections.generalInfo || false}
             onToggle={() => toggleSection('generalInfo')}
             fieldErrors={fieldErrors.generalInfo || []}
           />
+
+          <RatingGuidelines />
 
           {SECTION_CONFIG.map((section) => {
             const handler = createSectionHandler(section.key);
@@ -352,18 +363,7 @@ export default function RoutineInspectionPage() {
             errors={fieldErrors.summary || []}
           />
 
-          <ValueAssessmentSection
-            valueAssessment={formData.valueAssessment}
-            isExpanded={expandedSections.valueAssessment || false}
-            onToggle={() => toggleSection('valueAssessment')}
-            onValueAssessmentChange={(field, value) => {
-              setFormData((prev: any) => ({
-                ...prev,
-                valueAssessment: { ...prev.valueAssessment, [field]: value },
-              }));
-            }}
-            errors={fieldErrors.valueAssessment || []}
-          />
+          <Disclaimer />
 
           <FormActions
             onSaveDraft={handleSaveDraft}

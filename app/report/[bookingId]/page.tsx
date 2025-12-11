@@ -96,6 +96,7 @@ export default function InspectionReportViewPage() {
   const bookingId = params?.bookingId as string;
   
   const [report, setReport] = useState<ReportData | null>(null);
+  const [reportType, setReportType] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -205,6 +206,11 @@ export default function InspectionReportViewPage() {
         // Transform API data to ReportData format
         const apiReport = reportData.report;
         const booking = bookingData.booking;
+        
+        // Store report type for edit functionality
+        if (apiReport.reportType) {
+          setReportType(apiReport.reportType);
+        }
 
         // Transform sections
         const sections = apiReport.sections || {};
@@ -704,8 +710,20 @@ export default function InspectionReportViewPage() {
 
       {/* Action Buttons - Bottom Middle - Hidden when printing */}
       <div className="flex justify-center items-center gap-4 py-6 print:hidden">
-        {/* Only show button if isAdmin is explicitly true */}
+        {/* Only show admin buttons if isAdmin is explicitly true */}
         {isAdmin === true ? (
+          <>
+            {reportType && (
+              <Link
+                href={`/mechanic/report/${bookingId}/${reportType}`}
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit Report
+              </Link>
+            )}
           <button
             onClick={handleSendToCustomer}
             disabled={isSending}
@@ -725,6 +743,7 @@ export default function InspectionReportViewPage() {
               </>
             )}
           </button>
+          </>
         ) : null}
         <button
           onClick={handleExportPDF}
