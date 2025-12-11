@@ -1,17 +1,29 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, FormEvent, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import AdminLayout from '../../../../components/layout/AdminLayout';
-import { useAdminAuth } from '../../../hooks/useAdminAuth';
+import AdminLayout from '../../../../../components/layout/AdminLayout';
+import { useAdminAuth } from '../../../../hooks/useAdminAuth';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-export default function CreateUserPage() {
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  role: 'admin' | 'user' | 'mechanic';
+  firstName?: string;
+  lastName?: string;
+}
+
+export default function EditUserPage() {
   const router = useRouter();
+  const params = useParams();
+  const userId = params.id as string;
   const { user, isLoading: isAuthLoading } = useAdminAuth();
+  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -21,6 +33,58 @@ export default function CreateUserPage() {
     role: 'user' as 'admin' | 'user' | 'mechanic',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!isAuthLoading && user && userId) {
+      fetchUser();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, isAuthLoading, user]);
+
+  const fetchUser = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        toast.error('Authentication required. Please login again.');
+        router.push('/admin/login');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/auth/users`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
+
+      const data = await response.json();
+      const userToEdit = data.users?.find((u: User) => u._id === userId);
+
+      if (!userToEdit) {
+        toast.error('User not found');
+        router.push('/admin/dashboard/users');
+        return;
+      }
+
+      setFormData({
+        username: userToEdit.username || `${userToEdit.firstName || ''} ${userToEdit.lastName || ''}`.trim(),
+        email: userToEdit.email,
+        password: '',
+        role: userToEdit.role,
+      });
+    } catch (error: any) {
+      console.error('Error fetching user:', error);
+      toast.error(error.message || 'Failed to fetch user');
+      router.push('/admin/dashboard/users');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -35,9 +99,7 @@ export default function CreateUserPage() {
       newErrors.email = 'Invalid email format';
     }
 
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
+    if (formData.password && formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
@@ -67,26 +129,36 @@ export default function CreateUserPage() {
         return;
       }
 
-      const response = await fetch(`${API_URL}/api/auth/users`, {
-        method: 'POST',
+      const updateData: any = {
+        username: formData.username,
+        email: formData.email,
+        role: formData.role,
+      };
+
+      if (formData.password) {
+        updateData.password = formData.password;
+      }
+
+      const response = await fetch(`${API_URL}/api/auth/users/${userId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(updateData),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to create user');
+        throw new Error(data.message || 'Failed to update user');
       }
 
-      toast.success('User created successfully!');
+      toast.success('User updated successfully!');
       router.push('/admin/dashboard/users');
     } catch (error: any) {
-      console.error('Error creating user:', error);
-      toast.error(error.message || 'Failed to create user');
+      console.error('Error updating user:', error);
+      toast.error(error.message || 'Failed to update user');
     } finally {
       setIsSubmitting(false);
     }
@@ -104,10 +176,25 @@ export default function CreateUserPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <AdminLayout pageTitle="Edit User" pageSubtitle="Update user information">
+        <div className="p-6">
+          <div className="max-w-2xl mx-auto">
+            <div className="rounded-2xl bg-slate-800/60 backdrop-blur-xl p-12 shadow-xl border border-slate-700/50 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E54E3D] mx-auto mb-4"></div>
+              <p className="text-slate-300">Loading user...</p>
+            </div>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout
-      pageTitle="Create User"
-      pageSubtitle="Add a new user to the system"
+      pageTitle="Edit User"
+      pageSubtitle="Update user information"
     >
       <div className="p-6">
         <div className="max-w-2xl mx-auto">
@@ -124,7 +211,7 @@ export default function CreateUserPage() {
             </Link>
           </div>
 
-          {/* Create User Form */}
+          {/* Edit User Form */}
           <div className="rounded-2xl bg-slate-800/60 backdrop-blur-xl shadow-xl border border-slate-700/50 p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Full Name Field */}
@@ -174,7 +261,7 @@ export default function CreateUserPage() {
               {/* Password Field */}
               <div>
                 <label htmlFor="password" className="block text-sm font-semibold text-white mb-2">
-                  Password <span className="text-red-400">*</span>
+                  Password <span className="text-slate-400 text-xs">(leave blank to keep current password)</span>
                 </label>
                 <div className="relative">
                   <input
@@ -187,7 +274,7 @@ export default function CreateUserPage() {
                         ? 'border-red-500 focus:border-red-500'
                         : 'border-slate-600/50 focus:border-[#E54E3D]'
                     }`}
-                    placeholder="Enter password (min 6 characters)"
+                    placeholder="Enter new password (min 6 characters)"
                   />
                   <button
                     type="button"
@@ -246,14 +333,14 @@ export default function CreateUserPage() {
                   {isSubmitting ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Creating...
+                      Updating...
                     </>
                   ) : (
                     <>
                       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      Create User
+                      Update User
                     </>
                   )}
                 </button>
