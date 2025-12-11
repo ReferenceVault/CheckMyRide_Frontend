@@ -174,6 +174,11 @@ export function useInspectionForm({
               updated.priceNegotiation = reportData.report.sections.priceNegotiation;
             }
 
+            // Update photos
+            if (reportData.report.photos && Array.isArray(reportData.report.photos)) {
+              updated.photos = reportData.report.photos;
+            }
+
             return updated;
           });
         }
@@ -280,6 +285,7 @@ export function useInspectionForm({
           summary,
           valueAssessment,
           priceNegotiation,
+          photos: photos || [],
           ...sectionsData,
         }),
       });
@@ -427,6 +433,7 @@ export function useInspectionForm({
           summary,
           valueAssessment,
           priceNegotiation,
+          photos: photos || [],
           ...sectionsData,
         }),
       });

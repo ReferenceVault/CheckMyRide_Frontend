@@ -60,6 +60,7 @@ interface ReportData {
     assessment: string;
     notes?: string;
   };
+  photos?: string[];
   reportMetadata?: {
     reportGenerated: string;
     reportId: string;
@@ -267,6 +268,7 @@ export default function InspectionReportViewPage() {
             assessment: apiReport.valueAssessment.assessment || '',
             notes: apiReport.valueAssessment.notes,
           } : undefined,
+          photos: apiReport.photos && Array.isArray(apiReport.photos) ? apiReport.photos : undefined,
           reportMetadata: {
             reportGenerated: apiReport.createdAt 
               ? new Date(apiReport.createdAt).toLocaleDateString('en-US', { 
@@ -633,6 +635,25 @@ export default function InspectionReportViewPage() {
                 {report.valueAssessment.notes && (
                   <p className="text-sm text-[#64748b]">{report.valueAssessment.notes}</p>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Vehicle Photos */}
+          {report.photos && report.photos.length > 0 && report.photos.some((photo: string) => photo) && (
+            <div className="px-[30px] py-[40px] border-b border-gray-200">
+              <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Vehicle Photos</h2>
+              <hr className="border-gray-300 mb-6" />
+              <div className="grid grid-cols-3 gap-4">
+                {report.photos.filter((photo: string) => photo).map((photo: string, index: number) => (
+                  <div key={index} className="relative" style={{ aspectRatio: '4/3' }}>
+                    <img
+                      src={photo}
+                      alt={`Vehicle photo ${index + 1}`}
+                      className="w-full h-full object-cover rounded-lg border border-gray-200"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           )}

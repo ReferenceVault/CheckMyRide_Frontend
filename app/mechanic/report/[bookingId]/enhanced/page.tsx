@@ -30,6 +30,7 @@ import GeneralInfoSection from '../components/GeneralInfoSection';
 import RatingGuidelines from '../components/RatingGuidelines';
 import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
+import VehiclePhotos from '../components/VehiclePhotos';
 import Disclaimer from '../components/Disclaimer';
 import FormActions from '../components/FormActions';
 import ReportSubmittedMessage from '../components/ReportSubmittedMessage';
@@ -236,6 +237,7 @@ export default function EnhancedInspectionPage() {
       recommendations: '',
       recommendationNotes: '',
     },
+    photos: Array(12).fill(''),
   };
 
   const onFormDataInit = (booking: any) => ({
@@ -274,6 +276,7 @@ export default function EnhancedInspectionPage() {
     drivingPerformance: false,
     diagnosticTesting: false,
     summary: false,
+    vehiclePhotos: false,
   };
 
   const {
