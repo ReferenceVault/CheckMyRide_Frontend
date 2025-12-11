@@ -33,6 +33,12 @@ export default function UsersPage() {
     total: 0,
     pages: 0,
   });
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; userId: string | null; userName: string }>({
+    isOpen: false,
+    userId: null,
+    userName: '',
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!isAuthLoading && user) {
@@ -101,6 +107,56 @@ export default function UsersPage() {
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  const handleDeleteClick = (userId: string, userName: string) => {
+    setDeleteModal({
+      isOpen: true,
+      userId,
+      userName,
+    });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteModal.userId) return;
+
+    setIsDeleting(true);
+
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        toast.error('Authentication required. Please login again.');
+        router.push('/admin/login');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/api/auth/users/${deleteModal.userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete user');
+      }
+
+      toast.success('User deleted successfully!');
+      setDeleteModal({ isOpen: false, userId: null, userName: '' });
+      fetchUsers();
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      toast.error(error.message || 'Failed to delete user');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteModal({ isOpen: false, userId: null, userName: '' });
   };
 
   return (
@@ -176,10 +232,11 @@ export default function UsersPage() {
                 <table className="w-full">
                   <thead className="bg-slate-700/50 border-b border-slate-600/50">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-300">Username</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-300">Full Name</th>
                       <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-300">Email</th>
                       <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-300">Role</th>
                       <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-300">Created At</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-300">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-700/50">
@@ -198,6 +255,28 @@ export default function UsersPage() {
                         </td>
                         <td className="px-6 py-4">
                           <p className="text-sm text-slate-400">{formatDate(user.createdAt)}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => router.push(`/admin/dashboard/users/edit/${user._id}`)}
+                              className="p-2 rounded-lg text-blue-400 hover:bg-blue-400/10 transition-colors"
+                              title="Edit user"
+                            >
+                              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => handleDeleteClick(user._id, user.username)}
+                              className="p-2 rounded-lg text-red-400 hover:bg-red-400/10 transition-colors"
+                              title="Delete user"
+                            >
+                              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -304,6 +383,55 @@ export default function UsersPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="rounded-2xl bg-slate-800/95 backdrop-blur-xl shadow-2xl border border-slate-700/50 p-6 max-w-md w-full">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
+                <svg className="h-6 w-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-white mb-2">Delete User</h3>
+                <p className="text-sm text-slate-300 mb-4">
+                  Are you sure you want to delete <span className="font-semibold text-white">{deleteModal.userName}</span>? This action cannot be undone.
+                </p>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleDeleteConfirm}
+                    disabled={isDeleting}
+                    className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isDeleting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Deleting...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleDeleteCancel}
+                    disabled={isDeleting}
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-slate-700/50 text-white font-semibold hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
