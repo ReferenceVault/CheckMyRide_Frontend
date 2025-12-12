@@ -214,7 +214,9 @@ export default function VehiclePhotos({
                       }`}
                     >
                       <input
-                        ref={(el) => (fileInputRefs.current[index] = el)}
+                        ref={(el) => {
+                          fileInputRefs.current[index] = el;
+                        }}
                         type="file"
                         accept="image/*"
                         onChange={(e) => {
