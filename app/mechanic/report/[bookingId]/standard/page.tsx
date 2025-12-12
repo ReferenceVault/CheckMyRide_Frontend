@@ -306,6 +306,7 @@ export default function StandardInspectionPage() {
         bookingId={bookingId}
         inspectionType={selectedInspectionType}
         inspectionTypeLabel={INSPECTION_TYPES.find(t => t.value === selectedInspectionType)?.label || 'Standard Inspection'}
+        reportStatus={reportStatus}
         onInspectionTypeChange={handleInspectionTypeChange}
         availableTypes={INSPECTION_TYPES}
       />
@@ -314,9 +315,9 @@ export default function StandardInspectionPage() {
 
       <div className="max-w-7xl mx-auto p-6">
         <ErrorMessage error={error} validationErrors={validationErrors} />
-        <SuccessMessage success={success} />
+        <SuccessMessage success={success} isAdmin={isAdmin} />
 
-        <form onSubmit={handleSubmit} className={`space-y-6 ${success || (reportStatus === 'complete' && !isAdmin) ? 'opacity-50 pointer-events-none' : ''}`}>
+        <form onSubmit={handleSubmit} className={`space-y-6 ${(reportStatus === 'complete' && !isAdmin) ? 'opacity-50 pointer-events-none' : ''}`}>
           <GeneralInfoSection
             generalInfo={formData.generalInfo}
             isExpanded={expandedSections.generalInfo || false}

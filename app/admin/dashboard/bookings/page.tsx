@@ -353,7 +353,7 @@ export default function BookingsPage() {
                                 </Link>
                               </div>
                               {/* Report Form Actions */}
-                              <div className="flex items-center gap-2 pt-1 border-t border-slate-700/30">
+                              {/* <div className="flex items-center gap-2 pt-1 border-t border-slate-700/30">
                                 <button
                                   onClick={() => handleCopyReportLink(booking._id, booking.inspectionDetails.type)}
                                   className="inline-flex items-center gap-1.5 rounded-lg bg-purple-500/10 px-3 py-1.5 text-xs font-semibold text-purple-400 hover:bg-purple-500 hover:text-white transition-colors"
@@ -387,7 +387,7 @@ export default function BookingsPage() {
                                   </svg>
                                   Go to Form
                                 </Link>
-                              </div>
+                              </div> */}
                             </div>
                           </td>
                         </tr>

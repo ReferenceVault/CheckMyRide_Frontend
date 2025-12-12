@@ -1,8 +1,9 @@
 interface SuccessMessageProps {
   success: string | null;
+  isAdmin?: boolean;
 }
 
-export default function SuccessMessage({ success }: SuccessMessageProps) {
+export default function SuccessMessage({ success, isAdmin = false }: SuccessMessageProps) {
   if (!success) return null;
 
   return (
@@ -15,7 +16,7 @@ export default function SuccessMessage({ success }: SuccessMessageProps) {
         </div>
         <h3 className="text-2xl font-bold text-green-800 mb-2">Success!</h3>
         <p className="text-lg text-green-700 mb-4">{success}</p>
-        {success.includes('submitted') && (
+        {success.includes('submitted') && !isAdmin && (
         <p className="text-sm text-green-600">You will be redirected to the home page in a few seconds...</p>
         )}
       </div>

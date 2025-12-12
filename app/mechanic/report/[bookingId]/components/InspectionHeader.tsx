@@ -4,14 +4,50 @@ interface InspectionHeaderProps {
   bookingId: string;
   inspectionType: string;
   inspectionTypeLabel: string;
+  reportStatus?: string | null;
   onInspectionTypeChange?: (type: string) => void;
   availableTypes?: Array<{ value: string; label: string }>;
 }
+
+const getStatusBadge = (status: string | null | undefined) => {
+  if (!status) return null;
+  
+  const statusConfig: { [key: string]: { label: string; bgColor: string; textColor: string } } = {
+    draft: {
+      label: 'Draft',
+      bgColor: 'bg-yellow-100',
+      textColor: 'text-yellow-800',
+    },
+    complete: {
+      label: 'Completed',
+      bgColor: 'bg-green-100',
+      textColor: 'text-green-800',
+    },
+    cancelled: {
+      label: 'Cancelled',
+      bgColor: 'bg-red-100',
+      textColor: 'text-red-800',
+    },
+  };
+
+  const config = statusConfig[status] || {
+    label: status.charAt(0).toUpperCase() + status.slice(1),
+    bgColor: 'bg-gray-100',
+    textColor: 'text-gray-800',
+  };
+
+  return (
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.bgColor} ${config.textColor}`}>
+      {config.label}
+    </span>
+  );
+};
 
 export default function InspectionHeader({
   bookingId,
   inspectionType,
   inspectionTypeLabel,
+  reportStatus,
   onInspectionTypeChange,
   availableTypes = [],
 }: InspectionHeaderProps) {
@@ -31,26 +67,17 @@ export default function InspectionHeader({
           <h1 className="text-xl font-bold text-[#1f2a37]">
             Vehicle Inspection Report
           </h1>
-          <p className="text-xs text-[#64748b]">Booking ID: {bookingId}</p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-xs text-[#64748b]">Booking ID: {bookingId}</p>
+             <span className="text-xs text-[#64748b]"><b>Status:</b> {getStatusBadge(reportStatus)}</span>
+          </div>
         </div>
 
-        {onInspectionTypeChange && availableTypes.length > 0 && (
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <select
-                value={inspectionType}
-                onChange={(e) => onInspectionTypeChange(e.target.value)}
-                className="bg-[#E54E3D] text-white px-6 py-2.5 rounded-lg font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#E54E3D]/50 hover:bg-[#d14130] transition-all duration-200 shadow-lg border-2 border-[#E54E3D]/20 min-w-[240px]"
-              >
-                {availableTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="bg-[#E54E3D] text-white px-6 py-2.5 rounded-lg font-semibold shadow-lg border-2 border-[#E54E3D]/20 min-w-[240px] text-center">
+            {inspectionTypeLabel}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

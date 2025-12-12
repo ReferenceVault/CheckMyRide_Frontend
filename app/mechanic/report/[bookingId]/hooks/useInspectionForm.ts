@@ -487,9 +487,13 @@ export function useInspectionForm({
 
       setSuccess('Report submitted successfully!');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      setTimeout(() => {
-        router.push('/');
-      }, 5000);
+      
+      // Only redirect normal users, admins stay on the page
+      if (!isAdmin) {
+        setTimeout(() => {
+          router.push('/');
+        }, 5000);
+      }
     } catch (error: any) {
       setError(error.message || 'Failed to submit report');
       // Scroll to error message after state updates
