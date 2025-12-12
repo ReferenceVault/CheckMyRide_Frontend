@@ -28,6 +28,7 @@ import GeneralInfoSection from '../components/GeneralInfoSection';
 import RatingGuidelines from '../components/RatingGuidelines';
 import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
+import VehiclePhotos from '../components/VehiclePhotos';
 import Disclaimer from '../components/Disclaimer';
 import FormActions from '../components/FormActions';
 import ReportSubmittedMessage from '../components/ReportSubmittedMessage';
@@ -213,6 +214,7 @@ export default function RoutineInspectionPage() {
       recommendations: '',
       recommendationNotes: '',
     },
+    photos: Array(12).fill(''),
   };
 
   const onFormDataInit = (booking: any) => ({
@@ -249,6 +251,7 @@ export default function RoutineInspectionPage() {
     roadTestResults: false,
     customerConcerns: false,
     summary: false,
+    vehiclePhotos: false,
   };
 
   const {
@@ -361,6 +364,20 @@ export default function RoutineInspectionPage() {
               }));
             }}
             errors={fieldErrors.summary || []}
+          />
+
+          <VehiclePhotos
+            photos={formData.photos || []}
+            reportType={selectedInspectionType}
+            onPhotosChange={(photos) => {
+              setFormData((prev: any) => ({
+                ...prev,
+                photos,
+              }));
+            }}
+            isExpanded={expandedSections.vehiclePhotos || false}
+            onToggle={() => toggleSection('vehiclePhotos')}
+            isReadOnly={reportStatus === 'complete' && !isAdmin}
           />
 
           <Disclaimer />

@@ -174,6 +174,11 @@ export function useInspectionForm({
               updated.priceNegotiation = reportData.report.sections.priceNegotiation;
             }
 
+            // Update photos
+            if (reportData.report.photos && Array.isArray(reportData.report.photos)) {
+              updated.photos = reportData.report.photos;
+            }
+
             return updated;
           });
         }
@@ -257,7 +262,7 @@ export function useInspectionForm({
 
     try {
       // Extract sections from formData
-      const { generalInfo, summary, valueAssessment, priceNegotiation, ...sections } = formData;
+      const { generalInfo, summary, valueAssessment, priceNegotiation, photos, ...sections } = formData;
       
       // Build sections object (only include arrays that are sections)
       const sectionsData: { [key: string]: any[] } = {};
@@ -280,6 +285,7 @@ export function useInspectionForm({
           summary,
           valueAssessment,
           priceNegotiation,
+          photos: photos || [],
           ...sectionsData,
         }),
       });
@@ -403,7 +409,7 @@ export function useInspectionForm({
 
     try {
       // Extract sections from formData
-      const { generalInfo, summary, valueAssessment, priceNegotiation, ...sections } = formData;
+      const { generalInfo, summary, valueAssessment, priceNegotiation, photos, ...sections } = formData;
       
       // Build sections object (only include arrays that are sections)
       const sectionsData: { [key: string]: any[] } = {};
@@ -427,6 +433,7 @@ export function useInspectionForm({
           summary,
           valueAssessment,
           priceNegotiation,
+          photos: photos || [],
           ...sectionsData,
         }),
       });
