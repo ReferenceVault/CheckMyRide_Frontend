@@ -262,7 +262,7 @@ export function useInspectionForm({
 
     try {
       // Extract sections from formData
-      const { generalInfo, summary, valueAssessment, priceNegotiation, ...sections } = formData;
+      const { generalInfo, summary, valueAssessment, priceNegotiation, photos, ...sections } = formData;
       
       // Build sections object (only include arrays that are sections)
       const sectionsData: { [key: string]: any[] } = {};
@@ -409,7 +409,7 @@ export function useInspectionForm({
 
     try {
       // Extract sections from formData
-      const { generalInfo, summary, valueAssessment, priceNegotiation, ...sections } = formData;
+      const { generalInfo, summary, valueAssessment, priceNegotiation, photos, ...sections } = formData;
       
       // Build sections object (only include arrays that are sections)
       const sectionsData: { [key: string]: any[] } = {};
