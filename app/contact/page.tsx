@@ -178,11 +178,11 @@ export default function ContactPage() {
 
       <section className="relative px-[10%] pb-20 sm:pb-24">
         <div className="mx-auto max-w-5xl rounded-3xl bg-[#f8fafc] p-8 shadow-lg shadow-slate-200/70">
-          <h2 className="text-xl font-semibold text-[#0f172a] sm:text-2xl">Prefer to Call?</h2>
-          <p className="mt-3 text-sm text-[#475569] sm:text-base">
+          <h2 className="text-xl font-semibold text-[#0f172a] sm:text-2xl text-center">Prefer to Call?</h2>
+          <p className="mt-3 text-sm text-[#475569] sm:text-base text-center">
             Our team can help you choose the right inspection package, explain findings, or schedule re-inspections with the seller.
           </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-start">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center">
             <a
               href="tel:+16135550123"
               className="inline-flex items-center gap-2 rounded-full bg-[#E54E3D] px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-lg shadow-[#E54E3D]/35 transition hover:-translate-y-0.5 hover:bg-[#d14130]"
