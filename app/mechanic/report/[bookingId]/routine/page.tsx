@@ -365,6 +365,7 @@ export default function RoutineInspectionPage() {
               }));
             }}
             errors={fieldErrors.summary || []}
+            showRecommendations={false}
           />
 
           <VehiclePhotos

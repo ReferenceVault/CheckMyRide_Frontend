@@ -427,7 +427,7 @@ export default function InspectionReportViewPage() {
           </div>
 
           {/* General Information */}
-          <div className="px-[30px] py-[40px] border-b border-gray-200">
+          <div className="px-[30px] py-[40px] border-b border-gray-200 print-section">
             <h2 className="text-lg font-bold text-[#1f2a37] mb-4">General Information</h2>
             <hr className="border-gray-300 mb-6" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -451,7 +451,7 @@ export default function InspectionReportViewPage() {
 
           {/* Vehicle Information */}
           {report.vehicleInfo.make && (
-            <div className="px-[30px] py-[40px] border-b border-gray-200">
+            <div className="px-[30px] py-[40px] border-b border-gray-200 print-section">
               <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Vehicle Information</h2>
               <hr className="border-gray-300 mb-6" />
               <div className="bg-[#f8fafc] p-4 rounded-lg">
@@ -529,7 +529,7 @@ export default function InspectionReportViewPage() {
 
           {/* Overall Assessment */}
           {report.summary && (
-            <div className="px-[30px] py-[40px] border-b border-gray-200">
+            <div className="px-[30px] py-[40px] border-b border-gray-200 print-section">
               <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Overall Assessment</h2>
               <hr className="border-gray-300 mb-6" />
               
@@ -562,7 +562,7 @@ export default function InspectionReportViewPage() {
 
           {/* Body Condition */}
           {report.bodyCondition && report.bodyCondition.length > 0 && (
-            <div className="px-[30px] py-[40px] border-b border-gray-200">
+            <div className="px-[30px] py-[40px] border-b border-gray-200 print-section">
               <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Body Condition</h2>
               <hr className="border-gray-300 mb-6" />
               <div className="space-y-4">
@@ -593,7 +593,7 @@ export default function InspectionReportViewPage() {
               
               <div className="space-y-8">
                 {report.detailedInspection.map((category, catIndex) => (
-                  <div key={catIndex} className="mb-8">
+                  <div key={catIndex} className="mb-8 print-section">
                     <h3 className="font-bold text-[#1f2a37] mb-4 uppercase" style={{ fontSize: '15px' }}>{category.category}</h3>
                     <div className="overflow-x-auto">
                       <table className="w-full">
@@ -625,7 +625,7 @@ export default function InspectionReportViewPage() {
 
           {/* Value Assessment */}
           {report.valueAssessment && (
-            <div className="px-[30px] py-[40px] border-b border-gray-200">
+            <div className="px-[30px] py-[40px] border-b border-gray-200 print-section">
               <h2 className="text-lg font-bold text-[#1f2a37] mb-4">Value Assessment</h2>
               <hr className="border-gray-300 mb-6" />
               <div className="bg-[#f8fafc] p-4 rounded-lg">
@@ -659,7 +659,7 @@ export default function InspectionReportViewPage() {
           )}
 
           {/* Important Disclaimer */}
-          <div className="px-[30px] py-[40px] border-b border-gray-200">
+          <div className="px-[30px] py-[40px] border-b border-gray-200 print-section">
             <div className="bg-yellow-50 border-l-4 border-orange-500 p-6 rounded-lg">
               <h3 className="text-sm font-bold text-[#1f2a37] mb-4">IMPORTANT DISCLAIMER:</h3>
               <div className="text-[#1f2a37] space-y-3" style={{ fontSize: '11px' }}>
@@ -812,8 +812,16 @@ export default function InspectionReportViewPage() {
           .print\\:break-inside-avoid {
             break-inside: avoid;
           }
+          .print-section {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            -webkit-page-break-inside: avoid !important;
+          }
           @page {
-            margin: 0;
+            margin-top: 20mm;
+            margin-right: 0;
+            margin-bottom: 0;
+            margin-left: 0;
             size: A4;
           }
         }

@@ -328,9 +328,6 @@ export function useInspectionForm({
             } else if (err.includes('summary.inspectionSummary')) {
               if (!mappedFieldErrors.summary) mappedFieldErrors.summary = [];
               mappedFieldErrors.summary.push('Inspection Summary is required');
-            } else if (err.includes('summary.recommendations')) {
-              if (!mappedFieldErrors.summary) mappedFieldErrors.summary = [];
-              mappedFieldErrors.summary.push('Recommendations is required');
             } else if (err.includes('valueAssessment.assessment')) {
               if (!mappedFieldErrors.valueAssessment) mappedFieldErrors.valueAssessment = [];
               mappedFieldErrors.valueAssessment.push('Value Assessment is required');

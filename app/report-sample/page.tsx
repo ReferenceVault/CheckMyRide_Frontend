@@ -817,7 +817,10 @@ export default function SampleReportPage() {
             break-inside: avoid;
           }
           @page {
-            margin: 0;
+            margin-top: 20mm;
+            margin-right: 0;
+            margin-bottom: 0;
+            margin-left: 0;
             size: A4;
           }
         }
