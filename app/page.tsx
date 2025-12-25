@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, type ReactNode } from 'react';
 import { CalendarCheck, MapPin, Wrench, FileText } from 'lucide-react';
@@ -664,286 +664,344 @@ export default function Home() {
 
   const [activeChecklist, setActiveChecklist] = useState<null | ChecklistType>(null);
   const checklist = activeChecklist ? checklistContent[activeChecklist] : null;
-  const checklistHeadingId = checklist ? `${activeChecklist}-checklist-title` : undefined;
+  let checklistHeadingId: string | undefined;
+  if (checklist && activeChecklist) {
+    checklistHeadingId = activeChecklist + '-checklist-title';
+  }
 
   return (
     <main className="min-h-screen bg-white">
       <SiteHeader />
 
-      {/* Hero Section - Dark Background */}
+      {/* Hero Section - Hero Mechanic Image with Overlay */}
       <section
         id="home"
-        className="relative overflow-hidden bg-[#2B333B] px-[10%] pt-24 pb-12 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-[1.25rem]"
+        className="relative overflow-hidden h-[656px] bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/images/hero-mechanic.jpg')" }}
       >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.2),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(16,185,129,0.18),transparent_50%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.22),transparent_45%)]" />
-        <div className="pointer-events-none absolute -left-64 top-[-6rem] hidden h-[760px] w-[420px] lg:block">
-          <div className="hero-wave" />
-              </div>
-        <div className="pointer-events-none absolute -right-64 bottom-[-6rem] hidden h-[760px] w-[420px] lg:block">
-          <div className="hero-wave rotate-180" />
-            </div>
-        <div className="pointer-events-none absolute -right-24 -top-24 hidden h-96 w-96 rotate-12 rounded-full border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-transparent lg:block">
-          <div className="absolute inset-8 rounded-full border border-white/15" />
-          <div className="absolute inset-0 flex items-center justify-center text-5xl text-white/20">
-            🛠️
-            </div>
-          </div>
-        <div className="pointer-events-none hidden lg:block">
-          <div className="fixed left-6 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4">
-            <span className="block h-16 w-px bg-white/25" />
-            {heroSocialLinks.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                aria-label={item.label}
-                className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white transition-all duration-300 hover:-translate-y-1 hover:bg-[#E54E3D] hover:border-[#E54E3D]"
-              >
-                {item.icon}
-              </Link>
-            ))}
-            <span className="block h-16 w-px bg-white/25" />
-          </div>
-        </div>
+        <div className="relative z-10 h-full px-[10%] flex items-center">
+          <div className="mx-auto max-w-7xl w-full relative">
+            {/* Vector Frame - Partial Outline (Left + Bottom + 75% Top, No Right) */}
+            <svg
+              width="343"
+              height="500"
+              viewBox="0 0 343 500"
+              className="absolute pointer-events-none"
+              style={{ left: '-30px', top: '-40px' }}
+            >
+              {/* Define a mask to hide right side and last portion of top */}
+              <defs>
+                <mask id="vectorMask">
+                  <rect width="343" height="500" fill="white" />
+                  {/* Hide right side */}
+                  <rect x="255" y="0" width="100" height="500" fill="black" />
+                  {/* Hide top border after ~180px */}
+                  <rect x="180" y="0" width="100" height="20" fill="black" />
+                </mask>
+              </defs>
+              
+              {/* Draw full rounded rectangle border */}
+              <rect
+                x="2"
+                y="2"
+                width="339"
+                height="496"
+                rx="14"
+                ry="14"
+                fill="none"
+                stroke="#FFFFFF"
+                strokeWidth="4"
+                mask="url(#vectorMask)"
+              />
+              {/* Dot at the end of top border */}
+              <circle
+                cx="190"
+                cy="2.5"
+                r="2.6"
+                fill="#FFFFFF"
+              />
+              {/* Line at the bottom border */}
+              <line
+                x1="265"
+                y1="498"
+                x2="310"
+                y2="498"
+                stroke="#FFFFFF"
+                strokeWidth="4"
+                strokeLinecap="butt"
+              />
+            </svg>
 
-        <div className="mx-auto max-w-7xl grid gap-10 lg:grid-cols-[1.7fr_1fr] lg:items-center">
-          <div className="-mt-14 lg:-mt-20">
-            <div className="mb-5 flex items-center gap-4 text-white">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/70 text-lg">
-                🛠️
-              </span>
-              <span className="text-sm font-semibold uppercase tracking-[0.35em] text-white/80">
+            <div className="mb-5">
+              <span 
+                className="inline-flex items-center justify-center opacity-80"
+                style={{
+                  width: '209.92px',
+                  height: '48.64px',
+                  borderRadius: '100px',
+                  backgroundColor: 'rgba(0, 0, 0, 0.45)',
+                  backdropFilter: 'blur(106.8px)',
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 700,
+                  fontSize: '12.8px',
+                  lineHeight: '43.52px',
+                  letterSpacing: '-2%',
+                  color: '#FFFFFF',
+                  textTransform: 'none'
+                }}
+              >
                 Welcome to CheckMyRide
               </span>
             </div>
-            <h1 className="text-[1.55rem] sm:text-[2.1rem] md:text-4xl lg:text-[2.75rem] font-bold text-white leading-tight mb-4 sm:mb-6">
-              <span className="block whitespace-nowrap">Professional Vehicle Inspections</span>
-              <span className="block text-[#E54E3D]">Before You Buy</span>
-              </h1>
-            <p className="text-sm sm:text-base text-gray-300 leading-relaxed mb-5 sm:mb-8">
-                Don't risk buying a lemon. Our certified mechanics will thoroughly inspect any vehicle before you purchase, giving you peace of mind and confidence in your decision.
-              </p>
+            <h1 
+              className="font-bold text-white mb-4 sm:mb-6"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '51px',
+                lineHeight: '58px',
+                letterSpacing: '-0.02em',
+                fontWeight: 700,
+                color: '#FFFFFF',
+                width: '496px',
+                height: '175px'
+              }}
+            >
+              Professional Vehicle Inspections Before You Buy
+            </h1>
+            <p 
+              className="text-white mb-5 sm:mb-8"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '15px',
+                lineHeight: '18px',
+                letterSpacing: '0%',
+                fontWeight: 500,
+                color: '#FFFFFF',
+                width: '641px'
+              }}
+            >
+              Don't risk buying a lemon. Our certified mechanics will<br />thoroughly inspect any vehicle before you purchase, giving you peace of mind<br />and confidence in your decision.
+            </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link
                 href="/book-appointment#booking-form"
-                className="group inline-flex w-full sm:w-auto items-center justify-center rounded-full bg-[#E54E3D] px-4 sm:px-8 py-2 sm:py-4 text-xs sm:text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-[#D43E2D] hover:shadow-xl"
+                className="group inline-flex items-center justify-center rounded-[30px] bg-[#E54E3D] font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#D43E2D] hover:shadow-xl"
+                style={{
+                  width: '198.4px',
+                  height: '48px'
+                }}
+              >
+                <span>Book Inspection</span>
+                <span 
+                  className="ml-3 flex items-center justify-center rounded-full bg-white"
+                  style={{
+                    width: '25.6px',
+                    height: '25.6px'
+                  }}
                 >
-                <span>Book An Inspection</span>
+                  <svg 
+                    className="text-black" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{
+                      width: '12.8px',
+                      height: '12.8px'
+                    }}
+                  >
+                    <path d="M7 17L17 7M17 7H7M17 7V17" />
+                  </svg>
+                </span>
               </Link>
-              <button className="hidden sm:inline-flex px-6 sm:px-8 py-3 sm:py-4 bg-transparent text-white border-2 border-gray-400 rounded-lg hover:border-gray-300 transition-all text-sm sm:text-lg font-semibold">
-                  Learn More
-                </button>
-              </div>
+              <button 
+                className="hidden sm:inline-flex items-center justify-center font-semibold"
+                style={{
+                  width: '195px',
+                  height: '48px',
+                  borderRadius: '30px',
+                  backgroundColor: '#FFFFFF',
+                  color: '#000000'
+                }}
+              >
+                Learn More
+              </button>
             </div>
-
-          <div className="hidden lg:flex justify-center lg:justify-end">
-            <figure className="relative flex w-full max-w-[500px] items-center justify-center overflow-hidden rounded-3xl p-0 lg:-mt-[1.25rem]">
-              <img
-                src="/images/hero-vehicle.png"
-                alt="Certified mechanic inspecting a vehicle"
-                className="h-[580px] w-full rounded-3xl object-cover"
-              />
-            </figure>
           </div>
         </div>
       </section>
 
       {/* Our Inspection Services Section */}
-      <section id="features" className="relative bg-white px-[10%] pt-[40px] pb-[53px] sm:pt-[40px] sm:pb-[53px]">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#fdf5f3] via-transparent to-transparent" />
-        <div className="pointer-events-none absolute inset-y-10 left-10 hidden w-32 rounded-full bg-gradient-to-b from-[#fde8e2] via-transparent to-transparent blur-xl sm:block" />
-        <div className="pointer-events-none absolute inset-y-24 right-6 hidden w-40 rounded-full bg-gradient-to-t from-[#fde0d6] via-transparent to-transparent blur-2xl lg:block" />
+      <section id="features" className="relative bg-white px-[10%] pt-[40px] pb-[30px] sm:pt-[40px] sm:pb-[30px]">
         <div className="mx-auto max-w-7xl relative">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold leading-tight text-[#0f172a]">
-                Our <span className="text-[#E54E3D]">Inspection</span> <span className="text-[#E54E3D]">Services</span>
-              </h2>
-            </div>
-
-          <div className="relative grid gap-12 lg:grid-cols-[0.35fr_0.65fr] lg:items-start">
-            <div className="relative hidden lg:block pt-[60px]">
-              <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-[#0d2a4a] bg-white shadow-2xl">
-                <div className="h-[690px] w-full rounded-[2.3rem] bg-cover bg-center" style={{ backgroundImage: "url('/images/service-driver.png')" }} />
-                <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-transparent via-[#0ea5e9]/15 to-[#0f172a]/70 mix-blend-screen" />
-                    </div>
-                  </div>
-
+          {/* Header Section */}
+          <div className="mb-8">
             <div>
-              <div className="mb-5 text-left">
-                <p className="text-[0.95rem] sm:text-[1.02rem] leading-[1.6] text-[#3a4a61]">
-                  Choose the inspection level that fits your needs. Whether it&apos;s a Routine Check-Up or our comprehensive Full-Spectrum Inspection, we provide detailed findings to help you buy with confidence.
+              {/* Services Badge */}
+              <div className="inline-flex items-center gap-2 bg-[#E54E3D] rounded-lg px-2 py-1 mb-4">
+                <span className="flex items-center justify-center w-4 h-4 bg-white rounded">
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="2" width="20" height="20" rx="2" fill="#E54E3D" />
+                    <rect x="6" y="6" width="4" height="4" fill="#C43E2D" />
+                    <rect x="14" y="6" width="4" height="4" fill="#C43E2D" />
+                    <rect x="6" y="14" width="4" height="4" fill="#C43E2D" />
+                    <rect x="14" y="14" width="4" height="4" fill="#C43E2D" />
+                  </svg>
+                </span>
+                <span className="text-white font-semibold text-sm">Services</span>
+              </div>
+              
+              {/* Main Heading */}
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold leading-tight text-[#0f172a] mb-4">
+                Our Inspection Services
+              </h2>
+              
+              {/* Intro Paragraph */}
+              <p className="text-[0.94rem] sm:text-[1.01rem] leading-[1.6] text-[#3a4a61] max-w-2xl">
+                Choose the inspection level that fits your needs. Whether it&apos;s a Routine Check-Up or our <span className="whitespace-nowrap">comprehensive Full-Spectrum Inspection, we provide detailed findings to help you buy with confidence.</span>
               </p>
             </div>
+          </div>
 
-              <div className="grid gap-3 md:grid-cols-2">
-                {/* Standard Inspection Card */}
-                <div className="relative h-full">
-                  <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#dde2f0] bg-white/95 p-6 sm:p-7 shadow-xl shadow-slate-200/50">
-                    <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-[#0d2a4a]" />
-                    <div className="relative flex h-full flex-col gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
-                          <svg className="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="9" />
-                            <circle cx="12" cy="12" r="3" />
-                    </svg>
-                        </span>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#13203a]">Standard Inspection</h3>
-                    </div>
-                      <p className="text-sm leading-relaxed text-[#3f4756]">
-                        Ideal for newer or low-mileage vehicles. A 50+ point inspection covering essential systems with attention to safety and performance.
-                      </p>
-                      <ul className="flex-1 space-y-2 text-sm text-[#334155]">
-                        {["Exterior, lighting, tires & undercarriage checks", 'Engine, fluids, and dashboard control tests', 'Test drive evaluation and digital report', '45–60 minutes duration'].map((item) => (
-                          <li key={item} className="flex items-start gap-2">
-                            <span className="mt-2 block h-2 w-2 rounded-full bg-[#E64B37]" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <Link href="/services/standard-inspection" className="inline-flex items-center gap-1 text-sm font-semibold text-[#E64B37] transition hover:text-[#c63a2c]">
-                        Explore details
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M5 12h14" />
-                          <path d="m13 6 6 6-6 6" />
-                        </svg>
-                      </Link>
+          {/* Service Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Standard Inspection Card */}
+            <div className="relative">
+              {/* Image Container */}
+              <div className="relative h-48 w-full rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/images/inspection1.png" 
+                  alt="Standard Inspection" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Content Container */}
+              <div className="absolute right-0" style={{ width: '90%', top: '159px' }}>
+                <div className="relative rounded-tl-lg rounded-br-lg overflow-hidden shadow-lg" style={{ width: 'fit-content', height: '175px' }}>
+                  {/* Red Banner */}
+                  <div className="relative bg-[#E54E3D] py-2 rounded-tl-lg" style={{ width: 'fit-content', paddingLeft: '1rem', paddingRight: '1rem' }}>
+                    <h3 className="text-white font-bold uppercase tracking-wide" style={{ fontSize: '0.7rem' }}>Standard Inspection</h3>
+                  </div>
+                  
+                  {/* White Content Section */}
+                  <div className="relative bg-white px-4 py-3 rounded-br-lg rounded-bl-none flex flex-col justify-between" style={{ minHeight: '120px', paddingBottom: '4px' }}>
+                    <p className="text-[#3a4a61] leading-relaxed" style={{ fontSize: '0.77rem' }}>
+                      Ideal for newer or low-mileage vehicles. A 50+ point inspection covering essential systems with attention to safety and performance.
+                    </p>
+                    <Link href="/services/standard-inspection" className="text-[#E54E3D] font-semibold hover:text-[#d14130] transition-colors underline" style={{ fontSize: '0.7rem' }}>
+                      Explore Details
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Enhanced Inspection Card */}
+            <div className="relative">
+              {/* Image Container */}
+              <div className="relative h-48 w-full rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/images/inspection2.png" 
+                  alt="Enhanced Inspection" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Content Container */}
+              <div className="absolute right-0" style={{ width: '90%', top: '159px' }}>
+                <div className="relative rounded-tl-lg rounded-br-lg overflow-hidden shadow-lg" style={{ width: 'fit-content', height: '175px' }}>
+                  {/* Red Banner */}
+                  <div className="relative bg-[#E54E3D] py-2 rounded-tl-lg" style={{ width: 'fit-content', paddingLeft: '1rem', paddingRight: '1rem' }}>
+                    <h3 className="text-white font-bold uppercase tracking-wide" style={{ fontSize: '0.7rem' }}>Enhanced Inspection</h3>
+                  </div>
+                  
+                  {/* White Content Section */}
+                  <div className="relative bg-white px-4 py-3 rounded-br-lg rounded-bl-none flex flex-col justify-between" style={{ minHeight: '120px', paddingBottom: '4px' }}>
+                    <p className="text-[#3a4a61] leading-relaxed" style={{ fontSize: '0.77rem' }}>
+                      Our most popular 75+ point diagnostic inspection. Great for vehicles 5-10 years old or with moderate mileage needing detailed system analysis.
+                    </p>
+                    <Link href="/services/enhanced-inspection" className="text-[#E54E3D] font-semibold hover:text-[#d14130] transition-colors underline" style={{ fontSize: '0.7rem' }}>
+                      Explore Details
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Routine Check-Up Card */}
+            <div className="relative">
+              {/* Image Container */}
+              <div className="relative h-48 w-full rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/images/inspection3.jpg" 
+                  alt="Routine Check-Up" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Content Container */}
+              <div className="absolute right-0" style={{ width: '90%', top: '159px' }}>
+                <div className="relative rounded-tl-lg rounded-br-lg overflow-hidden shadow-lg" style={{ width: 'fit-content', height: '175px' }}>
+                  {/* Red Banner */}
+                  <div className="relative bg-[#E54E3D] py-2 rounded-tl-lg" style={{ width: 'fit-content', paddingLeft: '1rem', paddingRight: '1rem' }}>
+                    <h3 className="text-white font-bold uppercase tracking-wide" style={{ fontSize: '0.7rem' }}>Routine Check-Up</h3>
+                  </div>
+                  
+                  {/* White Content Section */}
+                  <div className="relative bg-white px-4 py-3 rounded-br-lg rounded-bl-none flex flex-col justify-between" style={{ minHeight: '120px', paddingBottom: '4px' }}>
+                    <p className="text-[#3a4a61] leading-relaxed" style={{ fontSize: '0.77rem' }}>
+                      For ongoing maintenance—helps car owners monitor health, prevent issues, and prepare vehicles for long journeys.
+                    </p>
+                    <Link href="/services/routine-check-up" className="text-[#E54E3D] font-semibold hover:text-[#d14130] transition-colors underline" style={{ fontSize: '0.7rem' }}>
+                      Explore Details
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Full-Spectrum Inspection Card */}
+            <div className="relative">
+              {/* Image Container */}
+              <div className="relative h-48 w-full rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/images/inspection4.png" 
+                  alt="Full-Spectrum Inspection" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Content Container */}
+              <div className="absolute right-0" style={{ width: '90%', top: '159px' }}>
+                <div className="relative rounded-tl-lg rounded-br-lg overflow-hidden shadow-lg" style={{ width: 'fit-content', height: '175px' }}>
+                  {/* Red Banner */}
+                  <div className="relative bg-[#E54E3D] py-2 rounded-tl-lg" style={{ width: 'fit-content', paddingLeft: '1rem', paddingRight: '1rem' }}>
+                    <h3 className="text-white font-bold uppercase tracking-wide" style={{ fontSize: '0.7rem' }}>Full-Spectrum Inspection</h3>
+                  </div>
+                  
+                  {/* White Content Section */}
+                  <div className="relative bg-white px-4 py-3 rounded-br-lg rounded-bl-none flex flex-col justify-between" style={{ minHeight: '120px', paddingBottom: '4px' }}>
+                    <p className="text-[#3a4a61] leading-relaxed" style={{ fontSize: '0.77rem' }}>
+                      A premium 100+ point comprehensive evaluation with compression testing, frame analysis, and emissions checks for complete peace of mind.
+                    </p>
+                    <Link href="/services/full-spectrum-inspection" className="text-[#E54E3D] font-semibold hover:text-[#d14130] transition-colors underline" style={{ fontSize: '0.7rem' }}>
+                      Explore Details
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-
-                {/* Enhanced Inspection Card */}
-                <div className="relative h-full">
-                  <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#fbd4cb] bg-white/95 p-6 sm:p-7 shadow-xl shadow-[#f97362]/20">
-                    <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-gradient-to-r from-[#f97362] via-[#E64B37] to-[#f97362]" />
-                    <div className="relative flex h-full flex-col gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
-                          <svg className="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="4" y="5" width="16" height="14" rx="3" />
-                            <path d="M8 9h8" />
-                            <path d="M8 13h5" />
-                      </svg>
-                        </span>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#13203a]">Enhanced Inspection</h3>
-                      </div>
-                      <p className="text-sm leading-relaxed text-[#324056]">
-                        Our most popular 75+ point diagnostic inspection. Great for vehicles 5–10 years old or with moderate mileage needing detailed system analysis.
-                      </p>
-                      <ul className="flex-1 space-y-2 text-sm text-[#2f3a4c]">
-                        {["Includes OBD-II scan and electrical diagnostics", 'Transmission and suspension assessments', 'Cooling system and battery performance test', '60–90 minutes duration'].map((item) => (
-                          <li key={item} className="flex items-start gap-2">
-                            <span className="mt-2 block h-2 w-2 rounded-full bg-[#E64B37]" />
-                            <span>{item}</span>
-                    </li>
-                        ))}
-                  </ul>
-                      <div className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <Link href="/services/enhanced-inspection" className="inline-flex items-center gap-1 text-sm font-semibold text-[#E64B37] transition hover:text-[#c63a2c]">
-                          Explore details
-                          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M5 12h14" />
-                            <path d="m13 6 6 6-6 6" />
-                          </svg>
-                        </Link>
-                        <span className="inline-flex w-fit items-center justify-center rounded-full bg-[#fde4de] px-4 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#E64B37]">
-                          Most Popular
-                        </span>
-                </div>
-              </div>
-                </div>
-                </div>
-
-                {/* Full-Spectrum Inspection Card */}
-                <div className="relative h-full">
-                  <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#fbd4cb] bg-white/95 p-6 sm:p-7 shadow-xl shadow-[#f97362]/20">
-                    <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-gradient-to-r from-[#f97362] via-[#E64B37] to-[#f97362]" />
-                    <div className="relative flex h-full flex-col gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
-                          <svg className="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="5" y="4" width="14" height="16" rx="3" />
-                            <path d="M9 8h6" />
-                            <path d="M9 12h6" />
-                            <path d="M9 16h4" />
-                      </svg>
-                        </span>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#13203a]">Full-Spectrum Inspection</h3>
-                      </div>
-                      <p className="text-sm leading-relaxed text-[#324056]">
-                        A premium 100+ point comprehensive evaluation with compression testing, frame analysis, and emissions checks for complete peace of mind.
-                      </p>
-                      <ul className="flex-1 space-y-2 text-sm text-[#2f3a4c]">
-                        {["Advanced engine diagnostics and performance scan", 'Frame, paint depth, and emissions evaluation', 'Negotiation insights for vehicle purchase', '90–120 minutes duration'].map((item) => (
-                          <li key={item} className="flex items-start gap-2">
-                            <span className="mt-2 block h-2 w-2 rounded-full bg-[#E64B37]" />
-                            <span>{item}</span>
-                    </li>
-                        ))}
-                  </ul>
-                      <Link href="/services/full-spectrum-inspection" className="inline-flex items-center gap-1 text-sm font-semibold text-[#E64B37] transition hover:text-[#c63a2c]">
-                        Explore details
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M5 12h14" />
-                          <path d="m13 6 6 6-6 6" />
-                        </svg>
-                      </Link>
-                </div>
-              </div>
-                </div>
-
-                {/* Routine Check-Up Card */}
-                <div className="relative h-full">
-                  <div className="relative h-full max-w-[540px] overflow-hidden rounded-3xl border border-[#dde2f0] bg-white/95 p-6 sm:p-7 shadow-xl shadow-slate-200/50">
-                    <span className="pointer-events-none absolute inset-x-3 top-0 h-2 rounded-b-full bg-[#0d2a4a]" />
-                    <div className="relative flex h-full flex-col gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#f8b7ab] bg-[#fde4de] text-[#E64B37]">
-                          <svg className="h-[14px] w-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="9" />
-                            <path d="M12 6v6l3 3" />
-                      </svg>
-                        </span>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#13203a]">Routine Check-Up</h3>
-                      </div>
-                      <p className="text-sm leading-relaxed text-[#3f4756]">
-                        For ongoing maintenance—helps car owners monitor health, prevent issues, and prepare vehicles for long journeys.
-                      </p>
-                      <ul className="flex-1 space-y-2 text-sm text-[#334155]">
-                        {[
-                          'Fluid level checks and visual wear assessment',
-                          'Tire health and battery life review',
-                          'Personalized maintenance recommendation report',
-                          '30–45 minutes duration',
-                        ].map((item) => (
-                          <li key={item} className="flex items-start gap-2">
-                            <span className="mt-2 block h-2 w-2 rounded-full bg-[#E64B37]" />
-                            <span>{item}</span>
-                    </li>
-                        ))}
-                  </ul>
-                      <Link href="/services/routine-check-up" className="inline-flex items-center gap-1 text-sm font-semibold text-[#E64B37] transition hover:text-[#c63a2c]">
-                        Explore details
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M5 12h14" />
-                          <path d="m13 6 6 6-6 6" />
-                        </svg>
-                      </Link>
-                </div>
-              </div>
-                </div>
-                </div>
-            </div>
-            
+          
+          {/* Book Inspection CTA */}
+          <div className="mt-48 flex flex-col items-center gap-2">
+            <Link
+              href="/book-appointment#booking-form"
+              className="inline-flex items-center justify-center rounded-full bg-[#E54E3D] px-8 py-3 font-semibold text-white shadow-lg transition hover:bg-[#d14130] hover:shadow-xl"
+            >
+              Book an Inspection Now
+            </Link>
+            <p className="text-sm font-medium text-[#34495E]">Call (613) 981-5498 for expert guidance.</p>
           </div>
-          <div className="mt-16 flex flex-col items-center gap-2">
-              <Link
-                href="/book-appointment#booking-form"
-                className="inline-flex items-center justify-center rounded-full bg-[#E64B37] px-12 py-4 text-base font-semibold text-white shadow-[0_10px_25px_rgba(229,78,55,0.35)] transition hover:-translate-y-0.5 hover:bg-[#d14130]"
-              >
-                Book an Inspection Now
-              </Link>
-              <p className="text-sm font-medium text-[#2f3a4c]">Call (613) 981-5498 for expert guidance.</p>
-            </div>
         </div>
       </section>
 
@@ -999,13 +1057,14 @@ export default function Home() {
           <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <Link
               href="/book-appointment#booking-form"
-              className="inline-flex items-center gap-2 rounded-full bg-[#E54E3D] px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-lg shadow-[#E54E3D]/35 transition hover:-translate-y-0.5 hover:bg-[#d14130]"
+              className="inline-flex items-center justify-center rounded-[30px] bg-[#E54E3D] h-[60px] px-8 font-bold text-white shadow-lg shadow-[#E54E3D]/35 transition hover:-translate-y-0.5 hover:bg-[#d14130]"
             >
-              Book an Inspection
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12h14" />
-                <path d="m13 6 6 6-6 6" />
-                  </svg>
+              <span>Book Inspection</span>
+              <span className="ml-3 flex h-8 w-8 items-center justify-center rounded-full bg-white">
+                <svg className="h-4 w-4 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17L17 7M17 7H7M17 7V17" />
+                </svg>
+              </span>
             </Link>
             <Link
               href="/report-sample"
@@ -1019,6 +1078,155 @@ export default function Home() {
 
           <p className="mt-6 text-center text-sm text-white/70">Serving Ottawa, Gatineau, Kanata & Orleans</p>
               </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section id="pricing" className="relative overflow-hidden bg-[#fdf5f3] px-[10%] pt-[40px] pb-[60px] sm:pt-[40px] sm:pb-[60px]">
+        <div className="mx-auto max-w-6xl relative">
+          <div className="text-center mb-14">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold leading-tight text-[#0f172a]">
+                Our <span className="text-[#E54E3D]">Pricing</span> 
+              </h2>
+            <p className="mt-4 text-base sm:text-lg leading-relaxed text-[#3a4a61] max-w-2xl mx-auto">
+                Transparent and competitive pricing for our professional inspection services.
+              </p>
+                  </div>
+
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {[{
+              name: 'Standard',
+              price: '$150',
+              bgColor: 'bg-white',
+              textColor: 'text-[#0f172a]',
+              priceColor: 'text-[#0f172a]',
+              badge: null,
+              detailsHref: '/services/standard-inspection',
+              bookingValue: 'standard',
+              checklistType: 'standard',
+              features: ['50+ Point Inspection', 'Detailed Report', 'Professional Mechanic', "Service at Seller's Location"],
+            },
+            {
+              name: 'Enhanced',
+              price: '$200',
+              bgColor: 'bg-[#1f2937]',
+              textColor: 'text-white',
+              priceColor: 'text-white',
+              badge: 'Most Popular',
+              detailsHref: '/services/enhanced-inspection',
+              bookingValue: 'enhanced',
+              checklistType: 'enhanced',
+              features: ['75+ Point Inspection', 'Comprehensive Report', 'Professional Mechanic', "Service at Seller's Location"],
+            },
+            {
+              name: 'Full-Spectrum',
+              price: '$300',
+              bgColor: 'bg-white',
+              textColor: 'text-[#0f172a]',
+              priceColor: 'text-[#0f172a]',
+              badge: null,
+              detailsHref: '/services/full-spectrum-inspection',
+              bookingValue: 'full-spectrum',
+              checklistType: 'full-spectrum',
+              features: ['100+ Point Inspection', 'Elite Detailed Report', 'Professional Mechanic', "Service at Seller's Location"],
+            },
+            {
+              name: 'Routine Check-Up',
+              price: '$100',
+              bgColor: 'bg-white',
+              textColor: 'text-[#0f172a]',
+              priceColor: 'text-[#0f172a]',
+              badge: null,
+              detailsHref: '/services/routine-check-up',
+              bookingValue: 'routine',
+              checklistType: 'routine',
+              features: ['Multi-Point Inspection', 'Fluid Levels Check', 'Tire & Brake Assessment', 'Battery Health Evaluation'],
+            }].map((plan) => (
+              <article
+                key={plan.name}
+                className={`group relative flex flex-col border border-gray-200 ${plan.bgColor} p-8 shadow-lg transition-all duration-300 hover:shadow-xl rounded-tl-[2rem] rounded-br-[2rem]`}
+              >
+                {plan.badge && (
+                  <span className="absolute right-4 -top-2 rounded-full bg-[#E54E3D] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+                    {plan.badge}
+                  </span>
+                )}
+
+                <header className="flex flex-col gap-4 mb-6 items-start text-left">
+                  <div className="w-full">
+                    <h3 className={`text-xl font-bold ${plan.textColor}`}>{plan.name}</h3>
+                    <div className="mt-2 h-0.5 w-[40%] bg-[#E54E3D]"></div>
+                  </div>
+                  <div className={`text-4xl font-semibold ${plan.priceColor}`}>{plan.price}</div>
+                </header>
+
+                <ul className="flex-1 space-y-4 mb-6">
+                  {plan.features.map((item) => (
+                    <li key={item} className={`flex items-center justify-between gap-3 text-sm ${plan.textColor}`}>
+                      <span className="flex-1">{item}</span>
+                      <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#E54E3D] text-white flex-shrink-0">
+                        <svg className="h-2 w-2" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.071 7.071a1 1 0 0 1-1.414 0L5.293 11.95a1 1 0 1 1 1.414-1.414l1.828 1.829 6.364-6.364a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
+                        </svg>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                {plan.checklistType === 'standard' ? (
+                  <button
+                    type="button"
+                    onClick={() => setActiveChecklist('standard')}
+                    className="mb-4 inline-flex items-center justify-start gap-2 text-sm font-semibold text-[#E54E3D] transition-colors hover:text-[#c63a2c]"
+                  >
+                    View Full Checklist
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14" />
+                      <path d="m13 6 6 6-6 6" />
+                    </svg>
+                  </button>
+                ) : (
+                  plan.checklistType ? (
+                    <button
+                      type="button"
+                      onClick={() => setActiveChecklist(plan.checklistType as ChecklistType)}
+                      className="mb-4 inline-flex items-center justify-start gap-2 text-sm font-semibold text-[#E54E3D] transition-colors hover:text-[#c63a2c]"
+                    >
+                      View Full Checklist
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 12h14" />
+                        <path d="m13 6 6 6-6 6" />
+                      </svg>
+                    </button>
+                  ) : (
+                    plan.detailsHref && (
+                      <Link
+                        href={plan.detailsHref}
+                        className="mb-4 inline-flex items-center justify-start gap-2 text-sm font-semibold text-[#E54E3D] transition-colors hover:text-[#c63a2c]"
+                      >
+                        View Full Checklist
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 12h14" />
+                          <path d="m13 6 6 6-6 6" />
+                        </svg>
+                      </Link>
+                    )
+                  )
+                )}
+
+                <Link
+                  href={`/book-appointment?service=${plan.bookingValue}#booking-form`}
+                  className="mt-auto inline-flex w-full items-center justify-center gap-2 border-2 border-black bg-white px-6 py-3 text-sm font-semibold uppercase tracking-wide text-black transition-all duration-300 hover:bg-[#E54E3D] hover:border-[#E54E3D] hover:text-white hover:shadow-lg hover:scale-105 rounded-tl-lg rounded-br-lg"
+                >
+                  BOOK NOW
+                  <svg className="h-4 w-4 transition-all duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14" />
+                    <path d="m13 6 6 6-6 6" />
+                  </svg>
+                </Link>
+              </article>
+            ))}
+                  </div>
+                </div>
       </section>
 
       {/* Why Choose Section */}
@@ -1084,164 +1292,18 @@ export default function Home() {
           <div className="mt-16 flex flex-col items-center gap-2">
             <Link
               href="/book-appointment#booking-form"
-              className="inline-flex items-center justify-center rounded-full bg-[#E64B37] px-12 py-4 text-base font-semibold text-white shadow-[0_10px_25px_rgba(229,78,55,0.35)] transition hover:-translate-y-0.5 hover:bg-[#d14130]"
+              className="inline-flex items-center justify-center rounded-[30px] bg-[#E54E3D] h-[60px] px-8 font-bold text-white shadow-[0_10px_25px_rgba(229,78,55,0.35)] transition hover:-translate-y-0.5 hover:bg-[#d14130]"
             >
-              Book an Inspection Now
+              <span>Book Inspection</span>
+              <span className="ml-3 flex h-8 w-8 items-center justify-center rounded-full bg-white">
+                <svg className="h-4 w-4 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 17L17 7M17 7H7M17 7V17" />
+                </svg>
+              </span>
             </Link>
             <p className="text-sm font-medium text-[#2f3a4c]">Trusted by used vehicle buyers and sellers.</p>
           </div>
         </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="relative overflow-hidden bg-white px-[10%] pt-[40px] pb-[60px] sm:pt-[40px] sm:pb-[60px]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.14),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(249,115,98,0.12),transparent_55%),radial-gradient(circle_at_bottom_left,rgba(252,165,143,0.12),transparent_60%)]" />
-        <div className="mx-auto max-w-6xl relative">
-          <div className="text-center mb-14">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold leading-tight text-[#0f172a]">
-                Our <span className="text-[#E54E3D]">Pricing</span> 
-              </h2>
-            <p className="mt-4 text-base sm:text-lg leading-relaxed text-[#3a4a61] max-w-2xl mx-auto">
-                Transparent and competitive pricing for our professional inspection services.
-              </p>
-                  </div>
-
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {[{
-              name: 'Standard',
-              price: '$150',
-              accent: 'from-[#E54E3D] via-[#f97362] to-[#E54E3D]',
-              border: 'border-[#fbd1ca]',
-              shadow: 'shadow-[#e54e3d]/18',
-              badge: null,
-              button: 'bg-[#E54E3D] text-white hover:bg-[#d14130]',
-              detailsHref: '/services/standard-inspection',
-              bookingValue: 'standard',
-              checklistType: 'standard',
-              features: ['50+ Point Inspection', 'Detailed Report', 'Professional Mechanic', "Service at Seller's Location"],
-            },
-            {
-              name: 'Enhanced',
-              price: '$200',
-              accent: 'from-[#0f172a] via-[#1f2937] to-[#0f172a]',
-              border: 'border-[#0f172a]/40',
-              shadow: 'shadow-[#0f172a]/20',
-              badge: 'MOST POPULAR',
-              button: 'bg-[#E54E3D] text-white hover:bg-[#d14130]',
-              detailsHref: '/services/enhanced-inspection',
-              bookingValue: 'enhanced',
-              checklistType: 'enhanced',
-              features: ['75+ Point Inspection', 'Comprehensive Report', 'Professional Mechanic', "Service at Seller's Location"],
-            },
-            {
-              name: 'Full-Spectrum',
-              price: '$300',
-              accent: 'from-[#0ea5e9] via-[#38bdf8] to-[#2563eb]',
-              border: 'border-[#bae6fd]',
-              shadow: 'shadow-[#0ea5e9]/20',
-              badge: null,
-              button: 'bg-[#E54E3D] text-white hover:bg-[#d14130]',
-              detailsHref: '/services/full-spectrum-inspection',
-              bookingValue: 'full-spectrum',
-              checklistType: 'full-spectrum',
-              features: ['100+ Point Inspection', 'Elite Detailed Report', 'Professional Mechanic', "Service at Seller's Location"],
-            },
-            {
-              name: 'Routine Check-Up',
-              price: '$100',
-              accent: 'from-[#16a34a] via-[#22c55e] to-[#16a34a]',
-              border: 'border-[#bbf7d0]',
-              shadow: 'shadow-[#16a34a]/18',
-              badge: null,
-              button: 'bg-[#E54E3D] text-white hover:bg-[#d14130]',
-              detailsHref: '/services/routine-check-up',
-              bookingValue: 'routine',
-              checklistType: 'routine',
-              features: ['Multi-Point Inspection', 'Fluid Levels Check', 'Tire & Brake Assessment', 'Battery Health Evaluation'],
-            }].map((plan) => (
-              <article
-                key={plan.name}
-                className={`group relative flex flex-col rounded-3xl border ${plan.border} bg-white/95 p-8 shadow-xl transition-all duration-300 hover:-translate-y-3 hover:shadow-2xl ${plan.shadow}`}
-              >
-                {plan.badge && (
-                  <span className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[#E54E3D] px-5 py-1 text-xs font-semibold tracking-[0.32em] uppercase text-white shadow-lg">
-                    {plan.badge}
-                  </span>
-                )}
-
-                <header className="flex flex-col items-center gap-5 text-center">
-                  <div className={`relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br ${plan.accent} shadow-inner shadow-black/10`}>
-                    <div className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-white/15 backdrop-blur-sm">
-                      <span className="text-3xl font-extrabold tracking-tight text-white">{plan.price}</span>
-                </div>
-              </div>
-                  <h3 className="text-xl font-bold text-[#152032]">{plan.name}</h3>
-                </header>
-
-                <ul className="mt-6 flex-1 space-y-4 text-left">
-                  {plan.features.map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-sm sm:text-base text-[#3f4756]">
-                      <span className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-[#E54E3D]/10 text-[#E54E3D]">
-                        <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.071 7.071a1 1 0 0 1-1.414 0L5.293 11.95a1 1 0 1 1 1.414-1.414l1.828 1.829 6.364-6.364a1 1 0 0 1 1.414 0Z" clipRule="evenodd" />
-                  </svg>
-                      </span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                  </ul>
-
-                {plan.checklistType === 'standard' ? (
-                  <button
-                    type="button"
-                    onClick={() => setActiveChecklist('standard')}
-                    className="mt-6 inline-flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#E54E3D] transition-colors hover:text-[#c63a2c]"
-                  >
-                    View Full Checklist
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14" />
-                      <path d="m13 6 6 6-6 6" />
-                  </svg>
-                  </button>
-                ) : (
-                  plan.checklistType ? (
-                    <button
-                      type="button"
-                      onClick={() => setActiveChecklist(plan.checklistType as ChecklistType)}
-                      className="mt-6 inline-flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#E54E3D] transition-colors hover:text-[#c63a2c]"
-                    >
-                      View Full Checklist
-                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 12h14" />
-                        <path d="m13 6 6 6-6 6" />
-                    </svg>
-                  </button>
-                  ) : (
-                    plan.detailsHref && (
-                      <Link
-                        href={plan.detailsHref}
-                        className="mt-6 inline-flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-wide text-[#E54E3D] transition-colors hover:text-[#c63a2c]"
-                      >
-                        View Full Checklist
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M5 12h14" />
-                          <path d="m13 6 6 6-6 6" />
-                        </svg>
-                      </Link>
-                    )
-                  )
-                )}
-
-                <Link
-                  href={`/book-appointment?service=${plan.bookingValue}#booking-form`}
-                  className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold uppercase tracking-wide transition-all ${plan.button}`}
-                >
-                  Book Now
-                </Link>
-              </article>
-            ))}
-                  </div>
-                </div>
       </section>
 
       {/* Testimonials Section */}
@@ -1308,39 +1370,43 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Call to Action Section */}
-      <section id="cta" className="relative overflow-hidden bg-[#0f172a] px-[10%] py-16 sm:py-20 lg:py-24">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.22),transparent_60%),radial-gradient(circle_at_bottom_right,rgba(249,115,98,0.18),transparent_60%),radial-gradient(circle_at_center,rgba(252,165,143,0.14),transparent_65%)]" />
-        <div className="pointer-events-none absolute -left-32 top-[-6rem] hidden h-[520px] w-[320px] lg:block">
-          <div className="hero-wave" />
-        </div>
-        <div className="pointer-events-none absolute -right-32 bottom-[-6rem] hidden h-[520px] w-[320px] lg:block">
-          <div className="hero-wave rotate-180" />
-        </div>
+      {/* Ready to Inspect CTA Section */}
+      <section className="relative overflow-hidden bg-white px-[10%] pt-[50px] pb-[50px]">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col lg:flex-row items-stretch gap-8" style={{ height: '170px' }}>
+            {/* Left Section - Promotional Text */}
+            <div className="relative bg-[#E54E3D] rounded-tl-[3rem] rounded-br-[3rem] px-4 lg:px-5 flex flex-col" style={{ width: '70%', height: '170px' }}>
+              {/* Decorative Icon Background */}
+              <div className="absolute inset-0 opacity-10 flex items-center justify-center">
+                <svg className="w-44 h-44" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M50 10 L60 40 L90 40 L68 58 L78 88 L50 70 L22 88 L32 58 L10 40 L40 40 Z" stroke="white" strokeWidth="2" fill="none"/>
+                </svg>
+              </div>
+              
+              <div className="relative z-10 flex-1 flex flex-col justify-center pt-[20px] pb-[20px]">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight mb-1">
+                  Ready to Inspect Your<br />Next Ride?
+                </h2>
+                <p className="text-white/90 text-sm sm:text-base leading-relaxed mb-1.5">
+                  Don't take chances with one of the biggest purchases you'll make.<br />Let our experts inspect the vehicle and give you peace of mind.
+                </p>
+              </div>
+              <Link
+                href="/book-appointment#booking-form"
+                className="absolute top-[20px] right-[20px] z-20 inline-flex items-center justify-center bg-white text-black font-bold px-5 py-[7.26px] rounded-tl-lg rounded-br-lg hover:bg-gray-100 transition-colors text-[12.75px]"
+              >
+                BOOK AN INSPECTION NOW
+              </Link>
+            </div>
 
-        <div className="mx-auto max-w-5xl relative text-center text-white">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-white/80">
-            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14" />
-              <path d="m13 6 6 6-6 6" />
-            </svg>
-            Instant Booking
-          </span>
-          <h2 className="mt-6 text-2xl sm:text-3xl md:text-4xl lg:text-[2.8rem] font-bold leading-tight">
-              Ready to Inspect Your Next Ride?
-            </h2>
-          <p className="mt-4 text-base sm:text-lg leading-relaxed text-white/85 max-w-2xl mx-auto">
-              Don't take chances with one of the biggest purchases you'll make. Let our experts inspect the vehicle and give you peace of mind.
-            </p>
-
-          <div className="mt-16 flex flex-col items-center gap-2">
-            <Link
-              href="/book-appointment#booking-form"
-              className="inline-flex items-center justify-center rounded-full bg-[#E64B37] px-12 py-4 text-base font-semibold text-white shadow-[0_10px_25px_rgba(229,78,55,0.35)] transition hover:-translate-y-0.5 hover:bg-[#d14130]"
-            >
-              Book an Inspection Now
-            </Link>
-            <p className="text-sm font-medium text-white/90">Call (613) 981-5498 for expert guidance.</p>
+            {/* Right Section - Car Inspection Image */}
+            <div className="rounded-tl-3xl rounded-bl-3xl overflow-hidden" style={{ width: '30%', height: '170px' }}>
+              <img 
+                src="/images/abovefoot.jpg" 
+                alt="Professional vehicle inspection" 
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>
