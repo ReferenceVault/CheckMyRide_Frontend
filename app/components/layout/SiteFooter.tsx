@@ -19,8 +19,7 @@ const companyLinks = [
 
 export default function SiteFooter() {
   return (
-    <footer className="relative overflow-hidden bg-[#f7f9fc] text-[#152032]">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(229,78,61,0.12),transparent_55%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.12),transparent_55%),radial-gradient(circle_at_center,rgba(59,130,246,0.08),transparent_60%)]" />
+    <footer className="relative overflow-hidden bg-black text-white">
       <div className="pointer-events-none absolute -left-40 top-[-5rem] hidden h-[520px] w-[280px] lg:block">
         <div className="hero-wave" />
       </div>
@@ -33,16 +32,15 @@ export default function SiteFooter() {
           <div className="space-y-6">
             <div>
               <Link href="/" className="inline-flex items-center">
-                <div className="relative -ml-[18px] -mt-4 flex h-[72px] w-[72px] items-center justify-center sm:-ml-[18px] sm:-mt-4 sm:h-[92px] sm:w-[92px]">
+                <div className="relative -ml-[18px] -mt-4 flex h-[35px] w-[35px] items-center justify-center sm:-ml-[18px] sm:-mt-4 sm:h-[45px] sm:w-[45px]">
                   <img src="/images/logofooter1.png" alt="CheckMyRide" className="h-full w-full object-contain" />
                 </div>
-                <span className="-ml-[25px] -mt-4 text-2xl font-bold tracking-tight text-[#152032]">
+                <span className="ml-0 -mt-4 text-2xl font-bold tracking-tight text-white">
                   Check<span className="text-[#E54E3D]">MyRide</span>
                 </span>
               </Link>
-              <div className="-mt-4 h-1 w-16 rounded-full bg-gradient-to-r from-[#E54E3D] to-[#f97362]" />
             </div>
-            <p className="text-sm sm:text-base leading-relaxed text-[#4a5568]">
+            <p className="text-sm sm:text-base leading-relaxed text-gray-300">
               Professional pre-purchase vehicle inspection services across Canada. Our experts help you make informed decisions and avoid costly mistakes.
             </p>
             <div className="flex gap-3">
@@ -98,10 +96,10 @@ export default function SiteFooter() {
 
           <div className="space-y-6">
             <div>
-              <h3 className="text-xl font-semibold tracking-wide text-[#0f172a]">Services</h3>
+              <h3 className="text-xl font-semibold tracking-wide text-white">Services</h3>
               <div className="mt-3 h-1 w-12 rounded-full bg-[#E54E3D]" />
             </div>
-            <ul className="space-y-3 text-sm sm:text-base text-[#3f4756]">
+            <ul className="space-y-3 text-sm sm:text-base text-gray-300">
               {serviceLinks.map((link) => (
                 <li key={link.label}>
                   <Link className="inline-flex items-center gap-2 transition-all hover:text-[#E54E3D]" href={link.href}>
@@ -115,10 +113,10 @@ export default function SiteFooter() {
 
           <div className="space-y-6">
             <div>
-              <h3 className="text-xl font-semibold tracking-wide text-[#0f172a]">Company</h3>
+              <h3 className="text-xl font-semibold tracking-wide text-white">Company</h3>
               <div className="mt-3 h-1 w-12 rounded-full bg-[#E54E3D]" />
             </div>
-            <ul className="space-y-3 text-sm sm:text-base text-[#3f4756]">
+            <ul className="space-y-3 text-sm sm:text-base text-gray-300">
               {companyLinks.map((link) => (
                 <li key={link.label}>
                   <a className="inline-flex items-center gap-2 transition-all hover:text-[#E54E3D]" href={link.href}>
@@ -132,24 +130,24 @@ export default function SiteFooter() {
 
           <div className="space-y-6">
             <div>
-              <h3 className="text-xl font-semibold tracking-wide text-[#0f172a]">Contact Us</h3>
+              <h3 className="text-xl font-semibold tracking-wide text-white">Contact Us</h3>
               <div className="mt-3 h-1 w-12 rounded-full bg-[#E54E3D]" />
             </div>
-            <ul className="space-y-4 text-sm sm:text-base text-[#3f4756]">
+            <ul className="space-y-4 text-sm sm:text-base text-gray-300">
               <li>
-                <span className="block text-[#6b7280]">Email:</span>
+                <span className="block text-gray-400">Email:</span>
                 <a className="transition-colors hover:text-[#E54E3D]" href="mailto:info@checkmyride.ca">
                   info@checkmyride.ca
                 </a>
               </li>
               <li>
-                <span className="block text-[#6b7280]">Phone:</span>
+                <span className="block text-gray-400">Phone:</span>
                 <a className="transition-colors hover:text-[#E54E3D]" href="tel:6139815498">
                   (613)-981-5498
                 </a>
               </li>
               <li>
-                <span className="block text-[#6b7280]">Hours:</span>
+                <span className="block text-gray-400">Hours:</span>
                 <span>Mon-Fri 9am-6pm EST</span>
               </li>
             </ul>
@@ -157,19 +155,19 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      <div className="relative border-t border-[#dbe0ef] px-[10%] py-6 text-center sm:text-left">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:text-base text-[#687385]">
+      <div className="relative border-t border-gray-800 px-[10%] py-6 text-center sm:text-left">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:text-base text-gray-200">
           <p>
             © 2025 CheckMyRide. All Rights Reserved.{' '}
             <Link className="hover:text-[#E54E3D]" href="/privacy-terms">
               Privacy Policy and Terms of Service
             </Link>
           </p>
-          <div className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#475569]">
+          <div className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-gray-300">
             <span>Vehicles</span>
-            <span className="h-px w-6 bg-[#dbe0ef]" />
+            <span className="h-px w-6 bg-gray-600" />
             <span>Inspections</span>
-            <span className="h-px w-6 bg-[#dbe0ef]" />
+            <span className="h-px w-6 bg-gray-600" />
             <span>Peace of Mind</span>
           </div>
         </div>
