@@ -754,33 +754,26 @@ export default function Home() {
               </span>
             </div>
             <h1 
-              className="font-bold text-white mb-4 sm:mb-6"
+              className="font-bold text-white mb-4 sm:mb-6 text-xl sm:text-4xl lg:text-[51px] leading-tight sm:leading-[58px] w-full max-w-full sm:w-[496px]"
               style={{
                 fontFamily: 'Inter, sans-serif',
-                fontSize: '51px',
-                lineHeight: '58px',
                 letterSpacing: '-0.02em',
                 fontWeight: 700,
-                color: '#FFFFFF',
-                width: '496px',
-                height: '175px'
+                color: '#FFFFFF'
               }}
             >
               Professional Vehicle Inspections Before You Buy
             </h1>
             <p 
-              className="text-white mb-5 sm:mb-8"
+              className="text-white mb-5 sm:mb-8 text-xs sm:text-[15px] leading-relaxed sm:leading-[18px] w-full max-w-full sm:w-[641px]"
               style={{
                 fontFamily: 'Inter, sans-serif',
-                fontSize: '15px',
-                lineHeight: '18px',
                 letterSpacing: '0%',
                 fontWeight: 500,
-                color: '#FFFFFF',
-                width: '641px'
+                color: '#FFFFFF'
               }}
             >
-              Don't risk buying a lemon. Our certified mechanics will<br />thoroughly inspect any vehicle before you purchase, giving you peace of mind<br />and confidence in your decision.
+              Don't risk buying a lemon. Our certified mechanics will<br className="hidden sm:block" />thoroughly inspect any vehicle before you purchase, giving you peace of mind<br className="hidden sm:block" />and confidence in your decision.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Link
@@ -834,33 +827,19 @@ export default function Home() {
       </section>
 
       {/* Our Inspection Services Section */}
-      <section id="features" className="relative bg-white px-[10%] pt-[40px] pb-[30px] sm:pt-[40px] sm:pb-[30px]">
+      <section id="features" className="relative bg-white px-4 sm:px-[10%] pt-[40px] pb-[30px] sm:pt-[40px] sm:pb-[30px] overflow-x-hidden">
         <div className="mx-auto max-w-7xl relative">
           {/* Header Section */}
           <div className="mb-8">
-            <div>
-              {/* Services Badge */}
-              <div className="inline-flex items-center gap-2 bg-[#E54E3D] rounded-lg px-2 py-1 mb-4">
-                <span className="flex items-center justify-center w-4 h-4 bg-white rounded">
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="2" y="2" width="20" height="20" rx="2" fill="#E54E3D" />
-                    <rect x="6" y="6" width="4" height="4" fill="#C43E2D" />
-                    <rect x="14" y="6" width="4" height="4" fill="#C43E2D" />
-                    <rect x="6" y="14" width="4" height="4" fill="#C43E2D" />
-                    <rect x="14" y="14" width="4" height="4" fill="#C43E2D" />
-                  </svg>
-                </span>
-                <span className="text-white font-semibold text-sm">Services</span>
-              </div>
-              
+            <div className="text-center">
               {/* Main Heading */}
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold leading-tight text-[#0f172a] mb-4">
-                Our Inspection Services
+                Our Inspection <span className="text-[#E54E3D]">Services</span>
               </h2>
               
               {/* Intro Paragraph */}
-              <p className="text-[0.94rem] sm:text-[1.01rem] leading-[1.6] text-[#3a4a61] max-w-2xl">
-                Choose the inspection level that fits your needs. Whether it&apos;s a Routine Check-Up or our <span className="whitespace-nowrap">comprehensive Full-Spectrum Inspection, we provide detailed findings to help you buy with confidence.</span>
+              <p className="text-[0.94rem] sm:text-[1.01rem] leading-[1.6] text-[#3a4a61] max-w-2xl mx-auto">
+                Choose the inspection level that fits your needs. Whether it&apos;s a Routine Check-Up or our <span className="sm:whitespace-nowrap">comprehensive Full-Spectrum Inspection, we provide detailed findings to help you buy with confidence.</span>
               </p>
             </div>
           </div>
@@ -868,7 +847,7 @@ export default function Home() {
           {/* Service Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Standard Inspection Card */}
-            <div className="relative">
+            <div className="relative overflow-visible pb-44 sm:pb-44">
               {/* Image Container */}
               <div className="relative h-48 w-full rounded-lg overflow-hidden shadow-lg">
                 <img 
@@ -899,7 +878,7 @@ export default function Home() {
             </div>
 
             {/* Enhanced Inspection Card */}
-            <div className="relative">
+            <div className="relative overflow-visible pb-44 sm:pb-44">
               {/* Image Container */}
               <div className="relative h-48 w-full rounded-lg overflow-hidden shadow-lg">
                 <img 
@@ -930,7 +909,7 @@ export default function Home() {
             </div>
 
             {/* Routine Check-Up Card */}
-            <div className="relative">
+            <div className="relative overflow-visible pb-44 sm:pb-44">
               {/* Image Container */}
               <div className="relative h-48 w-full rounded-lg overflow-hidden shadow-lg">
                 <img 
@@ -961,7 +940,7 @@ export default function Home() {
             </div>
 
             {/* Full-Spectrum Inspection Card */}
-            <div className="relative">
+            <div className="relative overflow-visible pb-44 sm:pb-44">
               {/* Image Container */}
               <div className="relative h-48 w-full rounded-lg overflow-hidden shadow-lg">
                 <img 
@@ -993,7 +972,7 @@ export default function Home() {
           </div>
           
           {/* Book Inspection CTA */}
-          <div className="mt-48 flex flex-col items-center gap-2">
+          <div className="mt-[60px] sm:mt-[30px] flex flex-col items-center gap-1 sm:gap-2">
             <Link
               href="/book-appointment#booking-form"
               className="inline-flex items-center justify-center rounded-full bg-[#E54E3D] px-8 py-3 font-semibold text-white shadow-lg transition hover:bg-[#d14130] hover:shadow-xl"
@@ -1371,11 +1350,11 @@ export default function Home() {
       </section>
 
       {/* Ready to Inspect CTA Section */}
-      <section className="relative overflow-hidden bg-white px-[10%] pt-[50px] pb-[50px]">
+      <section className="relative overflow-hidden bg-white px-4 sm:px-[10%] pt-[50px] pb-[50px]">
         <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col lg:flex-row items-stretch gap-8" style={{ height: '170px' }}>
+          <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:gap-8" style={{ minHeight: '170px' }}>
             {/* Left Section - Promotional Text */}
-            <div className="relative bg-[#E54E3D] rounded-tl-[3rem] rounded-br-[3rem] px-4 lg:px-5 flex flex-col" style={{ width: '70%', height: '170px' }}>
+            <div className="relative bg-[#E54E3D] rounded-tl-[3rem] rounded-br-[3rem] px-4 lg:px-5 flex flex-col w-full lg:w-[70%]" style={{ minHeight: '170px' }}>
               {/* Decorative Icon Background */}
               <div className="absolute inset-0 opacity-10 flex items-center justify-center">
                 <svg className="w-44 h-44" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1385,22 +1364,22 @@ export default function Home() {
               
               <div className="relative z-10 flex-1 flex flex-col justify-center pt-[20px] pb-[20px]">
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight mb-1">
-                  Ready to Inspect Your<br />Next Ride?
+                  Ready to Inspect Your<br className="hidden sm:block" />Next Ride?
                 </h2>
                 <p className="text-white/90 text-sm sm:text-base leading-relaxed mb-1.5">
-                  Don't take chances with one of the biggest purchases you'll make.<br />Let our experts inspect the vehicle and give you peace of mind.
+                  Don't take chances with one of the biggest purchases you'll make.<br className="hidden sm:block" />Let our experts inspect the vehicle and give you peace of mind.
                 </p>
               </div>
               <Link
                 href="/book-appointment#booking-form"
-                className="absolute top-[20px] right-[20px] z-20 inline-flex items-center justify-center bg-white text-black font-bold px-5 py-[7.26px] rounded-tl-lg rounded-br-lg hover:bg-gray-100 transition-colors text-[12.75px]"
+                className="absolute bottom-[20px] right-[20px] sm:bottom-auto sm:top-[20px] z-20 inline-flex items-center justify-center bg-white text-black font-bold px-2.5 sm:px-5 py-1.5 sm:py-[7.26px] rounded-tl-lg rounded-br-lg hover:bg-gray-100 transition-colors text-[9px] sm:text-[12.75px]"
               >
                 BOOK AN INSPECTION NOW
               </Link>
             </div>
 
             {/* Right Section - Car Inspection Image */}
-            <div className="rounded-tl-3xl rounded-bl-3xl overflow-hidden" style={{ width: '30%', height: '170px' }}>
+            <div className="hidden lg:block rounded-tl-3xl rounded-bl-3xl overflow-hidden" style={{ width: '30%', height: '170px' }}>
               <img 
                 src="/images/abovefoot.jpg" 
                 alt="Professional vehicle inspection" 
