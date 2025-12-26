@@ -831,28 +831,14 @@ export default function Home() {
         <div className="mx-auto max-w-7xl relative">
           {/* Header Section */}
           <div className="mb-8">
-            <div>
-              {/* Services Badge */}
-              <div className="inline-flex items-center gap-2 bg-[#E54E3D] rounded-lg px-2 py-1 mb-4">
-                <span className="flex items-center justify-center w-4 h-4 bg-white rounded">
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="2" y="2" width="20" height="20" rx="2" fill="#E54E3D" />
-                    <rect x="6" y="6" width="4" height="4" fill="#C43E2D" />
-                    <rect x="14" y="6" width="4" height="4" fill="#C43E2D" />
-                    <rect x="6" y="14" width="4" height="4" fill="#C43E2D" />
-                    <rect x="14" y="14" width="4" height="4" fill="#C43E2D" />
-                  </svg>
-                </span>
-                <span className="text-white font-semibold text-sm">Services</span>
-              </div>
-              
+            <div className="text-center">
               {/* Main Heading */}
               <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold leading-tight text-[#0f172a] mb-4">
-                Our Inspection Services
+                Our Inspection <span className="text-[#E54E3D]">Services</span>
               </h2>
               
               {/* Intro Paragraph */}
-              <p className="text-[0.94rem] sm:text-[1.01rem] leading-[1.6] text-[#3a4a61] max-w-2xl">
+              <p className="text-[0.94rem] sm:text-[1.01rem] leading-[1.6] text-[#3a4a61] max-w-2xl mx-auto">
                 Choose the inspection level that fits your needs. Whether it&apos;s a Routine Check-Up or our <span className="sm:whitespace-nowrap">comprehensive Full-Spectrum Inspection, we provide detailed findings to help you buy with confidence.</span>
               </p>
             </div>
@@ -986,7 +972,7 @@ export default function Home() {
           </div>
           
           {/* Book Inspection CTA */}
-          <div className="mt-24 sm:mt-48 flex flex-col items-center gap-1 sm:gap-2">
+          <div className="mt-[60px] sm:mt-[30px] flex flex-col items-center gap-1 sm:gap-2">
             <Link
               href="/book-appointment#booking-form"
               className="inline-flex items-center justify-center rounded-full bg-[#E54E3D] px-8 py-3 font-semibold text-white shadow-lg transition hover:bg-[#d14130] hover:shadow-xl"
