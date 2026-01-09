@@ -22,6 +22,9 @@ export default function AdminLoginPage() {
     setError(null);
 
     try {
+      // Debug: Log the API URL being used
+      console.log('Attempting login with API_URL:', API_URL);
+      
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000);
 
@@ -33,6 +36,8 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ email, password }),
         signal: controller.signal,
       });
+      
+      console.log('Login response status:', response.status);
 
       clearTimeout(timeoutId);
 
@@ -63,10 +68,12 @@ export default function AdminLoginPage() {
       router.push('/admin/dashboard');
 
     } catch (error: any) {
+      console.error('Login error:', error);
+      
       if (error.name === 'AbortError') {
         setError('Request timed out. Please check your connection and try again.');
       } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        setError('Network error. Please check your internet connection and try again.');
+        setError(`Network error: Unable to connect to ${API_URL}. Please ensure the backend server is running on port 3001.`);
       } else if (error.message) {
         setError(error.message);
       } else {
