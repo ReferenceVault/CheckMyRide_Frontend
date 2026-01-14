@@ -50,6 +50,10 @@ interface ReportData {
     inspectionSummary: string;
     recommendations: string;
     recommendationNotes?: string;
+    overallRating?: number;
+    criticalIssues?: number;
+    itemsNeedingAttention?: number;
+    overallConditionDescription?: string;
   };
   detailedInspection?: InspectionCategory[];
   valueAssessment?: {
@@ -57,6 +61,34 @@ interface ReportData {
     notes?: string;
   };
   photos?: string[];
+  itemsRequiringAttention?: Array<{
+    priority: string;
+    item: string;
+    recommendation: string;
+    estimatedCost: string;
+  }>;
+  roadTest?: {
+    results: Array<{
+      category: string;
+      rating: string;
+    }>;
+    testRoute?: string;
+    notes?: string;
+  };
+  serviceHistory?: {
+    recordsReviewed?: string;
+    lastService?: string;
+    majorServices?: string[];
+  };
+  inspectorComments?: {
+    overallAssessment?: string;
+    strengths?: string[];
+    areasOfNote?: string[];
+    purchaseRecommendation?: {
+      status: string;
+      text: string;
+    };
+  };
   reportMetadata?: {
     reportGenerated: string;
     reportId: string;
