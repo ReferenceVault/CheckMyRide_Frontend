@@ -110,6 +110,13 @@ export const INTERIOR_CONDITION_ITEMS = [
   'Interior lights',
 ];
 
+export const STANDARD_DIAGNOSTIC_TESTING_ITEMS = [
+  'OBD computer scan for error codes',
+  'Battery load test',
+  'Alternator output test',
+  'Cooling system pressure test',
+];
+
 export const ROAD_TEST_RESULTS_ITEMS = [
   'Acceleration',
   'Braking performance',

@@ -452,7 +452,7 @@ export default function FullSpectrumInspectionPage() {
               <tbody>
                 {[{
                   name: 'Standard',
-                  price: '$150',
+                  price: '$180',
                   bestFor: 'Newer vehicles under 5 years, lower mileage',
                   duration: '45-60 min',
                   highlight: true,
@@ -469,7 +469,7 @@ export default function FullSpectrumInspectionPage() {
                   highlight: true,
                 }, {
                   name: 'Routine Check-Up',
-                  price: '$100',
+                  price: '$120',
                   bestFor: 'Current owners wanting maintenance assessment',
                   duration: '30-45 min',
                 }].map((row) => (

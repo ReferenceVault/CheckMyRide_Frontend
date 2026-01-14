@@ -66,7 +66,7 @@ const customerCareChecklist = [
 const valueHighlights = [
   'Ideal for owners who want to prevent surprise breakdowns',
   'Pairs well with upcoming road trips or seasonal weather shifts',
-  'At $100, it routinely saves hundreds by catching issues early',
+  'At $120, it routinely saves hundreds by catching issues early',
 ];
 
 export default function RoutineCheckUpPage() {
@@ -134,7 +134,7 @@ export default function RoutineCheckUpPage() {
         </div>
         <div className="relative mx-auto max-w-4xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-white/75">
-            Routine Check-Up • $100
+            Routine Check-Up • $120
           </span>
           <h1 className="mt-6 text-3xl sm:text-4xl lg:text-[2.9rem] font-bold leading-tight text-white">
             Keep Your Vehicle Road-Ready Every Week
@@ -351,7 +351,7 @@ export default function RoutineCheckUpPage() {
                 </span>
                 <h3 className="mt-4 text-2xl font-semibold text-[#0f172a]">Peace of mind between service intervals</h3>
                 <p className="mt-4 text-sm sm:text-base leading-relaxed text-[#3a4a61]">
-                  Regular check-ups help you avoid expensive surprises by catching small problems early. Many owners recover the $100 investment in a single visit—and enjoy worry-free road trips knowing every system has been reviewed.
+                  Regular check-ups help you avoid expensive surprises by catching small problems early. Many owners recover the $120 investment in a single visit—and enjoy worry-free road trips knowing every system has been reviewed.
                 </p>
                 <ul className="mt-8 space-y-4 text-sm sm:text-base leading-relaxed text-[#3f4756]">
                   {valueHighlights.map((item) => (
@@ -380,7 +380,7 @@ export default function RoutineCheckUpPage() {
                 </p>
                 <div className="mt-6 flex flex-wrap items-center gap-4">
                   <div className="rounded-2xl bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/80 ring-1 ring-white/20">
-                    Investment $100
+                    Investment $120
                   </div>
                   <div className="rounded-2xl bg-[#E54E3D] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white shadow-lg shadow-[#E54E3D]/40">
                     Report Ready in 6 Hours
@@ -437,7 +437,7 @@ export default function RoutineCheckUpPage() {
               <tbody>
                 {[{
                   name: 'Standard',
-                  price: '$150',
+                  price: '$180',
                   bestFor: 'Newer vehicles under 5 years, lower mileage',
                   duration: '45-60 min',
                   highlight: true,
@@ -454,7 +454,7 @@ export default function RoutineCheckUpPage() {
                   highlight: true,
                 }, {
                   name: 'Routine Check-Up',
-                  price: '$100',
+                  price: '$120',
                   bestFor: 'Current owners wanting maintenance assessment',
                   duration: '30-45 min',
                   highlight: true,

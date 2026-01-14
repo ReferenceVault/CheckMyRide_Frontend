@@ -41,7 +41,7 @@ const faqSections = [
       {
         question: 'How much do your inspections cost?',
         answer:
-          'Our inspection packages start at $150 for Standard, $200 for Enhanced, $300 for Full-Spectrum, and $100 for Routine Check-Up.',
+          'Our inspection packages start at $180 for Standard, $200 for Enhanced, $300 for Full-Spectrum, and $120 for Routine Check-Up.',
       },
       {
         question: 'What are the limitations of your inspections?',
