@@ -143,7 +143,7 @@ export default function StandardInspectionPage() {
               <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M8 17l4 4 4-4M12 3v18" />
               </svg>
-              Standard Inspection • $150
+              Standard Inspection • $180
             </span>
             <h1 className="mt-6 text-3xl sm:text-4xl lg:text-[2.9rem] font-bold leading-tight text-white">
               Foundational Coverage for Modern
@@ -321,7 +321,7 @@ export default function StandardInspectionPage() {
                 </p>
                 <div className="mt-6 flex flex-wrap items-center gap-4">
                   <div className="rounded-2xl bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/80 ring-1 ring-white/20">
-                    Investment $150
+                    Investment $180
                   </div>
                   <div className="rounded-2xl bg-[#E54E3D] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white shadow-lg shadow-[#E54E3D]/40">
                     Report Ready in 6 Hours
@@ -380,7 +380,7 @@ export default function StandardInspectionPage() {
               <tbody>
                 {[{
                   name: 'Standard',
-                  price: '$150',
+                  price: '$180',
                   bestFor: 'Newer vehicles under 5 years, lower mileage',
                   duration: '45-60 min',
                   highlight: true,
@@ -397,7 +397,7 @@ export default function StandardInspectionPage() {
                   highlight: true,
                 }, {
                   name: 'Routine Check-Up',
-                  price: '$100',
+                  price: '$120',
                   bestFor: 'Current owners wanting maintenance assessment',
                   duration: '30-45 min',
                 }].map((row) => (

@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 interface InspectionHeaderProps {
   bookingId: string;
   inspectionType: string;
@@ -52,16 +50,11 @@ export default function InspectionHeader({
   availableTypes = [],
 }: InspectionHeaderProps) {
   return (
-    <div className="bg-gradient-to-r from-orange-50 via-gray-50 to-orange-50 border-b border-orange-200 py-3 px-6">
+    <div className="bg-white border-b border-gray-200 py-3 px-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="inline-flex items-center hover:opacity-80 transition-opacity">
-          <div className="relative -ml-[18px] -mt-4 flex h-[72px] w-[72px] items-center justify-center sm:-ml-[18px] sm:-mt-4 sm:h-[92px] sm:w-[92px]">
-            <img src="/images/logofooter1.png" alt="CheckMyRide" className="h-full w-full object-contain" />
-          </div>
-          <span className="-ml-[25px] -mt-4 text-2xl font-bold tracking-tight text-[#152032]">
-            Check<span className="text-[#E54E3D]">MyRide</span>
-          </span>
-        </Link>
+        <div className="inline-flex items-center">
+          <img src="/images/reportlogo.JPG" alt="Report Logo" className="h-[72px] w-auto object-contain sm:h-[92px]" />
+        </div>
 
         <div className="flex-1 flex flex-col items-center justify-center">
           <h1 className="text-xl font-bold text-[#1f2a37]">

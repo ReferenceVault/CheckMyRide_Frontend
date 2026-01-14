@@ -16,6 +16,7 @@ import {
   SAFETY_EQUIPMENT_ITEMS,
   FUNCTIONAL_TESTS_ITEMS,
   INTERIOR_CONDITION_ITEMS,
+  STANDARD_DIAGNOSTIC_TESTING_ITEMS,
   ROAD_TEST_RESULTS_ITEMS,
 } from '../types';
 import { useInspectionForm } from '../hooks/useInspectionForm';
@@ -28,7 +29,6 @@ import RatingGuidelines from '../components/RatingGuidelines';
 import InspectionSection from '../components/InspectionSection';
 import SummarySection from '../components/SummarySection';
 import VehiclePhotos from '../components/VehiclePhotos';
-import Disclaimer from '../components/Disclaimer';
 import FormActions from '../components/FormActions';
 import ReportSubmittedMessage from '../components/ReportSubmittedMessage';
 
@@ -159,6 +159,15 @@ const SECTION_CONFIG = [
     ),
   },
   {
+    key: 'diagnosticTesting',
+    title: 'Diagnostic Testing',
+    icon: (
+      <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+      </svg>
+    ),
+  },
+  {
     key: 'drivingPerformance',
     title: 'Road Test Results',
     icon: (
@@ -197,6 +206,7 @@ export default function StandardInspectionPage() {
         safetyEquipment: SAFETY_EQUIPMENT_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         functionalTests: FUNCTIONAL_TESTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         interiorCondition: INTERIOR_CONDITION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        diagnosticTesting: STANDARD_DIAGNOSTIC_TESTING_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         drivingPerformance: ROAD_TEST_RESULTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         summary: {
           overallCondition: '',
@@ -238,6 +248,7 @@ export default function StandardInspectionPage() {
     safetyEquipment: false,
     functionalTests: false,
     interiorCondition: false,
+    diagnosticTesting: false,
     drivingPerformance: false,
     summary: false,
     vehiclePhotos: false,
@@ -369,8 +380,6 @@ export default function StandardInspectionPage() {
             onToggle={() => toggleSection('vehiclePhotos')}
             isReadOnly={reportStatus === 'complete' && !isAdmin}
           />
-
-          <Disclaimer />
 
           <FormActions
             onSaveDraft={handleSaveDraft}

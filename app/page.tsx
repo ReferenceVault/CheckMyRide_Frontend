@@ -585,12 +585,12 @@ export default function Home() {
   ];
 
   const checklistContent: Record<ChecklistType, { title: string; price: string; sections: ChecklistSection[] }> = {
-    standard: { title: 'Standard Inspection Checklist', price: '$150', sections: standardChecklistSections },
+    standard: { title: 'Standard Inspection Checklist', price: '$180', sections: standardChecklistSections },
     enhanced: { title: 'Enhanced Inspection Checklist', price: '$200', sections: enhancedChecklistSections },
     'full-spectrum': { title: 'Full-Spectrum Inspection Checklist', price: '$300', sections: fullSpectrumChecklistSections },
     routine: {
       title: 'Routine Check-Up Inspection Checklist',
-      price: '$100',
+      price: '$120',
       sections: [
         {
           title: 'Body & Glass',
@@ -1074,7 +1074,7 @@ export default function Home() {
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {[{
               name: 'Standard',
-              price: '$150',
+              price: '$180',
               bgColor: 'bg-white',
               textColor: 'text-[#0f172a]',
               priceColor: 'text-[#0f172a]',
@@ -1110,7 +1110,7 @@ export default function Home() {
             },
             {
               name: 'Routine Check-Up',
-              price: '$100',
+              price: '$120',
               bgColor: 'bg-white',
               textColor: 'text-[#0f172a]',
               priceColor: 'text-[#0f172a]',
@@ -1355,13 +1355,6 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:gap-8" style={{ minHeight: '170px' }}>
             {/* Left Section - Promotional Text */}
             <div className="relative bg-[#E54E3D] rounded-tl-[3rem] rounded-br-[3rem] px-4 lg:px-5 flex flex-col w-full lg:w-[70%]" style={{ minHeight: '170px' }}>
-              {/* Decorative Icon Background */}
-              <div className="absolute inset-0 opacity-10 flex items-center justify-center">
-                <svg className="w-44 h-44" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M50 10 L60 40 L90 40 L68 58 L78 88 L50 70 L22 88 L32 58 L10 40 L40 40 Z" stroke="white" strokeWidth="2" fill="none"/>
-                </svg>
-              </div>
-              
               <div className="relative z-10 flex-1 flex flex-col justify-center pt-[20px] pb-[20px]">
                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight mb-1">
                   Ready to Inspect Your<br className="hidden sm:block" />Next Ride?
