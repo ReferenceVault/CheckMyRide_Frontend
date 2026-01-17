@@ -545,6 +545,9 @@ function AppointmentBookingForm() {
                   <span className="font-semibold">E-transfer</span>
                 </label>
               </div>
+              <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-xs leading-relaxed font-bold text-[#475569] shadow-inner shadow-slate-200/40">
+                Payment is due upon completion of the inspection, unless otherwise arranged. Receipts are provided digitally via email.
+              </div>
             </div>
 
             <div className="space-y-6">
@@ -557,9 +560,6 @@ function AppointmentBookingForm() {
                   placeholder="Enter promo or referral code (if applicable)"
                 />
               </label>
-              <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-xs leading-relaxed text-[#475569] shadow-inner shadow-slate-200/40">
-                Payment is due upon completion of the inspection, unless otherwise arranged. Receipts are provided digitally via email.
-              </div>
             </div>
           </section>
 
@@ -575,7 +575,7 @@ function AppointmentBookingForm() {
               <input type="checkbox" name="termsAccepted" className="mt-1 h-4 w-4 rounded border-[#cbd5f5] text-[#E54E3D] focus:ring-[#E54E3D]" />
               <span>
                 I confirm that the information provided is accurate, and I agree to the{' '}
-                <Link href="/privacy-terms" className="font-semibold text-[#E54E3D] hover:text-[#d14130]">
+                <Link href="/privacy-terms" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#E54E3D] hover:text-[#d14130]">
                   Privacy Policy and Terms of Service
                 </Link>
                 .

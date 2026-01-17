@@ -16,7 +16,7 @@ import {
   ROUTINE_COMPUTER_DIAGNOSIS_ITEMS,
   ROUTINE_CONTROLS_ITEMS,
   ROUTINE_SAFETY_SYSTEMS_ITEMS,
-  ROUTINE_ROAD_TEST_RESULTS_ITEMS,
+  ROAD_TEST_RESULTS_ITEMS,
   ROUTINE_CUSTOMER_CONCERNS_ITEMS,
 } from '../types';
 import { useInspectionForm } from '../hooks/useInspectionForm';
@@ -158,8 +158,8 @@ const SECTION_CONFIG = [
     ),
   },
   {
-    key: 'roadTestResults',
-    title: 'Road Test Results',
+    key: 'drivingPerformance',
+    title: 'Driving Performance Checklist',
     icon: (
       <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -205,13 +205,10 @@ export default function RoutineInspectionPage() {
     computerDiagnosis: ROUTINE_COMPUTER_DIAGNOSIS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     controls: ROUTINE_CONTROLS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     safetySystems: ROUTINE_SAFETY_SYSTEMS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-    roadTestResults: ROUTINE_ROAD_TEST_RESULTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+    drivingPerformance: ROAD_TEST_RESULTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     customerConcerns: ROUTINE_CUSTOMER_CONCERNS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
     summary: {
-      overallCondition: '',
-      inspectionSummary: '',
-      recommendations: '',
-      recommendationNotes: '',
+      notesAndComments: '',
     },
     photos: Array(12).fill(''),
   };
@@ -247,7 +244,7 @@ export default function RoutineInspectionPage() {
     computerDiagnosis: false,
     controls: false,
     safetySystems: false,
-    roadTestResults: false,
+    drivingPerformance: false,
     customerConcerns: false,
     summary: false,
     vehiclePhotos: false,
