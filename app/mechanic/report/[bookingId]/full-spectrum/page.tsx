@@ -12,7 +12,7 @@ import {
   BATTERY_ALTERNATOR_ITEMS,
   FULL_SPECTRUM_FLUID_INSPECTION_ITEMS,
   FULL_SPECTRUM_BELTS_HOSES_ITEMS,
-  FULL_SPECTRUM_ROAD_TEST_RESULTS_ITEMS,
+  ROAD_TEST_RESULTS_ITEMS,
   FULL_SPECTRUM_DIAGNOSTIC_TESTING_ITEMS,
   FULL_SPECTRUM_DASHBOARD_CONTROLS_ITEMS,
   FULL_SPECTRUM_WINDOWS_MIRRORS_ITEMS,
@@ -128,8 +128,8 @@ const SECTION_CONFIG = [
     ),
   },
   {
-    key: 'roadTestResults',
-    title: 'Road Test Results',
+    key: 'drivingPerformance',
+    title: 'Driving Performance Checklist',
     icon: (
       <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -253,7 +253,7 @@ export default function FullSpectrumInspectionPage() {
         batteryAlternator: BATTERY_ALTERNATOR_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         fluidInspection: FULL_SPECTRUM_FLUID_INSPECTION_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         beltsHoses: FULL_SPECTRUM_BELTS_HOSES_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
-        roadTestResults: FULL_SPECTRUM_ROAD_TEST_RESULTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
+        drivingPerformance: ROAD_TEST_RESULTS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         diagnosticTesting: FULL_SPECTRUM_DIAGNOSTIC_TESTING_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         dashboardControls: FULL_SPECTRUM_DASHBOARD_CONTROLS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
         windowsMirrors: FULL_SPECTRUM_WINDOWS_MIRRORS_ITEMS.map(item => ({ item, rating: '' as const, notes: '' })),
@@ -276,10 +276,7 @@ export default function FullSpectrumInspectionPage() {
           estimatedSavingsDetails: '',
         },
         summary: {
-          overallCondition: '',
-          inspectionSummary: '',
-          recommendations: '',
-          recommendationNotes: '',
+          notesAndComments: '',
         },
         photos: Array(12).fill(''),
   };
@@ -311,7 +308,7 @@ export default function FullSpectrumInspectionPage() {
     batteryAlternator: false,
     fluidInspection: false,
     beltsHoses: false,
-    roadTestResults: false,
+    drivingPerformance: false,
     diagnosticTesting: false,
     dashboardControls: false,
     windowsMirrors: false,

@@ -35,10 +35,7 @@ interface GeneralInfo {
 }
 
 interface Summary {
-  overallCondition: string;
-  inspectionSummary: string;
-  recommendations: string;
-  recommendationNotes: string;
+  notesAndComments: string;
 }
 
 interface ValueAssessment {
@@ -322,12 +319,9 @@ export function useInspectionForm({
             } else if (err.includes('generalInfo.inspectionTime')) {
               if (!mappedFieldErrors.generalInfo) mappedFieldErrors.generalInfo = [];
               mappedFieldErrors.generalInfo.push('Inspection Time is required');
-            } else if (err.includes('summary.overallCondition')) {
+            } else if (err.includes('summary.notesAndComments') || err.includes('Notes & Comments') || err.includes('Notes and Comments')) {
               if (!mappedFieldErrors.summary) mappedFieldErrors.summary = [];
-              mappedFieldErrors.summary.push('Overall Vehicle Condition is required');
-            } else if (err.includes('summary.inspectionSummary')) {
-              if (!mappedFieldErrors.summary) mappedFieldErrors.summary = [];
-              mappedFieldErrors.summary.push('Inspection Summary is required');
+              mappedFieldErrors.summary.push('Notes & Comments is required');
             } else if (err.includes('valueAssessment.assessment')) {
               if (!mappedFieldErrors.valueAssessment) mappedFieldErrors.valueAssessment = [];
               mappedFieldErrors.valueAssessment.push('Value Assessment is required');
@@ -445,7 +439,7 @@ export function useInspectionForm({
           const sectionsToExpand: string[] = [];
           
           errorData.errors.forEach((err: string) => {
-            if (err.includes('Overall Vehicle Condition') || err.includes('Inspection Summary') || err.includes('Recommendations')) {
+            if (err.includes('Notes & Comments') || err.includes('Notes and Comments')) {
               if (!mappedErrors.summary) mappedErrors.summary = [];
               mappedErrors.summary.push(err);
               if (!sectionsToExpand.includes('summary')) sectionsToExpand.push('summary');

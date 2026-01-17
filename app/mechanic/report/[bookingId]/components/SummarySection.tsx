@@ -3,10 +3,7 @@ import toast from 'react-hot-toast';
 
 interface SummarySectionProps {
   summary: {
-    overallCondition: string;
-    inspectionSummary: string;
-    recommendations: string;
-    recommendationNotes: string;
+    notesAndComments: string;
   };
   isExpanded: boolean;
   onToggle: () => void;
@@ -34,7 +31,7 @@ export default function SummarySection({
           <svg className="w-5 h-5 text-[#E54E3D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          {showRecommendations ? 'Summary and Recommendations' : 'Summary'}
+          Notes & Comments
         </h2>
         <svg
           className={`w-5 h-5 text-[#E54E3D] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
@@ -60,107 +57,24 @@ export default function SummarySection({
           )}
           <div>
             <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>
-              Overall Vehicle Condition
-              {errors.some(e => e.includes('Overall Vehicle Condition')) && (
-                <span className="text-red-600 ml-1">*</span>
-              )}
-            </label>
-            <select
-              value={summary.overallCondition}
-              onChange={(e) => onSummaryChange('overallCondition', e.target.value)}
-              className={`w-full rounded-lg border-2 px-4 py-2 focus:outline-none ${
-                errors.some(e => e.includes('Overall Vehicle Condition'))
-                  ? 'border-red-500 focus:border-red-600'
-                  : 'border-[#e2e8f0] focus:border-[#E54E3D]'
-              }`}
-              style={{ fontSize: '14px' }}
-            >
-              <option value="">Select...</option>
-              {RATING_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>
-              Inspection Summary
-              {errors.some(e => e.includes('Inspection Summary')) && (
+              Notes & Comments
+              {errors.some(e => e.includes('Notes & Comments') || e.includes('Notes and Comments')) && (
                 <span className="text-red-600 ml-1">*</span>
               )}
             </label>
             <textarea
-              value={summary.inspectionSummary}
-              onChange={(e) => onSummaryChange('inspectionSummary', e.target.value)}
-              rows={6}
+              value={summary.notesAndComments}
+              onChange={(e) => onSummaryChange('notesAndComments', e.target.value)}
+              rows={8}
               className={`w-full rounded-lg border-2 px-4 py-2 focus:outline-none ${
-                errors.some(e => e.includes('Inspection Summary'))
+                errors.some(e => e.includes('Notes & Comments') || e.includes('Notes and Comments'))
                   ? 'border-red-500 focus:border-red-600'
                   : 'border-[#e2e8f0] focus:border-[#E54E3D]'
               }`}
-              placeholder="Provide a comprehensive summary of the vehicle's condition based on inspection findings..."
+              placeholder="Enter your notes and comments about the vehicle inspection..."
               style={{ fontSize: '14px' }}
             />
-            <button
-              type="button"
-              onClick={() => {
-                toast('AI summary generation will be implemented soon', {
-                  icon: 'ℹ️',
-                });
-              }}
-              className="mt-3 px-4 py-2 bg-[#E54E3D] text-white rounded-lg font-semibold hover:bg-[#d14130] transition-colors flex items-center gap-2"
-              style={{ fontSize: '14px' }}
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              Generate Summary from Inspection Data
-            </button>
           </div>
-
-          {showRecommendations && (
-            <>
-              <div>
-                <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>
-                  Recommendations
-                  {errors.some(e => e.includes('Recommendations')) && (
-                    <span className="text-red-600 ml-1">*</span>
-                  )}
-                </label>
-                <select
-                  value={summary.recommendations}
-                  onChange={(e) => onSummaryChange('recommendations', e.target.value)}
-                  className={`w-full rounded-lg border-2 px-4 py-2 focus:outline-none ${
-                    errors.some(e => e.includes('Recommendations'))
-                      ? 'border-red-500 focus:border-red-600'
-                      : 'border-[#e2e8f0] focus:border-[#E54E3D]'
-                  }`}
-                  style={{ fontSize: '14px' }}
-                >
-                  <option value="">Select...</option>
-                  <option value="purchase-recommended">Purchase Recommended</option>
-                  <option value="purchase-with-caution">Purchase with Caution</option>
-                  <option value="negotiate-price">Negotiate Price</option>
-                  <option value="major-repairs-needed">Major Repairs Needed</option>
-                  <option value="not-recommended">Not Recommended</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-[#64748b] mb-2" style={{ fontSize: '14px' }}>
-                  Additional notes or explanations for your recommendation
-                </label>
-                <textarea
-                  value={summary.recommendationNotes}
-                  onChange={(e) => onSummaryChange('recommendationNotes', e.target.value)}
-                  rows={4}
-                  className="w-full rounded-lg border-2 border-[#e2e8f0] px-4 py-2 focus:border-[#E54E3D] focus:outline-none"
-                  placeholder="Add additional notes..."
-                  style={{ fontSize: '14px' }}
-                />
-              </div>
-            </>
-          )}
         </div>
       )}
     </div>

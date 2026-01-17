@@ -24,42 +24,6 @@ export default function PriceNegotiationSection({
   onPriceNegotiationChange,
   errors = [],
 }: PriceNegotiationSectionProps) {
-  // Calculate estimated savings
-  const calculateEstimatedSavings = () => {
-    const original = parseFloat(priceNegotiation.originalAskingPrice) || 0;
-    const final = parseFloat(priceNegotiation.finalNegotiatedPrice) || 0;
-    if (original > 0 && final > 0) {
-      const savings = original - final;
-      return savings > 0 ? savings.toFixed(2) : '0.00';
-    }
-    return '';
-  };
-
-  // Update calculated fields when prices change
-  const handlePriceChange = (field: 'originalAskingPrice' | 'finalNegotiatedPrice', value: string) => {
-    onPriceNegotiationChange(field, value);
-    
-    // Calculate with updated value
-    const original = parseFloat(field === 'originalAskingPrice' ? value : priceNegotiation.originalAskingPrice) || 0;
-    const final = parseFloat(field === 'finalNegotiatedPrice' ? value : priceNegotiation.finalNegotiatedPrice) || 0;
-    
-    if (original > 0 && final > 0) {
-      const calculatedSavings = original - final;
-      onPriceNegotiationChange('estimatedSavingsAchieved', calculatedSavings > 0 ? calculatedSavings.toFixed(2) : '0.00');
-      onPriceNegotiationChange('estimatedSavingsDetails', `Automatically calculated: $${original.toFixed(2)} - $${final.toFixed(2)} = $${calculatedSavings > 0 ? calculatedSavings.toFixed(2) : '0.00'}`);
-    } else {
-      onPriceNegotiationChange('estimatedSavingsAchieved', '');
-      onPriceNegotiationChange('estimatedSavingsDetails', '');
-    }
-  };
-
-  // Calculate estimated savings from current values
-  const estimatedSavings = calculateEstimatedSavings();
-  const displayEstimatedSavings = estimatedSavings || priceNegotiation.estimatedSavingsAchieved || '';
-  const displayEstimatedSavingsDetails = estimatedSavings 
-    ? `Automatically calculated: $${(parseFloat(priceNegotiation.originalAskingPrice) || 0).toFixed(2)} - $${(parseFloat(priceNegotiation.finalNegotiatedPrice) || 0).toFixed(2)} = $${estimatedSavings}`
-    : (priceNegotiation.estimatedSavingsDetails || 'Automatically calculated based on the original asking price and the final negotiated price');
-
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
       <button
@@ -95,35 +59,6 @@ export default function PriceNegotiationSection({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#e2e8f0]">
-                {/* Price Reduction Requested */}
-                <tr className="bg-white">
-                  <td className="px-4 py-3 font-semibold text-[#1f2a37]" style={{ fontSize: '14px' }}>
-                    Price Reduction Requested
-                  </td>
-                  <td className="px-4 py-3">
-                    <select
-                      value={priceNegotiation.priceReductionRequested}
-                      onChange={(e) => onPriceNegotiationChange('priceReductionRequested', e.target.value)}
-                      className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 focus:border-[#E54E3D] focus:outline-none"
-                      style={{ fontSize: '14px' }}
-                    >
-                      <option value="">Select...</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                  </td>
-                  <td className="px-4 py-3">
-                    <textarea
-                      value={priceNegotiation.amountRequested}
-                      onChange={(e) => onPriceNegotiationChange('amountRequested', e.target.value)}
-                      rows={2}
-                      className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 focus:border-[#E54E3D] focus:outline-none"
-                      placeholder="Enter amount requested"
-                      style={{ fontSize: '14px' }}
-                    />
-                  </td>
-                </tr>
-
                 {/* Negotiation Outcome */}
                 <tr className="bg-[#f8fafc]">
                   <td className="px-4 py-3 font-semibold text-[#1f2a37]" style={{ fontSize: '14px' }}>
@@ -156,92 +91,33 @@ export default function PriceNegotiationSection({
                   </td>
                 </tr>
 
-                {/* Original Asking Price */}
-                <tr className="bg-white">
-                  <td className="px-4 py-3 font-semibold text-[#1f2a37]" style={{ fontSize: '14px' }}>
-                    Original Asking Price
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center">
-                      <span className="text-[#64748b] mr-2" style={{ fontSize: '14px' }}>$</span>
-                      <input
-                        type="number"
-                        value={priceNegotiation.originalAskingPrice}
-                        onChange={(e) => handlePriceChange('originalAskingPrice', e.target.value)}
-                        className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 focus:border-[#E54E3D] focus:outline-none"
-                        placeholder="Enter amount"
-                        style={{ fontSize: '14px' }}
-                        step="0.01"
-                        min="0"
-                      />
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <textarea
-                      value={priceNegotiation.originalAskingPriceNotes}
-                      onChange={(e) => onPriceNegotiationChange('originalAskingPriceNotes', e.target.value)}
-                      rows={2}
-                      className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 focus:border-[#E54E3D] focus:outline-none"
-                      placeholder="Enter notes"
-                      style={{ fontSize: '14px' }}
-                    />
-                  </td>
-                </tr>
-
-                {/* Final Negotiated Price */}
-                <tr className="bg-[#f8fafc]">
-                  <td className="px-4 py-3 font-semibold text-[#1f2a37]" style={{ fontSize: '14px' }}>
-                    Final Negotiated Price
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center">
-                      <span className="text-[#64748b] mr-2" style={{ fontSize: '14px' }}>$</span>
-                      <input
-                        type="number"
-                        value={priceNegotiation.finalNegotiatedPrice}
-                        onChange={(e) => handlePriceChange('finalNegotiatedPrice', e.target.value)}
-                        className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 focus:border-[#E54E3D] focus:outline-none"
-                        placeholder="Enter amount"
-                        style={{ fontSize: '14px' }}
-                        step="0.01"
-                        min="0"
-                      />
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <textarea
-                      value={priceNegotiation.savingsAmount}
-                      onChange={(e) => onPriceNegotiationChange('savingsAmount', e.target.value)}
-                      rows={2}
-                      className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 focus:border-[#E54E3D] focus:outline-none"
-                      placeholder="Enter savings amount"
-                      style={{ fontSize: '14px' }}
-                    />
-                  </td>
-                </tr>
-
                 {/* Estimated Savings Achieved */}
                 <tr className="bg-white">
                   <td className="px-4 py-3 font-semibold text-[#1f2a37]" style={{ fontSize: '14px' }}>
                     Estimated Savings Achieved
                   </td>
                   <td className="px-4 py-3">
-                    <input
-                      type="number"
-                      value={displayEstimatedSavings}
-                      readOnly
-                      className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 bg-gray-50 text-gray-600"
-                      placeholder="Calculated automatically"
-                      style={{ fontSize: '14px' }}
-                    />
+                    <div className="flex items-center">
+                      <span className="text-[#64748b] mr-2" style={{ fontSize: '14px' }}>$</span>
+                      <input
+                        type="number"
+                        value={priceNegotiation.estimatedSavingsAchieved}
+                        onChange={(e) => onPriceNegotiationChange('estimatedSavingsAchieved', e.target.value)}
+                        className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 focus:border-[#E54E3D] focus:outline-none"
+                        placeholder="Enter amount"
+                        style={{ fontSize: '14px' }}
+                        step="0.01"
+                        min="0"
+                      />
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <textarea
-                      value={displayEstimatedSavingsDetails}
-                      readOnly
+                      value={priceNegotiation.estimatedSavingsDetails}
+                      onChange={(e) => onPriceNegotiationChange('estimatedSavingsDetails', e.target.value)}
                       rows={2}
-                      className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 bg-gray-50 text-gray-600"
-                      placeholder="Automatically calculated based on the original asking price and the final negotiated price"
+                      className="w-full rounded-lg border-2 border-[#e2e8f0] px-3 py-2 focus:border-[#E54E3D] focus:outline-none"
+                      placeholder="Enter details"
                       style={{ fontSize: '14px' }}
                     />
                   </td>

@@ -50,9 +50,11 @@ interface ReportData {
   };
   bodyCondition?: BodyConditionItem[];
   summary: {
-    overallCondition: string;
-    inspectionSummary: string;
-    recommendations: string;
+    notesAndComments?: string;
+    // Legacy fields for backward compatibility (deprecated - calculated automatically)
+    overallCondition?: string;
+    inspectionSummary?: string;
+    recommendations?: string;
     recommendationNotes?: string;
   };
   detailedInspection?: InspectionCategory[];
@@ -151,6 +153,10 @@ const formatCategoryName = (categoryName: string): string => {
     'CUSTOMERCONCERNS': 'CUSTOMER CONCERNS',
     'SEATSUPHOLSTERY': 'SEATS UPHOLSTERY',
     'DIAGNOSTICTESTING': 'DIAGNOSTIC TESTING',
+    'BATTERYALTERNATOR': 'BATTERY ALTERNATOR',
+    'AUDIOENTERTAINMENT': 'AUDIO ENTERTAINMENT',
+    'EMISSIONSENVIRONMENTAL': 'EMISSIONS ENVIRONMENTAL',
+    'PRICENEGOTIATION': 'PRICE NEGOTIATION',
   };
   
   // Check if the category name (uppercase) is in our mapping
@@ -425,9 +431,11 @@ export default function InspectionReportViewPage() {
           },
           bodyCondition: bodyCondition.length > 0 ? bodyCondition : undefined,
           summary: {
-            overallCondition: apiReport.summary?.overallCondition || '',
-            inspectionSummary: apiReport.summary?.inspectionSummary || '',
-            recommendations: apiReport.summary?.recommendations || '',
+            notesAndComments: apiReport.summary?.notesAndComments || '',
+            // Legacy fields for backward compatibility
+            overallCondition: apiReport.summary?.overallCondition,
+            inspectionSummary: apiReport.summary?.inspectionSummary,
+            recommendations: apiReport.summary?.recommendations,
             recommendationNotes: apiReport.summary?.recommendationNotes,
           },
           detailedInspection: detailedInspection.length > 0 ? detailedInspection : undefined,
@@ -727,7 +735,7 @@ export default function InspectionReportViewPage() {
                     {report.vehicleInfo.vin && (
                       <p className="text-sm"><span className="text-[#64748b]">VIN:</span> <span className="font-bold text-[#1f2a37] font-mono">{report.vehicleInfo.vin}</span></p>
                     )}
-                    {report.vehicleInfo.mileage && (
+                    {(report.vehicleInfo.mileage !== undefined && report.vehicleInfo.mileage !== null) && (
                       <p className="text-sm"><span className="text-[#64748b]">Mileage:</span> <span className="font-bold text-[#1f2a37]">{report.vehicleInfo.mileage.toLocaleString()} km</span></p>
                     )}
                   </div>
@@ -739,11 +747,139 @@ export default function InspectionReportViewPage() {
           {/* Overall Assessment */}
           {report.summary && (() => {
             const categoryScores = calculateCategoryScores();
-            const overallConditionValue = report.summary.overallCondition || 'fair';
+            
+            // Calculate overall condition from all ratings
+            const calculateOverallCondition = (): 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical' => {
+              const allRatings: string[] = [];
+              
+              // Collect from bodyCondition
+              if (report.bodyCondition && report.bodyCondition.length > 0) {
+                report.bodyCondition.forEach((item) => {
+                  const rating = item.rating;
+                  if (rating === 'excellent' || rating === 'good' || rating === 'fair' || rating === 'needs-attention' || rating === 'critical') {
+                    allRatings.push(rating);
+                  }
+                });
+              }
+              
+              // Collect from detailedInspection
+              if (report.detailedInspection && report.detailedInspection.length > 0) {
+                report.detailedInspection.forEach((category) => {
+                  category.items.forEach((item) => {
+                    const condition = item.condition.toLowerCase();
+                    if (condition.includes('excellent')) allRatings.push('excellent');
+                    else if (condition.includes('good')) allRatings.push('good');
+                    else if (condition.includes('fair')) allRatings.push('fair');
+                    else if (condition.includes('attention') || condition.includes('needs')) allRatings.push('needs-attention');
+                    else if (condition.includes('critical')) allRatings.push('critical');
+                  });
+                });
+              }
+              
+              if (allRatings.length === 0) return 'fair';
+              
+              // Calculate average score
+              const scores = allRatings.map(ratingToScore);
+              const avgScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+              
+              // Determine overall condition based on average score and worst rating
+              const worstRating = getWorstRating(allRatings);
+              
+              if (worstRating === 'critical' || (avgScore < 30 && worstRating === 'needs-attention')) {
+                return 'critical';
+              }
+              if (worstRating === 'needs-attention' || avgScore < 45) {
+                return 'needs-attention';
+              }
+              if (avgScore >= 70 && worstRating !== 'needs-attention' && worstRating !== 'critical') {
+                if (avgScore >= 90 && worstRating === 'excellent' || worstRating === 'good') {
+                  return 'excellent';
+                }
+                return 'good';
+              }
+              return 'fair';
+            };
+            
+            // Calculate purchase recommendation from overall condition
+            const calculatePurchaseRecommendation = (condition: 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical'): string => {
+              switch (condition) {
+                case 'excellent':
+                  return 'purchase-recommended';
+                case 'good':
+                  return 'purchase-recommended';
+                case 'fair':
+                  return 'purchase-with-caution';
+                case 'needs-attention':
+                  return 'negotiate-price';
+                case 'critical':
+                  return 'not-recommended';
+                default:
+                  return 'purchase-with-caution';
+              }
+            };
+            
+            const overallConditionValue = calculateOverallCondition();
+            const purchaseRecommendation = calculatePurchaseRecommendation(overallConditionValue);
             const conditionAngle = overallConditionValue === 'excellent' ? 135 : 
                                   overallConditionValue === 'good' ? 90 : 
                                   overallConditionValue === 'fair' ? 45 : 
                                   overallConditionValue === 'needs-attention' ? 20 : 0;
+            
+            // Get unified color for all three elements (gauge needle, condition text, recommendation button)
+            const getConditionColor = (condition: string) => {
+              switch (condition) {
+                case 'excellent':
+                  return {
+                    gaugeStroke: '#10b981', // green-500
+                    textColor: 'text-green-600',
+                    bgColor: 'bg-green-100',
+                    textColorButton: 'text-green-800',
+                    borderColor: 'border-green-300',
+                  };
+                case 'good':
+                  return {
+                    gaugeStroke: '#3b82f6', // blue-500
+                    textColor: 'text-blue-600',
+                    bgColor: 'bg-blue-100',
+                    textColorButton: 'text-blue-800',
+                    borderColor: 'border-blue-300',
+                  };
+                case 'fair':
+                  return {
+                    gaugeStroke: '#eab308', // yellow-500
+                    textColor: 'text-yellow-600',
+                    bgColor: 'bg-yellow-100',
+                    textColorButton: 'text-yellow-800',
+                    borderColor: 'border-yellow-300',
+                  };
+                case 'needs-attention':
+                  return {
+                    gaugeStroke: '#f97316', // orange-500
+                    textColor: 'text-orange-600',
+                    bgColor: 'bg-orange-100',
+                    textColorButton: 'text-orange-800',
+                    borderColor: 'border-orange-300',
+                  };
+                case 'critical':
+                  return {
+                    gaugeStroke: '#ef4444', // red-500
+                    textColor: 'text-red-600',
+                    bgColor: 'bg-red-100',
+                    textColorButton: 'text-red-800',
+                    borderColor: 'border-red-300',
+                  };
+                default:
+                  return {
+                    gaugeStroke: '#eab308', // yellow-500
+                    textColor: 'text-yellow-600',
+                    bgColor: 'bg-yellow-100',
+                    textColorButton: 'text-yellow-800',
+                    borderColor: 'border-yellow-300',
+                  };
+              }
+            };
+            
+            const conditionColors = getConditionColor(overallConditionValue);
             
             // Get icon for rating
             const getRatingIcon = (rating: string) => {
@@ -764,16 +900,6 @@ export default function InspectionReportViewPage() {
               return 'bg-red-500';
             };
 
-            // Get recommendation badge color
-            const getRecommendationColor = (rec: string) => {
-              const r = rec.toLowerCase();
-              if (r.includes('recommended')) return 'bg-green-100 text-green-800 border-green-300';
-              if (r.includes('caution')) return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-              if (r.includes('negotiate')) return 'bg-orange-100 text-orange-800 border-orange-300';
-              if (r.includes('not-recommended') || r.includes('not recommended')) return 'bg-red-100 text-red-800 border-red-300';
-              return 'bg-gray-100 text-gray-800 border-gray-300';
-            };
-
             return (
               <div className="pt-6 px-[0.5px] print-section">
                 {/* Header Bar */}
@@ -786,19 +912,20 @@ export default function InspectionReportViewPage() {
                   {/* 4-Column Layout: 1 for Graph, 3 for Scorecard */}
                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 print:grid-cols-4">
                     {/* Column 1 - Gauge Component */}
-                    <div className="lg:col-span-1 print:col-span-1">
-                      <div className="flex flex-col items-center print:items-center">
-                        <svg width="200" height="120" viewBox="0 0 200 120" className="mb-4 print:w-full print:max-w-[180px] print:h-auto" style={{ maxWidth: '180px' }}>
+                    <div className="lg:col-span-1 print:col-span-1 pl-2 pr-10" style={{ overflow: 'visible', minWidth: 0 }}>
+                      <div className="flex flex-col items-center print:items-center w-full" style={{ overflow: 'visible' }}>
+                        <svg width="200" height="120" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid meet" className="mb-4 print:w-full print:max-w-[180px] print:h-auto" style={{ width: '100%', maxWidth: '200px', height: 'auto', overflow: 'visible', display: 'block' }}>
                           <defs>
                             <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                               <stop offset="0%" stopColor="#ef4444" />
-                              <stop offset="50%" stopColor="#eab308" />
-                              <stop offset="100%" stopColor="#3b82f6" />
+                              <stop offset="33%" stopColor="#f97316" />
+                              <stop offset="66%" stopColor="#eab308" />
+                              <stop offset="100%" stopColor="#eab308" />
                             </linearGradient>
                           </defs>
                           {/* Background Arc */}
                           <path
-                            d="M 20 100 A 80 80 0 0 1 180 100"
+                            d="M 25 100 A 75 75 0 0 1 175 100"
                             fill="none"
                             stroke="#e5e7eb"
                             strokeWidth="20"
@@ -806,7 +933,7 @@ export default function InspectionReportViewPage() {
                           />
                           {/* Colored Gradient Arc - Full arc visible */}
                           <path
-                            d="M 20 100 A 80 80 0 0 1 180 100"
+                            d="M 25 100 A 75 75 0 0 1 175 100"
                             fill="none"
                             stroke="url(#gaugeGradient)"
                             strokeWidth="20"
@@ -818,42 +945,32 @@ export default function InspectionReportViewPage() {
                             y1="100"
                             x2={100 + 70 * Math.cos((conditionAngle - 90) * Math.PI / 180)}
                             y2={100 + 70 * Math.sin((conditionAngle - 90) * Math.PI / 180)}
-                            stroke="#000"
+                            stroke={conditionColors.gaugeStroke}
                             strokeWidth="3"
                             strokeLinecap="round"
+                            style={{ overflow: 'visible' }}
                           />
                           {/* Center Circle */}
-                          <circle cx="100" cy="100" r="6" fill="#000" />
+                          <circle cx="100" cy="100" r="6" fill={conditionColors.gaugeStroke} style={{ overflow: 'visible' }} />
                         </svg>
                         
                         <div className="text-center">
                           <p className="text-xs text-gray-500 mb-1">Vehicle Condition</p>
-                          <p className={`text-xl font-bold ${
-                            overallConditionValue === 'excellent' ? 'text-green-600' :
-                            overallConditionValue === 'good' ? 'text-green-500' :
-                            overallConditionValue === 'fair' ? 'text-yellow-500' :
-                            overallConditionValue === 'needs-attention' ? 'text-orange-500' :
-                            'text-red-500'
-                          }`}>
+                          <p className={`text-xl font-bold ${conditionColors.textColor}`}>
                             {RATING_LABELS[overallConditionValue] || overallConditionValue}
                           </p>
                         </div>
                       </div>
 
                       {/* Purchase Recommendation */}
-                      {report.summary.recommendations && (
-                        <div className="mt-4">
-                          <div className="space-y-2">
-                            <p className="text-xs text-gray-500 text-center">Purchase Recommendation</p>
-                            <div className={`px-4 py-2 rounded-lg border-2 font-bold text-center text-sm ${getRecommendationColor(report.summary.recommendations)}`}>
-                              {formatRecommendation(report.summary.recommendations)}
-                            </div>
-                            {report.summary.recommendationNotes && (
-                              <p className="text-xs text-gray-500 mt-2 text-center">{report.summary.recommendationNotes}</p>
-                            )}
+                      <div className="mt-4">
+                        <div className="space-y-2">
+                          <p className="text-xs text-gray-500 text-center">Purchase Recommendation</p>
+                          <div className={`px-4 py-2 rounded-lg border-2 font-bold text-center text-sm ${conditionColors.bgColor} ${conditionColors.textColorButton} ${conditionColors.borderColor}`}>
+                            {formatRecommendation(purchaseRecommendation)}
                           </div>
                         </div>
-                      )}
+                      </div>
                     </div>
 
                     {/* Columns 2-4 - Scorecard */}
@@ -986,27 +1103,30 @@ export default function InspectionReportViewPage() {
                       <p className="text-xs text-gray-600">Critical Safety</p>
                     </div>
                     {/* Safety Attention */}
-                    <div className="bg-orange-100 p-2.5 rounded-lg border-2 border-orange-300 text-center flex flex-col justify-center items-center">
-                      <p className="text-[17px] font-bold text-orange-800">{safetyAttentionCount}</p>
+                    <div className="bg-orange-50 p-2.5 rounded-lg border-2 border-orange-200 text-center flex flex-col justify-center items-center">
+                      <p className="text-[17px] font-bold text-gray-900">{safetyAttentionCount}</p>
                       <p className="text-xs text-gray-600">Safety Attention</p>
                     </div>
                     {/* Other Concerns */}
-                    <div className="bg-orange-100 p-2.5 rounded-lg border-2 border-orange-300 text-center flex flex-col justify-center items-center">
-                      <p className="text-[17px] font-bold text-orange-800">{otherConcernsCount}</p>
+                    <div className="bg-green-100 p-2.5 rounded-lg border-2 border-green-300 text-center flex flex-col justify-center items-center">
+                      <p className="text-[17px] font-bold text-gray-900">{otherConcernsCount}</p>
                       <p className="text-xs text-gray-600">Other Concerns</p>
                     </div>
                   </div>
 
                   {/* Safety Issues Section */}
                   {safetyIssues.length > 0 && (
-                    <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3.5 rounded-r-lg mb-5">
-                      <h3 className="text-xs font-bold text-gray-800 mb-2.5 flex items-center gap-2">
-                        <span>▲</span> Safety Issues:
+                    <div className="bg-amber-100 border-l-4 border-amber-300 p-3.5 rounded-r-lg mb-5">
+                      <h3 className="text-xs font-bold text-gray-900 mb-2.5 flex items-center gap-2">
+                        <svg className="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        Safety Issues:
                       </h3>
                       <div className="space-y-1.5">
                         {safetyIssues.map((issue, index) => (
-                          <div key={index} className="text-xs text-gray-700">
-                            <span className="font-semibold">{issue.category}:</span> {issue.item}
+                          <div key={index} className="text-xs text-gray-900">
+                            <span className="font-bold">{issue.category}:</span> {issue.item}
                             {issue.notes && <span> — {issue.notes}</span>}
                           </div>
                         ))}
@@ -1084,7 +1204,7 @@ export default function InspectionReportViewPage() {
                   </div>
 
                   {/* Inspector's Notes & Comments */}
-                  {report.summary.inspectionSummary && (
+                  {report.summary.notesAndComments && (
                     <div className="bg-white border border-gray-200 p-4 rounded-lg">
                       <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
                         <span>►</span>
@@ -1093,7 +1213,7 @@ export default function InspectionReportViewPage() {
                         </svg>
                         Inspector&apos;s Notes & Comments
                       </h3>
-                      <p className="text-sm text-gray-700 leading-relaxed">{report.summary.inspectionSummary}</p>
+                      <p className="text-sm text-gray-700 leading-relaxed">{report.summary.notesAndComments}</p>
                     </div>
                   )}
                 </div>
@@ -1119,7 +1239,12 @@ export default function InspectionReportViewPage() {
                       <h3 className="text-xs font-bold text-[#1f2a37]">BODY CONDITION</h3>
                     </div>
                     <div className="overflow-x-auto">
-                      <table className="w-full">
+                      <table className="w-full table-fixed">
+                        <colgroup>
+                          <col className="w-[40%]" />
+                          <col className="w-[20%]" />
+                          <col className="w-[40%]" />
+                        </colgroup>
                         <thead>
                           <tr className="bg-orange-50">
                             <th className="px-4 py-3 text-left text-xs font-semibold text-orange-600">Component</th>
@@ -1149,7 +1274,12 @@ export default function InspectionReportViewPage() {
                       <h3 className="text-xs font-bold text-[#1f2a37]">{formatCategoryName(category.category)}</h3>
                     </div>
                     <div className="overflow-x-auto">
-                      <table className="w-full">
+                      <table className="w-full table-fixed">
+                        <colgroup>
+                          <col className="w-[40%]" />
+                          <col className="w-[20%]" />
+                          <col className="w-[40%]" />
+                        </colgroup>
                         <thead>
                           <tr className="bg-orange-50">
                             <th className="px-4 py-3 text-left text-xs font-semibold text-orange-600">Component</th>
@@ -1216,7 +1346,8 @@ export default function InspectionReportViewPage() {
             </div>
           )}
 
-          {/* How We Determine Purchase Recommendations */}
+          {/* How We Determine Purchase Recommendations - Hidden for Routine Checkup */}
+          {reportType !== 'routine' && (
           <div className="pt-0 px-[0.5px] print-section">
             <div className="border border-gray-200 bg-white">
               {/* Header Bar */}
@@ -1273,6 +1404,7 @@ export default function InspectionReportViewPage() {
             </div>
             </div>
           </div>
+          )}
 
           {/* Important Disclaimer */}
           <div className="pt-6 px-[0.5px] print-section">
