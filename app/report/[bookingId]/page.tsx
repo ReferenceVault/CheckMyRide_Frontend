@@ -540,11 +540,12 @@ export default function InspectionReportViewPage() {
 
   const formatRecommendation = (rec: string) => {
     const labels: { [key: string]: string } = {
-      'purchase-recommended': 'Purchase Recommended',
       'purchase-with-caution': 'Purchase with Caution',
-      'negotiate-price': 'Negotiate Price',
-      'major-repairs-needed': 'Major Repairs Needed',
+      'do-not-purchase': 'Do Not Purchase',
       'not-recommended': 'Not Recommended',
+      'recommended-with-minor-repairs': 'Recommended with Minor Repairs',
+      'recommended': 'Recommended',
+      'highly-recommended': 'Highly Recommended',
     };
     return labels[rec] || rec;
   };
@@ -560,6 +561,16 @@ export default function InspectionReportViewPage() {
     return labels[assessment] || assessment;
   };
 
+  const toRatingFromCondition = (condition: string): 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical' | null => {
+    const lower = condition.toLowerCase();
+    if (lower.includes('excellent')) return 'excellent';
+    if (lower.includes('good')) return 'good';
+    if (lower.includes('fair')) return 'fair';
+    if (lower.includes('attention') || lower.includes('needs')) return 'needs-attention';
+    if (lower.includes('critical')) return 'critical';
+    return null;
+  };
+
   // Helper function to convert rating to numeric score
   const ratingToScore = (rating: string): number => {
     const scoreMap: { [key: string]: number } = {
@@ -572,6 +583,38 @@ export default function InspectionReportViewPage() {
     return scoreMap[rating.toLowerCase()] || 0;
   };
 
+  const isSafetyCriticalItem = (category: string, item: string) => {
+    const text = `${category} ${item}`.toLowerCase();
+    const keywords = [
+      'brake',
+      'steering',
+      'airbag',
+      'air bag',
+      'seat belt',
+      'seatbelt',
+      'srs',
+      'safety equipment',
+    ];
+    return keywords.some((keyword) => text.includes(keyword));
+  };
+
+  const isSafetyRelatedItem = (category: string, item: string) => {
+    const text = `${category} ${item}`.toLowerCase();
+    const keywords = [
+      'light',
+      'headlight',
+      'taillight',
+      'signal',
+      'indicator',
+      'lamp',
+      'tire',
+      'tyre',
+      'wheel',
+      'rim',
+    ];
+    return keywords.some((keyword) => text.includes(keyword));
+  };
+
   // Helper function to get worst rating from an array of ratings
   const getWorstRating = (ratings: string[]): string => {
     const priority = ['critical', 'needs-attention', 'fair', 'good', 'excellent'];
@@ -581,6 +624,157 @@ export default function InspectionReportViewPage() {
       }
     }
     return 'fair';
+  };
+
+  const getConditionFromScore = (score: number): 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical' => {
+    if (score >= 85) return 'excellent';
+    if (score >= 70) return 'good';
+    if (score >= 45) return 'fair';
+    if (score >= 30) return 'needs-attention';
+    return 'critical';
+  };
+
+  const getRecommendationFromMetrics = (
+    overallScore: number,
+    safetyScore: number,
+    safetyCriticalIssueCount: number,
+    safetyAttentionCount: number,
+    safetyRelatedCriticalCount: number,
+    nonSafetyCriticalCount: number,
+    hasMinorIssues: boolean,
+    safetyMinorWear: boolean
+  ) => {
+    if (safetyCriticalIssueCount > 0 || safetyAttentionCount >= 3) {
+      return 'do-not-purchase';
+    }
+    if (safetyRelatedCriticalCount >= 2 || safetyScore < 30 || overallScore < 30) {
+      return 'not-recommended';
+    }
+    if (
+      safetyRelatedCriticalCount === 1 ||
+      safetyAttentionCount >= 2 ||
+      (overallScore >= 30 && overallScore <= 45) ||
+      (safetyScore >= 30 && safetyScore <= 45) ||
+      nonSafetyCriticalCount >= 2
+    ) {
+      return 'purchase-with-caution';
+    }
+    if (overallScore >= 85 && safetyScore >= 80) {
+      return 'highly-recommended';
+    }
+    if (overallScore >= 70 && safetyScore >= 70 && !hasMinorIssues && !safetyMinorWear) {
+      return 'recommended';
+    }
+    if (overallScore >= 70 && (hasMinorIssues || safetyMinorWear)) {
+      return 'recommended-with-minor-repairs';
+    }
+    if (overallScore >= 70 && safetyScore >= 70) {
+      return 'recommended';
+    }
+    return 'purchase-with-caution';
+  };
+
+  const getReportRatings = () => {
+    if (!report) return [];
+    const ratings: Array<{
+      category: string;
+      item: string;
+      rating: 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical';
+      notes?: string;
+      group: 'safety-critical' | 'safety-related' | 'non-safety';
+    }> = [];
+
+    if (report.bodyCondition && report.bodyCondition.length > 0) {
+      report.bodyCondition.forEach((item) => {
+        const rating = item.rating;
+        if (rating && rating !== 'n/a' && rating !== '') {
+          const categoryName = 'Body Condition';
+          const group = isSafetyCriticalItem(categoryName, item.item)
+            ? 'safety-critical'
+            : isSafetyRelatedItem(categoryName, item.item)
+              ? 'safety-related'
+              : 'non-safety';
+          ratings.push({
+            category: categoryName,
+            item: item.item,
+            rating: rating as 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical',
+            notes: item.notes,
+            group,
+          });
+        }
+      });
+    }
+
+    if (report.detailedInspection && report.detailedInspection.length > 0) {
+      report.detailedInspection.forEach((category) => {
+        const categoryName = formatCategoryName(category.category);
+        category.items.forEach((item) => {
+          const rating = toRatingFromCondition(item.condition);
+          if (rating) {
+            const group = isSafetyCriticalItem(categoryName, item.component)
+              ? 'safety-critical'
+              : isSafetyRelatedItem(categoryName, item.component)
+                ? 'safety-related'
+                : 'non-safety';
+            ratings.push({
+              category: categoryName,
+              item: item.component,
+              rating,
+              notes: item.notes,
+              group,
+            });
+          }
+        });
+      });
+    }
+
+    return ratings;
+  };
+
+  const getReportMetrics = () => {
+    const ratings = getReportRatings();
+    const totalInspected = ratings.length;
+    const overallScore = totalInspected > 0
+      ? ratings.reduce((sum, r) => sum + ratingToScore(r.rating), 0) / totalInspected
+      : 0;
+    const safetyRatings = ratings.filter((r) => r.group !== 'non-safety');
+    const safetyScore = safetyRatings.length > 0
+      ? safetyRatings.reduce((sum, r) => sum + ratingToScore(r.rating), 0) / safetyRatings.length
+      : 0;
+
+    const safetyCriticalIssueCount = ratings.filter(
+      (r) => r.group === 'safety-critical' && r.rating === 'critical'
+    ).length;
+    const safetyRelatedCriticalCount = ratings.filter(
+      (r) => r.group === 'safety-related' && r.rating === 'critical'
+    ).length;
+    const safetyAttentionCount = ratings.filter(
+      (r) => r.group !== 'non-safety' && r.rating === 'needs-attention'
+    ).length;
+    const nonSafetyCriticalCount = ratings.filter(
+      (r) => r.group === 'non-safety' && r.rating === 'critical'
+    ).length;
+    const hasMinorIssues = ratings.some(
+      (r) => r.rating === 'fair' || r.rating === 'needs-attention'
+    );
+    const safetyMinorWear = ratings.some(
+      (r) =>
+        r.group !== 'non-safety' &&
+        (r.rating === 'fair' || r.rating === 'needs-attention')
+    );
+
+    return {
+      ratings,
+      totalInspected,
+      overallScore,
+      safetyScore,
+      safetyCriticalIssueCount,
+      safetyRelatedCriticalCount,
+      safetyAttentionCount,
+      nonSafetyCriticalCount,
+      hasMinorIssues,
+      safetyMinorWear,
+    };
   };
 
   // Calculate category scores from report data
@@ -748,82 +942,29 @@ export default function InspectionReportViewPage() {
           {report.summary && (() => {
             const categoryScores = calculateCategoryScores();
             
-            // Calculate overall condition from all ratings
-            const calculateOverallCondition = (): 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical' => {
-              const allRatings: string[] = [];
-              
-              // Collect from bodyCondition
-              if (report.bodyCondition && report.bodyCondition.length > 0) {
-                report.bodyCondition.forEach((item) => {
-                  const rating = item.rating;
-                  if (rating === 'excellent' || rating === 'good' || rating === 'fair' || rating === 'needs-attention' || rating === 'critical') {
-                    allRatings.push(rating);
-                  }
-                });
-              }
-              
-              // Collect from detailedInspection
-              if (report.detailedInspection && report.detailedInspection.length > 0) {
-                report.detailedInspection.forEach((category) => {
-                  category.items.forEach((item) => {
-                    const condition = item.condition.toLowerCase();
-                    if (condition.includes('excellent')) allRatings.push('excellent');
-                    else if (condition.includes('good')) allRatings.push('good');
-                    else if (condition.includes('fair')) allRatings.push('fair');
-                    else if (condition.includes('attention') || condition.includes('needs')) allRatings.push('needs-attention');
-                    else if (condition.includes('critical')) allRatings.push('critical');
-                  });
-                });
-              }
-              
-              if (allRatings.length === 0) return 'fair';
-              
-              // Calculate average score
-              const scores = allRatings.map(ratingToScore);
-              const avgScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
-              
-              // Determine overall condition based on average score and worst rating
-              const worstRating = getWorstRating(allRatings);
-              
-              if (worstRating === 'critical' || (avgScore < 30 && worstRating === 'needs-attention')) {
-                return 'critical';
-              }
-              if (worstRating === 'needs-attention' || avgScore < 45) {
-                return 'needs-attention';
-              }
-              if (avgScore >= 70 && worstRating !== 'needs-attention' && worstRating !== 'critical') {
-                if (avgScore >= 90 && worstRating === 'excellent' || worstRating === 'good') {
-                  return 'excellent';
-                }
-                return 'good';
-              }
-              return 'fair';
-            };
-            
-            // Calculate purchase recommendation from overall condition
-            const calculatePurchaseRecommendation = (condition: 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical'): string => {
-              switch (condition) {
-                case 'excellent':
-                  return 'purchase-recommended';
-                case 'good':
-                  return 'purchase-recommended';
-                case 'fair':
-                  return 'purchase-with-caution';
-                case 'needs-attention':
-                  return 'negotiate-price';
-                case 'critical':
-                  return 'not-recommended';
-                default:
-                  return 'purchase-with-caution';
-              }
-            };
-            
-            const overallConditionValue = calculateOverallCondition();
-            const purchaseRecommendation = calculatePurchaseRecommendation(overallConditionValue);
-            const conditionAngle = overallConditionValue === 'excellent' ? 135 : 
-                                  overallConditionValue === 'good' ? 90 : 
-                                  overallConditionValue === 'fair' ? 45 : 
-                                  overallConditionValue === 'needs-attention' ? 20 : 0;
+            const {
+              overallScore,
+              safetyScore,
+              safetyCriticalIssueCount,
+              safetyRelatedCriticalCount,
+              safetyAttentionCount,
+              nonSafetyCriticalCount,
+              hasMinorIssues,
+              safetyMinorWear,
+            } = getReportMetrics();
+
+            const overallConditionValue = getConditionFromScore(overallScore);
+            const purchaseRecommendation = getRecommendationFromMetrics(
+              overallScore,
+              safetyScore,
+              safetyCriticalIssueCount,
+              safetyAttentionCount,
+              safetyRelatedCriticalCount,
+              nonSafetyCriticalCount,
+              hasMinorIssues,
+              safetyMinorWear
+            );
+            let conditionAngle = 0;
             
             // Get unified color for all three elements (gauge needle, condition text, recommendation button)
             const getConditionColor = (condition: string) => {
@@ -880,6 +1021,43 @@ export default function InspectionReportViewPage() {
             };
             
             const conditionColors = getConditionColor(overallConditionValue);
+
+            const recommendationSteps = [
+              { id: 'do-not-purchase', color: '#ef4444' },
+              { id: 'not-recommended', color: '#f97316' },
+              { id: 'purchase-with-caution', color: '#eab308' },
+              { id: 'recommended-with-minor-repairs', color: '#86efac' },
+              { id: 'recommended', color: '#22c55e' },
+              { id: 'highly-recommended', color: '#16a34a' },
+            ];
+
+            const activeRecommendationIndex = Math.max(
+              recommendationSteps.findIndex((step) => step.id === purchaseRecommendation),
+              0
+            );
+
+            const gaugeCenterX = 100;
+            const gaugeCenterY = 100;
+            const gaugeRadius = 75;
+            const gaugeStartAngle = 180;
+            const gaugeEndAngle = 360;
+            const segmentAngle = (gaugeEndAngle - gaugeStartAngle) / recommendationSteps.length;
+            const activeSegmentColor = recommendationSteps[activeRecommendationIndex]?.color || conditionColors.gaugeStroke;
+            conditionAngle = gaugeStartAngle + (activeRecommendationIndex + 0.5) * segmentAngle;
+
+            const polarToCartesian = (cx: number, cy: number, radius: number, angle: number) => {
+              const rad = angle * Math.PI / 180;
+              return {
+                x: cx + radius * Math.cos(rad),
+                y: cy + radius * Math.sin(rad),
+              };
+            };
+
+            const describeArc = (cx: number, cy: number, radius: number, startAngle: number, endAngle: number) => {
+              const start = polarToCartesian(cx, cy, radius, startAngle);
+              const end = polarToCartesian(cx, cy, radius, endAngle);
+              return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 1 ${end.x} ${end.y}`;
+            };
             
             // Get icon for rating
             const getRatingIcon = (rating: string) => {
@@ -915,43 +1093,34 @@ export default function InspectionReportViewPage() {
                     <div className="lg:col-span-1 print:col-span-1 pl-2 pr-10" style={{ overflow: 'visible', minWidth: 0 }}>
                       <div className="flex flex-col items-center print:items-center w-full" style={{ overflow: 'visible' }}>
                         <svg width="200" height="120" viewBox="0 0 200 120" preserveAspectRatio="xMidYMid meet" className="mb-4 print:w-full print:max-w-[180px] print:h-auto" style={{ width: '100%', maxWidth: '200px', height: 'auto', overflow: 'visible', display: 'block' }}>
-                          <defs>
-                            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                              <stop offset="0%" stopColor="#ef4444" />
-                              <stop offset="33%" stopColor="#f97316" />
-                              <stop offset="66%" stopColor="#eab308" />
-                              <stop offset="100%" stopColor="#eab308" />
-                            </linearGradient>
-                          </defs>
-                          {/* Background Arc */}
-                          <path
-                            d="M 25 100 A 75 75 0 0 1 175 100"
-                            fill="none"
-                            stroke="#e5e7eb"
-                            strokeWidth="20"
-                            strokeLinecap="round"
-                          />
-                          {/* Colored Gradient Arc - Full arc visible */}
-                          <path
-                            d="M 25 100 A 75 75 0 0 1 175 100"
-                            fill="none"
-                            stroke="url(#gaugeGradient)"
-                            strokeWidth="20"
-                            strokeLinecap="round"
-                          />
+                          {recommendationSteps.map((step, index) => {
+                            const start = gaugeStartAngle + (index * segmentAngle);
+                            const end = gaugeStartAngle + ((index + 1) * segmentAngle);
+                            const strokeColor = index <= activeRecommendationIndex ? step.color : '#e5e7eb';
+                            return (
+                              <path
+                                key={step.id}
+                                d={describeArc(gaugeCenterX, gaugeCenterY, gaugeRadius, start, end)}
+                                fill="none"
+                                stroke={strokeColor}
+                                strokeWidth="20"
+                                strokeLinecap="round"
+                              />
+                            );
+                          })}
                           {/* Needle */}
                           <line
                             x1="100"
                             y1="100"
-                            x2={100 + 70 * Math.cos((conditionAngle - 90) * Math.PI / 180)}
-                            y2={100 + 70 * Math.sin((conditionAngle - 90) * Math.PI / 180)}
-                            stroke={conditionColors.gaugeStroke}
+                            x2={100 + 70 * Math.cos((conditionAngle) * Math.PI / 180)}
+                            y2={100 + 70 * Math.sin((conditionAngle) * Math.PI / 180)}
+                            stroke={activeSegmentColor}
                             strokeWidth="3"
                             strokeLinecap="round"
                             style={{ overflow: 'visible' }}
                           />
                           {/* Center Circle */}
-                          <circle cx="100" cy="100" r="6" fill={conditionColors.gaugeStroke} style={{ overflow: 'visible' }} />
+                          <circle cx="100" cy="100" r="6" fill={activeSegmentColor} style={{ overflow: 'visible' }} />
                         </svg>
                         
                         <div className="text-center">
@@ -1006,76 +1175,30 @@ export default function InspectionReportViewPage() {
 
           {/* Safety Assessment */}
           {report.summary && (() => {
-            // Calculate all ratings from the report
-            const allRatings: Array<{ category: string; item: string; rating: string; notes?: string }> = [];
+            const {
+              ratings,
+              totalInspected,
+              safetyScore,
+            } = getReportMetrics();
 
-            // Collect from bodyCondition
-            if (report.bodyCondition && report.bodyCondition.length > 0) {
-              report.bodyCondition.forEach((item) => {
-                const rating = item.rating;
-                const validRatings: Array<'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical'> = 
-                  ['excellent', 'good', 'fair', 'needs-attention', 'critical'];
-                if (rating && validRatings.includes(rating as any)) {
-                  allRatings.push({
-                    category: 'Body Condition',
-                    item: item.item,
-                    rating: rating as 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical',
-                    notes: item.notes,
-                  });
-                }
-              });
-            }
+            const excellentCount = ratings.filter(r => r.rating === 'excellent').length;
+            const goodCount = ratings.filter(r => r.rating === 'good').length;
+            const fairCount = ratings.filter(r => r.rating === 'fair').length;
+            const attentionCount = ratings.filter(r => r.rating === 'needs-attention').length;
+            const criticalCount = ratings.filter(r => r.rating === 'critical').length;
 
-            // Collect from detailedInspection
-            if (report.detailedInspection && report.detailedInspection.length > 0) {
-              report.detailedInspection.forEach((category) => {
-                category.items.forEach((item) => {
-                  // Convert condition text back to rating
-                  const condition = item.condition.toLowerCase();
-                  let rating: string | null = null;
-                  if (condition.includes('excellent')) rating = 'excellent';
-                  else if (condition.includes('good')) rating = 'good';
-                  else if (condition.includes('fair')) rating = 'fair';
-                  else if (condition.includes('attention') || condition.includes('needs')) rating = 'needs-attention';
-                  else if (condition.includes('critical')) rating = 'critical';
-                  
-                  if (rating) {
-                    allRatings.push({
-                      category: formatCategoryName(category.category),
-                      item: item.component,
-                      rating: rating,
-                      notes: item.notes,
-                    });
-                  }
-                });
-              });
-            }
-
-            // Calculate metrics
-            const totalInspected = allRatings.length;
-            const excellentCount = allRatings.filter(r => r.rating === 'excellent').length;
-            const goodCount = allRatings.filter(r => r.rating === 'good').length;
-            const fairCount = allRatings.filter(r => r.rating === 'fair').length;
-            const attentionCount = allRatings.filter(r => r.rating === 'needs-attention').length;
-            const criticalCount = allRatings.filter(r => r.rating === 'critical').length;
-
-            // Calculate safety score (average of all ratings)
-            const safetyScore = totalInspected > 0
-              ? (allRatings.reduce((sum, r) => sum + ratingToScore(r.rating), 0) / totalInspected).toFixed(1)
-              : '0';
-
-            // Get safety issues (items with needs-attention or critical)
-            const safetyIssues = allRatings.filter(r => 
-              r.rating === 'needs-attention' || r.rating === 'critical'
+            const safetyIssues = ratings.filter(r =>
+              r.group !== 'non-safety' && (r.rating === 'needs-attention' || r.rating === 'critical')
             );
 
-            // Critical Safety count (critical only)
-            const criticalSafetyCount = criticalCount;
+            const criticalSafetyCount = ratings.filter(
+              (r) => r.group !== 'non-safety' && r.rating === 'critical'
+            ).length;
 
-            // Safety Attention count (needs-attention only)
-            const safetyAttentionCount = attentionCount;
+            const safetyAttentionCount = ratings.filter(
+              (r) => r.group !== 'non-safety' && r.rating === 'needs-attention'
+            ).length;
 
-            // Other Concerns (fair ratings)
             const otherConcernsCount = fairCount;
 
             return (
@@ -1094,7 +1217,7 @@ export default function InspectionReportViewPage() {
                   <div className="grid grid-cols-4 gap-3.5 mb-5">
                     {/* Safety Score */}
                     <div className="bg-gray-100 p-2.5 rounded-lg text-center flex flex-col justify-center items-center">
-                      <p className="text-[17px] font-bold text-gray-800">{safetyScore}</p>
+                      <p className="text-[17px] font-bold text-gray-800">{safetyScore.toFixed(1)}</p>
                       <p className="text-xs text-gray-500">Safety Score</p>
                     </div>
                     {/* Critical Safety */}
@@ -1363,7 +1486,7 @@ export default function InspectionReportViewPage() {
               <div className="bg-white px-[0.5px] pt-2 pb-6">
               <div className="px-6">
                 <p className="text-[12.6px] text-gray-700 mb-6">
-                  Our recommendations prioritize your safety. Safety-critical systems (brakes, steering, seat belts, airbags) and safety-related systems (lights, tires) are weighted more heavily than cosmetic or convenience items.
+                  Our recommendations prioritize your safety while being realistic about cosmetic and minor issues. Safety-critical systems (brakes, steering, seat belts, airbags) are weighted most heavily. Non-safety issues like paint or interior condition affect the overall score but won't alone prevent a purchase recommendation.
                 </p>
 
                 <div className="bg-white border border-gray-200 rounded-t-lg overflow-hidden">
@@ -1378,23 +1501,27 @@ export default function InspectionReportViewPage() {
                       <tbody>
                       <tr className="bg-red-50">
                         <td className="px-4 py-3 text-xs font-semibold text-gray-800 border-b border-gray-200">Do Not Purchase</td>
-                        <td className="px-4 py-3 text-xs text-gray-700 border-b border-gray-200">Any critical safety issue, or 2+ safety items needing attention</td>
+                        <td className="px-4 py-3 text-xs text-gray-700 border-b border-gray-200">Critical issue in safety-critical system (brakes, steering, airbags), OR 3+ safety systems need attention</td>
                       </tr>
-                      <tr className="bg-orange-50">
+                      <tr className="bg-red-100">
                         <td className="px-4 py-3 text-xs font-semibold text-gray-800 border-b border-gray-200">Not Recommended</td>
-                        <td className="px-4 py-3 text-xs text-gray-700 border-b border-gray-200">Overall score below 45, or safety systems below threshold</td>
+                        <td className="px-4 py-3 text-xs text-gray-700 border-b border-gray-200">Multiple critical issues in lights/tires, OR safety score below 30, OR overall score below 30</td>
                       </tr>
                       <tr className="bg-yellow-50">
                         <td className="px-4 py-3 text-xs font-semibold text-gray-800 border-b border-gray-200">Purchase with Caution</td>
-                        <td className="px-4 py-3 text-xs text-gray-700 border-b border-gray-200">1 safety item needs attention, OR fair overall (45-69), OR safety showing wear, OR multiple non-safety items need attention</td>
+                        <td className="px-4 py-3 text-xs text-gray-700 border-b border-gray-200">Single critical in lights/tires, OR 2+ safety attention items, OR overall/safety score 30-45, OR multiple non-safety critical issues</td>
                       </tr>
                       <tr className="bg-green-50">
-                        <td className="px-4 py-3 text-xs font-semibold text-gray-800 border-b border-gray-200">Recommended</td>
-                        <td className="px-4 py-3 text-xs text-gray-700 border-b border-gray-200">Good overall (70+) with good safety score (70+), minimal issues</td>
+                        <td className="px-4 py-3 text-xs font-semibold text-gray-800 border-b border-gray-200">Recommended with Minor Repairs</td>
+                        <td className="px-4 py-3 text-xs text-gray-700 border-b border-gray-200">Good overall (70+) with minor issues to address, OR good overall with safety showing minor wear</td>
                       </tr>
                       <tr className="bg-green-100">
+                        <td className="px-4 py-3 text-xs font-semibold text-gray-800 border-b border-gray-200">Recommended</td>
+                        <td className="px-4 py-3 text-xs text-gray-700 border-b border-gray-200">Good overall (70+) with good safety (70+), minimal issues</td>
+                      </tr>
+                      <tr className="bg-green-200">
                         <td className="px-4 py-3 text-xs font-semibold text-gray-800">Highly Recommended</td>
-                        <td className="px-4 py-3 text-xs text-gray-700">Excellent overall (90+) with strong safety (70+)</td>
+                        <td className="px-4 py-3 text-xs text-gray-700">Excellent overall (85+) with strong safety (80+)</td>
                       </tr>
                     </tbody>
                   </table>
@@ -1412,7 +1539,7 @@ export default function InspectionReportViewPage() {
               <h3 className="text-sm font-bold text-[#E54E3D] mb-4">Important Disclaimer</h3>
               <div className="text-[#1f2a37] space-y-3" style={{ fontSize: '11px' }}>
                 <p>
-                  This inspection report is provided for informational purposes only and represents the vehicle&apos;s condition at the time of inspection. CheckMyRide does not guarantee future reliability, cannot detect all potential issues, and recommends buyers conduct their own due diligence. This is a visual and functional inspection; we do not disassemble components.
+                  This inspection report is provided for informational purposes only and represents the vehicle&apos;s condition at the time of inspection. CheckMyRide does not guarantee future reliability, cannot detect all potential issues, and recommends buyers conduct their own due diligence. This is a visual and functional inspection; we do not disassemble components. Purchase recommendations are advisory only and do not constitute a guarantee of vehicle quality or safety. Buyers should factor in their own risk tolerance, intended use, and budget for potential repairs when making purchase decisions.
                 </p>
               </div>
             </div>
