@@ -687,7 +687,7 @@ export default function InspectionReportViewPage() {
     if (report.bodyCondition && report.bodyCondition.length > 0) {
       report.bodyCondition.forEach((item) => {
         const rating = item.rating;
-        if (rating && rating !== 'n/a' && rating !== '') {
+        if (rating === 'excellent' || rating === 'good' || rating === 'fair' || rating === 'needs-attention' || rating === 'critical') {
           const categoryName = 'Body Condition';
           const group = isSafetyCriticalItem(categoryName, item.item)
             ? 'safety-critical'
@@ -697,7 +697,7 @@ export default function InspectionReportViewPage() {
           ratings.push({
             category: categoryName,
             item: item.item,
-            rating: rating as 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical',
+            rating: rating,
             notes: item.notes,
             group,
           });
@@ -787,7 +787,7 @@ export default function InspectionReportViewPage() {
       const ratings = report.bodyCondition
         .map(item => item.rating)
         .filter((rating): rating is 'excellent' | 'good' | 'fair' | 'needs-attention' | 'critical' => 
-          Boolean(rating) && rating !== 'n/a' && rating !== ''
+          rating === 'excellent' || rating === 'good' || rating === 'fair' || rating === 'needs-attention' || rating === 'critical'
         );
       if (ratings.length > 0) {
         const scores = ratings.map(ratingToScore);
