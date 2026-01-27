@@ -220,7 +220,7 @@ export default function StandardInspectionPage() {
                   You&apos;ll know whether the vehicle is road-ready, which repairs to budget, and how to negotiate with confidence—backed by annotated photos, technician notes, and prioritized recommendations.
                 </p>
                 <p className="mt-8 text-xs font-semibold uppercase tracking-[0.35em] text-[#2f3f63]">
-                  Rapid turnaround with digital report in six hours or less.
+                  Your report within 60 minutes—decisions made easy
                 </p>
               </div>
             </div>
@@ -324,7 +324,7 @@ export default function StandardInspectionPage() {
                     Investment $180
                   </div>
                   <div className="rounded-2xl bg-[#E54E3D] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white shadow-lg shadow-[#E54E3D]/40">
-                    Report Ready in 6 Hours
+                    ACCESS THE REPORT WITHIN 60-MINUTES
                   </div>
                 </div>
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">

@@ -809,7 +809,8 @@ export default function Home() {
                   </svg>
                 </span>
               </Link>
-              <button 
+              <Link
+                href="/#pricing"
                 className="hidden sm:inline-flex items-center justify-center font-semibold"
                 style={{
                   width: '195px',
@@ -820,7 +821,7 @@ export default function Home() {
                 }}
               >
                 Learn More
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -989,6 +990,11 @@ export default function Home() {
         id="how-it-works"
         className="relative overflow-hidden bg-[linear-gradient(180deg,#162F45_0%,#1C3A54_45%,#213F5D_75%,#0B1F31_100%)] px-[10%] pt-[40px] pb-[53px] text-white sm:pt-[40px] sm:pb-[53px]"
       >
+        <div
+          className="pointer-events-none absolute inset-0 bg-center bg-cover opacity-35"
+          style={{ backgroundImage: "url('/images/Howitworks.png')" }}
+          aria-hidden="true"
+        />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(23,50,76,0.35),transparent_65%),radial-gradient(circle_at_bottom_right,rgba(14,33,52,0.4),transparent_70%)]" />
         <div className="pointer-events-none absolute -left-56 top-[-6rem] hidden h-[640px] w-[360px] lg:block">
           <div className="hero-wave" />
@@ -999,37 +1005,41 @@ export default function Home() {
         <div className="mx-auto max-w-6xl relative">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] font-bold leading-tight text-white">
-                How <span className="text-[#E54E3D]">It Works</span> 
-              </h2>
+              How <span className="text-[#E54E3D]">It Works</span>
+            </h2>
             <p className="mt-4 text-lg sm:text-xl leading-relaxed text-white/80 max-w-2xl mx-auto">
               Our inspection process is designed for speed, convenience, and confidence. Here's what to expect when you book with CheckMyRide.
-              </p>
-            </div>
+            </p>
+          </div>
 
           <ol className="mt-12 grid gap-6 sm:gap-8 md:grid-cols-2 xl:grid-cols-4">
             <Step
               index={1}
-              icon={<CalendarCheck className="h-6 w-6" />}
+              icon={<CalendarCheck className="h-8 w-8" />}
               title="Book Online"
               text="Schedule your inspection in minutes through our easy booking system. Input your preferred inspection location or choose a CheckMyRide location."
+              isLast={false}
             />
             <Step
               index={2}
-              icon={<MapPin className="h-6 w-6" />}
+              icon={<MapPin className="h-8 w-8" />}
               title="Coordination"
               text="We coordinate with you or the seller to confirm location and time, managing any proposed changes quickly and efficiently."
+              isLast={false}
             />
             <Step
               index={3}
-              icon={<Wrench className="h-6 w-6" />}
+              icon={<Wrench className="h-8 w-8" />}
               title="Inspection"
               text="Our certified mechanic conducts a full inspection of the vehicle. Ensure the vehicle is accessible and ready at the scheduled time and place."
+              isLast={false}
             />
             <Step
               index={4}
-              icon={<FileText className="h-6 w-6" />}
+              icon={<FileText className="h-8 w-8" />}
               title="Detailed Report"
-              text="Within hours after the inspection and payment, you'll receive a detailed report with our findings and expert recommendations."
+              text="Within 60 minutes after the inspection and payment, you'll receive a detailed report with our findings and expert recommendations."
+              isLast={true}
             />
           </ol>
 
@@ -1053,10 +1063,10 @@ export default function Home() {
             >
               View Sample Report
             </Link>
-                </div>
+          </div>
 
           <p className="mt-6 text-center text-sm text-white/70">Serving Ottawa, Gatineau, Kanata & Orleans</p>
-              </div>
+        </div>
       </section>
 
       {/* Pricing Section */}
@@ -1242,7 +1252,7 @@ export default function Home() {
               icon: '📘',
             }, {
               title: 'Fast Turnaround',
-              desc: 'Receive your vehicle\'s full inspection report within 24 hours, helping you make quick, confident decisions.',
+              desc: 'Receive your vehicle\'s full inspection report within 60 minutes, helping you make quick, confident decisions.',
               iconBg: 'bg-[#E64B37]',
               icon: '⏱️',
             }, {
@@ -1450,23 +1460,30 @@ export default function Home() {
   );
 }
 
-function Step({ index, icon, title, text }: { index: number; icon: ReactNode; title: string; text: string }) {
+function Step({ index, icon, title, text, isLast }: { index: number; icon: ReactNode; title: string; text: string; isLast: boolean }) {
   return (
     <li className="relative">
-      <div className="group h-full rounded-[32px] bg-[#334E65] p-7 shadow-[0_18px_44px_rgba(5,15,27,0.55)] transition-transform duration-300 hover:-translate-y-2 hover:shadow-[0_26px_58px_rgba(5,15,27,0.65)]">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E64B37] text-sm font-semibold text-white shadow-lg shadow-[#E64B37]/35">
-            {index}
-          </span>
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/12 text-white shadow-inner shadow-black/10">
+      {!isLast && (
+        <span className="hidden xl:block absolute -right-5 top-10 h-4 w-4 rotate-45 border-r-2 border-t-2 border-[#E54E3D]/70 drop-shadow-[0_0_10px_rgba(226,77,54,0.45)]" />
+      )}
+      <div className="group relative h-full overflow-hidden rounded-[30px] border border-white/15 bg-gradient-to-b from-[#233A57]/90 via-[#1c2f47]/95 to-[#162436] p-6 shadow-[0_20px_45px_rgba(0,0,0,0.45)] transition-transform duration-300 hover:-translate-y-2">
+        <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-[#E54E3D] to-transparent opacity-90" />
+        <div className="absolute -bottom-10 right-6 h-24 w-24 rounded-full bg-[#E54E3D]/25 blur-3xl" />
+        <div className="absolute -top-10 left-6 h-24 w-24 rounded-full bg-blue-400/15 blur-3xl" />
+
+        <div className="relative z-10 flex flex-col items-center text-center">
+          <div className="flex w-full items-center gap-3">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#E54E3D] text-sm font-semibold text-white shadow-lg shadow-[#E54E3D]/45">
+              {index}
+            </span>
+            <h3 className="text-lg font-semibold text-white">{title}</h3>
+          </div>
+          <div className="mt-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/30 bg-transparent">
             {icon}
-          </span>
-          <h3 className="flex-1 text-[15px] font-semibold leading-tight text-white">{title}</h3>
+          </div>
+          <p className="mt-2 text-sm leading-relaxed text-white/80">{text}</p>
         </div>
-        <p className="mt-5 text-[13px] leading-6 text-white/80 sm:text-sm sm:leading-6">{text}</p>
       </div>
     </li>
   );
 }
-
-

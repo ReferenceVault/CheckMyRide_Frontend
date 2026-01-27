@@ -210,7 +210,7 @@ export default function RoutineCheckUpPage() {
                   We handle fluids, tires, diagnostics, and your personal concerns in one focused visit—so you can drive with confidence and plan repairs on your own schedule.
                 </p>
                 <p className="mt-8 text-xs font-semibold uppercase tracking-[0.35em] text-[#2f3f63]">
-                  Rapid turnaround with digital report in six hours or less.
+                  Your report within 60 minutes—decisions made easy
                 </p>
               </div>
             </div>
@@ -376,14 +376,14 @@ export default function RoutineCheckUpPage() {
                 </span>
                 <h3 className="mt-4 text-2xl font-semibold leading-snug text-white">Reserve your Routine Check-Up visit</h3>
                 <p className="mt-4 text-sm sm:text-base leading-relaxed text-white/80">
-                  Schedule a technician at your location, confirm your vehicle’s health, and get back on the road with confidence in under an hour.
+                  Schedule a technician at your location, confirm your vehicle’s health, and get back on the road with confidence in within 60 minutes.
                 </p>
                 <div className="mt-6 flex flex-wrap items-center gap-4">
                   <div className="rounded-2xl bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/80 ring-1 ring-white/20">
                     Investment $120
                   </div>
                   <div className="rounded-2xl bg-[#E54E3D] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white shadow-lg shadow-[#E54E3D]/40">
-                    Report Ready in 6 Hours
+                    ACCESS THE REPORT WITHIN 60-MINUTES
                   </div>
                 </div>
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
