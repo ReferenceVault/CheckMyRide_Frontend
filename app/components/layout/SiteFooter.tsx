@@ -148,7 +148,7 @@ export default function SiteFooter() {
               </li>
               <li>
                 <span className="block text-gray-400">Hours:</span>
-                <span>Mon-Fri 9am-6pm EST</span>
+                <span>Mon-Sat 9:00am to 5:00pm EST</span>
               </li>
             </ul>
           </div>

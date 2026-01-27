@@ -71,7 +71,7 @@ export default function ContactPage() {
                     id="phone"
                     name="phone"
                     type="tel"
-                    placeholder="(613) 555-0123"
+                    placeholder="(613) 981-5498"
                     className="w-full rounded-2xl border border-[#d4dbe8] bg-[#f8fafc] px-4 py-3 text-sm text-[#0f172a] shadow-sm outline-none transition focus:border-[#E54E3D] focus:ring-2 focus:ring-[#E54E3D]/30"
                   />
                 </div>
@@ -126,8 +126,8 @@ export default function ContactPage() {
               <div className="mt-6 space-y-5 text-sm">
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-[#E64B37]" />
-                  <a href="tel:+16135550123" className="text-white transition hover:text-[#E64B37]">
-                    (613) 555-0123
+                  <a href="tel:+16139815498" className="text-white transition hover:text-[#E64B37]">
+                    (613) 981-5498
                   </a>
                 </div>
                 <div className="flex items-center gap-3">
@@ -150,7 +150,7 @@ export default function ContactPage() {
               <div className="mt-4 space-y-3 text-sm text-[#475569]">
                 <div className="flex items-center gap-3">
                   <Clock className="h-5 w-5 text-[#E64B37]" />
-                  <span>Monday – Saturday: 8 AM – 8 PM</span>
+                  <span>Monday – Saturday: 9:00 AM – 5:00 PM</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Clock className="h-5 w-5 text-[#E64B37]" />

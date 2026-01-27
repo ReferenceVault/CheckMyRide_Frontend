@@ -219,7 +219,7 @@ export default function EnhancedInspectionPage() {
                   Expect an expanded appointment that explores drivability, electronics, and component wear more thoroughly than the Standard package. Findings are prioritized so you know where to negotiate or walk away.
                 </p>
                 <p className="mt-8 text-xs font-semibold uppercase tracking-[0.35em] text-[#39496b]">
-                  Rapid turnaround with digital report in six hours or less.
+                  Your report within 60 minutes—decisions made easy
                 </p>
               </div>
             </div>
@@ -347,14 +347,14 @@ export default function EnhancedInspectionPage() {
                 </span>
                 <h3 className="mt-4 text-2xl font-semibold leading-snug text-white">Reserve your Enhanced Inspection window</h3>
                 <p className="mt-4 text-sm sm:text-base leading-relaxed text-white/80">
-                  Coordinate timing with the seller, capture advanced diagnostics, and receive actionable insights within hours.
+                  Coordinate timing with the seller, capture advanced diagnostics, and receive actionable insights within 60 minutes.
                 </p>
                 <div className="mt-6 flex flex-wrap items-center gap-4">
                   <div className="rounded-2xl bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/80 ring-1 ring-white/20">
                     Investment $200
                   </div>
                   <div className="rounded-2xl bg-[#E54E3D] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white shadow-lg shadow-[#E54E3D]/40">
-                    Report Ready in 6 Hours
+                    ACCESS THE REPORT WITHIN 60-MINUTES
                   </div>
                 </div>
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">

@@ -53,7 +53,7 @@ export default function AboutPage() {
           <article className="space-y-6">
             <h2 className="text-2xl font-semibold text-[#152032]">Meet Our Team</h2>
             <p className="text-sm sm:text-base leading-relaxed text-[#3f4756]">
-              Led by co-founders Anthony Annan and Harrison Ackwah—who also serves as our head inspector—our team brings together automotive professionals passionate about vehicle safety and consumer protection. Every inspector undergoes rigorous training to uphold our standards of inspection quality.
+              Founded by Anthony Annan, CheckMyRide is built on a team of automotive professionals and enthusiasts united by a shared commitment to vehicle safety and consumer protection. Each inspector passes a rigorous vetting process and participates in ongoing training to ensure every inspection meets our exacting standards.
             </p>
             <div className="rounded-2xl bg-[#fef4f1] p-5 text-sm sm:text-base text-[#3f4756] shadow-inner shadow-slate-200/50 min-h-[220px]">
               <p className="font-semibold text-[#E54E3D]">Our Commitment</p>

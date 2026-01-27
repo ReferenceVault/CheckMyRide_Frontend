@@ -979,11 +979,11 @@ export default function InspectionReportViewPage() {
                   };
                 case 'good':
                   return {
-                    gaugeStroke: '#3b82f6', // blue-500
-                    textColor: 'text-blue-600',
-                    bgColor: 'bg-blue-100',
-                    textColorButton: 'text-blue-800',
-                    borderColor: 'border-blue-300',
+                    gaugeStroke: '#86efac', // green-200
+                    textColor: 'text-green-600',
+                    bgColor: 'bg-green-100',
+                    textColorButton: 'text-green-800',
+                    borderColor: 'border-green-300',
                   };
                 case 'fair':
                   return {
@@ -1022,6 +1022,63 @@ export default function InspectionReportViewPage() {
             
             const conditionColors = getConditionColor(overallConditionValue);
 
+            const getRecommendationColors = (recommendation: string) => {
+              switch (recommendation) {
+                case 'do-not-purchase':
+                  return {
+                    gaugeStroke: '#ef4444',
+                    textColor: 'text-red-600',
+                    bgColor: 'bg-red-100',
+                    textColorButton: 'text-red-800',
+                    borderColor: 'border-red-300',
+                  };
+                case 'not-recommended':
+                  return {
+                    gaugeStroke: '#f97316',
+                    textColor: 'text-orange-600',
+                    bgColor: 'bg-orange-100',
+                    textColorButton: 'text-orange-800',
+                    borderColor: 'border-orange-300',
+                  };
+                case 'purchase-with-caution':
+                  return {
+                    gaugeStroke: '#eab308',
+                    textColor: 'text-yellow-600',
+                    bgColor: 'bg-yellow-100',
+                    textColorButton: 'text-yellow-800',
+                    borderColor: 'border-yellow-300',
+                  };
+                case 'recommended-with-minor-repairs':
+                  return {
+                    gaugeStroke: '#86efac',
+                    textColor: 'text-green-600',
+                    bgColor: 'bg-green-100',
+                    textColorButton: 'text-green-800',
+                    borderColor: 'border-green-300',
+                  };
+                case 'recommended':
+                  return {
+                    gaugeStroke: '#22c55e',
+                    textColor: 'text-green-600',
+                    bgColor: 'bg-green-100',
+                    textColorButton: 'text-green-800',
+                    borderColor: 'border-green-300',
+                  };
+                case 'highly-recommended':
+                  return {
+                    gaugeStroke: '#16a34a',
+                    textColor: 'text-green-600',
+                    bgColor: 'bg-green-100',
+                    textColorButton: 'text-green-800',
+                    borderColor: 'border-green-300',
+                  };
+                default:
+                  return conditionColors;
+              }
+            };
+
+            const displayColors = getRecommendationColors(purchaseRecommendation);
+
             const recommendationSteps = [
               { id: 'do-not-purchase', color: '#ef4444' },
               { id: 'not-recommended', color: '#f97316' },
@@ -1042,7 +1099,6 @@ export default function InspectionReportViewPage() {
             const gaugeStartAngle = 180;
             const gaugeEndAngle = 360;
             const segmentAngle = (gaugeEndAngle - gaugeStartAngle) / recommendationSteps.length;
-            const activeSegmentColor = recommendationSteps[activeRecommendationIndex]?.color || conditionColors.gaugeStroke;
             conditionAngle = gaugeStartAngle + (activeRecommendationIndex + 0.5) * segmentAngle;
 
             const polarToCartesian = (cx: number, cy: number, radius: number, angle: number) => {
@@ -1096,13 +1152,26 @@ export default function InspectionReportViewPage() {
                           {recommendationSteps.map((step, index) => {
                             const start = gaugeStartAngle + (index * segmentAngle);
                             const end = gaugeStartAngle + ((index + 1) * segmentAngle);
-                            const strokeColor = index <= activeRecommendationIndex ? step.color : '#e5e7eb';
                             return (
                               <path
-                                key={step.id}
+                                key={`${step.id}-base`}
                                 d={describeArc(gaugeCenterX, gaugeCenterY, gaugeRadius, start, end)}
                                 fill="none"
-                                stroke={strokeColor}
+                                stroke="#e5e7eb"
+                                strokeWidth="20"
+                                strokeLinecap="round"
+                              />
+                            );
+                          })}
+                          {recommendationSteps.slice(0, activeRecommendationIndex + 1).map((step, index) => {
+                            const start = gaugeStartAngle + (index * segmentAngle);
+                            const end = gaugeStartAngle + ((index + 1) * segmentAngle);
+                            return (
+                              <path
+                                key={`${step.id}-active`}
+                                d={describeArc(gaugeCenterX, gaugeCenterY, gaugeRadius, start, end)}
+                                fill="none"
+                                stroke={step.color}
                                 strokeWidth="20"
                                 strokeLinecap="round"
                               />
@@ -1114,18 +1183,18 @@ export default function InspectionReportViewPage() {
                             y1="100"
                             x2={100 + 70 * Math.cos((conditionAngle) * Math.PI / 180)}
                             y2={100 + 70 * Math.sin((conditionAngle) * Math.PI / 180)}
-                            stroke={activeSegmentColor}
+                            stroke={displayColors.gaugeStroke}
                             strokeWidth="3"
                             strokeLinecap="round"
                             style={{ overflow: 'visible' }}
                           />
                           {/* Center Circle */}
-                          <circle cx="100" cy="100" r="6" fill={activeSegmentColor} style={{ overflow: 'visible' }} />
+                          <circle cx="100" cy="100" r="6" fill={displayColors.gaugeStroke} style={{ overflow: 'visible' }} />
                         </svg>
                         
                         <div className="text-center">
                           <p className="text-xs text-gray-500 mb-1">Vehicle Condition</p>
-                          <p className={`text-xl font-bold ${conditionColors.textColor}`}>
+                          <p className={`text-xl font-bold ${displayColors.textColor}`}>
                             {RATING_LABELS[overallConditionValue] || overallConditionValue}
                           </p>
                         </div>
@@ -1135,7 +1204,7 @@ export default function InspectionReportViewPage() {
                       <div className="mt-4">
                         <div className="space-y-2">
                           <p className="text-xs text-gray-500 text-center">Purchase Recommendation</p>
-                          <div className={`px-4 py-2 rounded-lg border-2 font-bold text-center text-sm ${conditionColors.bgColor} ${conditionColors.textColorButton} ${conditionColors.borderColor}`}>
+                          <div className={`px-4 py-2 rounded-lg border-2 font-bold text-center text-sm ${displayColors.bgColor} ${displayColors.textColorButton} ${displayColors.borderColor}`}>
                             {formatRecommendation(purchaseRecommendation)}
                           </div>
                         </div>
@@ -1152,8 +1221,8 @@ export default function InspectionReportViewPage() {
                           <div key={index} className="space-y-1 print:break-inside-avoid">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <span className="text-base print:text-sm">{getRatingIcon(category.worstRating)}</span>
                                 <span className="text-xs font-medium text-gray-700 print:text-[10px]">{category.name}</span>
+                                <span className="text-base print:text-sm">{getRatingIcon(category.worstRating)}</span>
                               </div>
                               <span className="text-xs font-bold text-gray-800 print:text-[10px]">{category.score.toFixed(1)}</span>
                             </div>
@@ -1553,7 +1622,7 @@ export default function InspectionReportViewPage() {
               <p className="text-[#64748b] text-sm">
                 For questions about this report, please contact us at{' '}
                 <a href="mailto:info@checkmyride.com" className="text-[#E54E3D] hover:underline">info@checkmyride.com</a>
-                {' '}or (613) 555-RIDE
+                {' '}or (613) 981-5498
               </p>
               {report.reportMetadata && (
                 <p className="text-[#64748b] text-sm">
